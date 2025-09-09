@@ -1,0 +1,84 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <AssemblyName>XIVSync</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp9.0</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>11.0</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="XIVSync.Localization.de.json" />
+    <None Remove="XIVSync.Localization.fr.json" />
+    <EmbeddedResource Include="XIVSync.Localization.de.json" LogicalName="XIVSync.Localization.de.json" />
+    <EmbeddedResource Include="XIVSync.Localization.fr.json" LogicalName="XIVSync.Localization.fr.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Dalamud">
+      <HintPath>C:\Users\Username\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
+    </Reference>
+    <Reference Include="NReco.Logging.File">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\NReco.Logging.File.dll</HintPath>
+    </Reference>
+    <Reference Include="XIVSync.API">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\XIVSync.API.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.SignalR.Client.Core">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\Microsoft.AspNetCore.SignalR.Client.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FFXIVClientStructs">
+      <HintPath>C:\Users\Username\AppData\Roaming\XIVLauncher\addon\Hooks\dev\FFXIVClientStructs.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\Microsoft.AspNetCore.SignalR.Protocols.MessagePack.dll</HintPath>
+    </Reference>
+    <Reference Include="MessagePack">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\MessagePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Connections.Client">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\Microsoft.AspNetCore.Http.Connections.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IdentityModel.Tokens.Jwt">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
+    <Reference Include="Dalamud.Bindings.ImGui">
+      <HintPath>C:\Users\Username\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Dalamud.Bindings.ImGui.dll</HintPath>
+    </Reference>
+    <Reference Include="SixLabors.ImageSharp">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\SixLabors.ImageSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Lumina">
+      <HintPath>C:\Users\Username\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Lumina.dll</HintPath>
+    </Reference>
+    <Reference Include="K4os.Compression.LZ4.Legacy">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\K4os.Compression.LZ4.Legacy.dll</HintPath>
+    </Reference>
+    <Reference Include="Lumina.Excel">
+      <HintPath>C:\Users\Username\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Lumina.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="Glamourer.Api">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\Glamourer.Api.dll</HintPath>
+    </Reference>
+    <Reference Include="Penumbra.Api">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\Penumbra.Api.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.SignalR.Client">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\Microsoft.AspNetCore.SignalR.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens">
+      <HintPath>C:\Users\Username\Downloads\latest(4)\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    </Reference>
+    <Reference Include="InteropGenerator.Runtime">
+      <HintPath>C:\Users\Username\AppData\Roaming\XIVLauncher\addon\Hooks\dev\InteropGenerator.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="CheapLoc">
+      <HintPath>C:\Users\Username\AppData\Roaming\XIVLauncher\addon\Hooks\dev\CheapLoc.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
