@@ -35,6 +35,10 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 
 	private CancellationTokenSource? _uploadCancellationTokenSource = new CancellationTokenSource();
 
+	private readonly HashSet<string> _uploadingHashes = new HashSet<string>(StringComparer.Ordinal);
+
+	private readonly SemaphoreSlim _uploadManagementLock = new SemaphoreSlim(1, 1);
+
 	public List<FileTransfer> CurrentUploads { get; } = new List<FileTransfer>();
 
 	public bool IsUploading => CurrentUploads.Count > 0;
@@ -61,6 +65,7 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 			_uploadCancellationTokenSource?.Dispose();
 			_uploadCancellationTokenSource = null;
 			CurrentUploads.Clear();
+			_uploadingHashes.Clear();
 			return true;
 		}
 		return false;
@@ -121,15 +126,33 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 
 	public async Task<CharacterData> UploadFiles(CharacterData data, List<UserData> visiblePlayers)
 	{
-		CancelUpload();
-		_uploadCancellationTokenSource = new CancellationTokenSource();
-		CancellationToken uploadToken = _uploadCancellationTokenSource.Token;
-		base.Logger.LogDebug("Sending Character data {hash} to service {url}", data.DataHash.Value, _serverManager.CurrentApiUrl);
-		HashSet<string> unverifiedUploads = GetUnverifiedFiles(data);
-		if (unverifiedUploads.Any())
+		await _uploadManagementLock.WaitAsync().ConfigureAwait(continueOnCapturedContext: false);
+		try
 		{
-			await UploadUnverifiedFiles(unverifiedUploads, visiblePlayers, uploadToken).ConfigureAwait(continueOnCapturedContext: false);
-			base.Logger.LogInformation("Upload complete for {hash}", data.DataHash.Value);
+			HashSet<string> unverifiedUploads = GetUnverifiedFiles(data);
+			HashSet<string> newFilesToUpload = unverifiedUploads.Except<string>(_uploadingHashes, StringComparer.Ordinal).ToHashSet<string>(StringComparer.Ordinal);
+			bool hasLargeFileUploading = CurrentUploads.Any((FileTransfer upload) => upload.Total > 10485760);
+			if (newFilesToUpload.Count > 0 && (!hasLargeFileUploading || newFilesToUpload.Count > unverifiedUploads.Count / 2))
+			{
+				base.Logger.LogDebug("Cancelling upload due to significant new content: {newFiles} new files out of {total} total", newFilesToUpload.Count, unverifiedUploads.Count);
+				CancelUpload();
+				_uploadCancellationTokenSource = new CancellationTokenSource();
+			}
+			else if (_uploadCancellationTokenSource == null)
+			{
+				_uploadCancellationTokenSource = new CancellationTokenSource();
+			}
+			CancellationToken uploadToken = _uploadCancellationTokenSource.Token;
+			base.Logger.LogDebug("Sending Character data {hash} to service {url}", data.DataHash.Value, _serverManager.CurrentApiUrl);
+			if (unverifiedUploads.Any())
+			{
+				await UploadUnverifiedFiles(unverifiedUploads, visiblePlayers, uploadToken).ConfigureAwait(continueOnCapturedContext: false);
+				base.Logger.LogInformation("Upload complete for {hash}", data.DataHash.Value);
+			}
+		}
+		finally
+		{
+			_uploadManagementLock.Release();
 		}
 		foreach (KeyValuePair<ObjectKind, List<FileReplacementData>> kvp in data.FileReplacements)
 		{
@@ -142,6 +165,7 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 	{
 		base.Dispose(disposing);
 		Reset();
+		_uploadManagementLock?.Dispose();
 	}
 
 	private async Task<List<UploadFileDto>> FilesSend(List<string> hashes, List<string> uids, CancellationToken ct)
@@ -184,6 +208,7 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 		_uploadCancellationTokenSource?.Dispose();
 		_uploadCancellationTokenSource = null;
 		CurrentUploads.Clear();
+		_uploadingHashes.Clear();
 		_verifiedUploadedHashes.Clear();
 	}
 
@@ -285,6 +310,7 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 				await _orchestrator.WaitForUploadSlotAsync(token).ConfigureAwait(continueOnCapturedContext: false);
 				try
 				{
+					_uploadingHashes.Add(fileTransfer.Hash);
 					base.Logger.LogDebug("[{hash}] Compressing", fileTransfer);
 					(string, byte[]) data = await _fileDbManager.GetCompressedFileData(fileTransfer.Hash, token).ConfigureAwait(continueOnCapturedContext: false);
 					CurrentUploads.Single((FileTransfer e) => string.Equals(e.Hash, data.Item1, StringComparison.Ordinal)).Total = data.Item2.Length;
@@ -294,6 +320,7 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 				}
 				finally
 				{
+					_uploadingHashes.Remove(fileTransfer.Hash);
 					_orchestrator.ReleaseUploadSlot();
 				}
 			}).ConfigureAwait(continueOnCapturedContext: false);

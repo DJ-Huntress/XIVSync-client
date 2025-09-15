@@ -951,20 +951,20 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 		}
 		ImGui.SameLine();
 		ImGui.SetNextItemWidth(100f);
-        _uiShared.DrawCombo("###speed", [DownloadSpeeds.Bps, DownloadSpeeds.KBps, DownloadSpeeds.MBps],
+        _uiSharedService.DrawCombo("###speed", [DownloadSpeeds.Bps, DownloadSpeeds.KBps, DownloadSpeeds.MBps],
             (s) => s switch
-            {
-                DownloadSpeeds.Bps => "Byte/s",
-                DownloadSpeeds.KBps => "KB/s",
-                DownloadSpeeds.MBps => "MB/s",
-                _ => throw new NotSupportedException()
-            }, (s) =>
-            {
-                _configService.Current.DownloadSpeedType = s;
-                _configService.Save();
-                Mediator.Publish(new DownloadLimitChangedMessage());
-            }, _configService.Current.DownloadSpeedType);
-        ImGui.SameLine();
+		{
+			DownloadSpeeds.Bps => "Byte/s", 
+			DownloadSpeeds.KBps => "KB/s", 
+			DownloadSpeeds.MBps => "MB/s", 
+			_ => "Unknown", 
+        }, (s) =>
+		{
+			_configService.Current.DownloadSpeedType = s;
+			_configService.Save();
+            Mediator.Publish(new DownloadLimitChangedMessage());
+		}, _configService.Current.DownloadSpeedType);
+		ImGui.SameLine();
 		ImGui.Text("(0 = No limit)");
 		int maxParallelDownloads = _configService.Current.ParallelDownloads;
 		if (ImGui.SliderInt("Maximum Parallel Downloads", ref maxParallelDownloads, 1, 10))

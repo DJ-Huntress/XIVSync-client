@@ -64,6 +64,14 @@ public class ChangelogPopupHandler : IPopupHandler
 		{
 			new ThemePalette();
 		}
+		DrawVersionChangelog("1.35.0", new string[18]
+		{
+			"UI Experience Improvements:", "• Moved Settings, Customize, Collapse, and Disconnect buttons out of hamburger menu for quick access", "• Added Close button next to Disconnect for easier window management", "• Removed hamburger menu and cleaned up toolbar layout", "• Made all backgrounds 25% more transparent for better game visibility", "", "Upload Performance Fixes:", "• Fixed large file upload cancellation issues that prevented 40MB+ files from completing", "• Smarter upload queue management - won't cancel uploads for minor character changes", "• Increased HTTP timeout to 10 minutes for large texture files",
+			"• Large files now upload successfully instead of getting stuck in retry loops", "", "Interface Polish:", "• Username/UID display now scales font size to fit available space", "• Simplified name display - shows vanity name OR UID, not both", "• Added bottom padding to pairs list to prevent items getting cut off", "• Moved toolbar 2 pixels left and status message down 3 pixels for better positioning", "• Made pairs list backgrounds fully transparent for cleaner appearance"
+		});
+		ImGui.Spacing();
+		ImGui.Separator();
+		ImGui.Spacing();
 		DrawVersionChangelog("1.30.0", new string[8] { "\ud83c\udf89 New Features:", "• Added NSFW profile viewing toggle in Settings > General", "• UI no longer auto-opens on game start - only appears when using '/xiv' command", "• Improved privacy controls for adult content viewing", "", "\ud83d\udd27 Improvements:", "• Better user control over when the XIVSync UI appears", "• Enhanced settings organization for profile-related options" });
 		ImGui.Spacing();
 		ImGui.Separator();

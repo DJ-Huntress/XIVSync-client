@@ -40,7 +40,7 @@ using XIVSync.WebAPI.SignalR;
 
 namespace XIVSync.UI;
 
-public partial class UiSharedService : DisposableMediatorSubscriberBase
+public class UiSharedService : DisposableMediatorSubscriberBase
 {
 	public sealed record IconScaleData(Vector2 IconSize, Vector2 NormalizedIconScale, float OffsetX, float IconScaling);
 
@@ -1193,6 +1193,7 @@ public partial class UiSharedService : DisposableMediatorSubscriberBase
 	}
 
 	[DllImport("user32", ExactSpelling = true)]
+	[LibraryImport("user32")]
 	internal static extern short GetKeyState(int nVirtKey);
 
 	internal void ResetOAuthTasksState()

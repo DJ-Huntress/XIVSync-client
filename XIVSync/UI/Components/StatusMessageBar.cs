@@ -75,11 +75,10 @@ public class StatusMessageBar : IMediatorSubscriber
 					if (_isEditing)
 					{
 						DrawEditingMode(theme, availableWidth);
+						return;
 					}
-					else
-					{
-						DrawDisplayMode(theme, availableWidth);
-					}
+					ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f);
+					DrawDisplayMode(theme, availableWidth);
 				}
 			}
 		}

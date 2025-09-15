@@ -149,6 +149,7 @@ public sealed class Plugin : IDalamudPlugin, IDisposable
 				HttpClient httpClient = new HttpClient();
 				Version version = Assembly.GetExecutingAssembly().GetName().Version;
 				httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("MareSynchronos", version.Major + "." + version.Minor + "." + version.Build));
+				httpClient.Timeout = TimeSpan.FromMinutes(10L);
 				return httpClient;
 			});
 			collection.AddSingleton((IServiceProvider s) => new MareConfigService(pluginInterface.ConfigDirectory.FullName));

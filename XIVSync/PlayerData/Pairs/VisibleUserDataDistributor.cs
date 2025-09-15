@@ -55,7 +55,8 @@ public class VisibleUserDataDistributor : DisposableMediatorSubscriberBase
 			{
 				_lastCreatedData = characterData;
 				base.Logger.LogTrace("Storing new data hash {hash}", characterData.DataHash.Value);
-				PushToAllVisibleUsers(forced: true);
+				bool forced = _uploadingCharacterData == null || !_fileTransferManager.IsUploading;
+				PushToAllVisibleUsers(forced);
 			}
 			else
 			{
