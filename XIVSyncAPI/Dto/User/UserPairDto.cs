@@ -14,12 +14,11 @@ public record UserPairDto : UserDto
 
 	public IndividualPairStatus IndividualPairStatus { get; set; }
 
-	public UserPairDto(UserData User, IndividualPairStatus IndividualPairStatus, UserPermissions OwnPermissions, UserPermissions OtherPermissions)
+	public UserPairDto(UserData User, IndividualPairStatus IndividualPairStatus, UserPermissions OwnPermissions, UserPermissions OtherPermissions) : base(User)
 	{
 		this.OwnPermissions = OwnPermissions;
 		this.OtherPermissions = OtherPermissions;
 		this.IndividualPairStatus = IndividualPairStatus;
-		base._002Ector(User);
 	}
 
 	[CompilerGenerated]

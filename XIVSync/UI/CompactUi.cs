@@ -26,7 +26,6 @@ using XIVSync.UI.Components;
 using XIVSync.UI.Handlers;
 using XIVSync.UI.Theming;
 using XIVSync.WebAPI;
-using XIVSync.WebAPI.Files;
 using XIVSync.WebAPI.Files.Models;
 using XIVSync.WebAPI.SignalR.Utils;
 
@@ -34,112 +33,13 @@ namespace XIVSync.UI;
 
 public class CompactUi : WindowMediatorSubscriberBase
 {
-	private enum SurfaceBg
-	{
-		Popup,
-		Window
-	}
-
-	private static class H
-	{
-		public const float Red = 0f;
-
-		public const float Yellow = 0.12f;
-
-		public const float Green = 0.33f;
-
-		public const float Blue = 0.58f;
-	}
-
-	private sealed class ThemedWindowScope : IDisposable
-	{
-		private readonly int _colorCount;
-
-		private readonly int _styleCount;
-
-		public ThemedWindowScope(ThemePalette theme, SurfaceBg bgKind, float rounding = 8f, float borderSize = 1f)
-		{
-			if (bgKind == SurfaceBg.Popup)
-			{
-				ImGui.PushStyleColor(ImGuiCol.PopupBg, theme.PanelBg);
-			}
-			else
-			{
-				ImGui.PushStyleColor(ImGuiCol.WindowBg, theme.PanelBg);
-			}
-			ImGui.PushStyleColor(ImGuiCol.Border, theme.PanelBorder);
-			ImGui.PushStyleColor(ImGuiCol.TitleBg, theme.HeaderBg);
-			ImGui.PushStyleColor(ImGuiCol.TitleBgActive, theme.HeaderBg);
-			ImGui.PushStyleColor(ImGuiCol.TitleBgCollapsed, theme.HeaderBg);
-			ImGui.PushStyleColor(ImGuiCol.Text, theme.TextPrimary);
-			ImGui.PushStyleColor(ImGuiCol.TextDisabled, theme.TextDisabled);
-			ImGui.PushStyleColor(ImGuiCol.Header, theme.Btn);
-			ImGui.PushStyleColor(ImGuiCol.HeaderHovered, theme.BtnHovered);
-			ImGui.PushStyleColor(ImGuiCol.HeaderActive, theme.BtnActive);
-			ImGui.PushStyleColor(ImGuiCol.CheckMark, theme.Accent);
-			ImGui.PushStyleColor(ImGuiCol.ScrollbarBg, theme.Btn);
-			ImGui.PushStyleColor(ImGuiCol.ScrollbarGrab, theme.BtnHovered);
-			ImGui.PushStyleColor(ImGuiCol.ScrollbarGrabHovered, theme.Accent);
-			ImGui.PushStyleColor(ImGuiCol.ScrollbarGrabActive, theme.BtnActive);
-			ImGui.PushStyleColor(ImGuiCol.ModalWindowDimBg, new Vector4(theme.PanelBg.X, theme.PanelBg.Y, theme.PanelBg.Z, 0.5f));
-			_colorCount = 18;
-			ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, rounding);
-			ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, borderSize);
-			_styleCount = 2;
-		}
-
-		public void Dispose()
-		{
-			ImGui.PopStyleVar(_styleCount);
-			ImGui.PopStyleColor(_colorCount);
-		}
-	}
-
-	private sealed class GlobalThemeScope : IDisposable
-	{
-		private readonly int _c;
-
-		private readonly int _v;
-
-		public GlobalThemeScope(ThemePalette t)
-		{
-			ImGui.PushStyleColor(ImGuiCol.Separator, t.PanelBorder);
-			ImGui.PushStyleColor(ImGuiCol.SeparatorHovered, t.Accent);
-			ImGui.PushStyleColor(ImGuiCol.SeparatorActive, t.Accent);
-			ImGui.PushStyleColor(ImGuiCol.Header, t.Btn);
-			ImGui.PushStyleColor(ImGuiCol.HeaderHovered, t.BtnHovered);
-			ImGui.PushStyleColor(ImGuiCol.HeaderActive, t.BtnActive);
-			ImGui.PushStyleColor(ImGuiCol.CheckMark, t.Accent);
-			ImGui.PushStyleColor(ImGuiCol.FrameBg, t.Btn);
-			ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, t.BtnHovered);
-			ImGui.PushStyleColor(ImGuiCol.FrameBgActive, t.BtnActive);
-			ImGui.PushStyleColor(ImGuiCol.SliderGrab, t.Accent);
-			ImGui.PushStyleColor(ImGuiCol.SliderGrabActive, t.BtnActive);
-			ImGui.PushStyleColor(ImGuiCol.Tab, t.Btn);
-			ImGui.PushStyleColor(ImGuiCol.TabHovered, t.BtnHovered);
-			ImGui.PushStyleColor(ImGuiCol.TabActive, t.BtnActive);
-			_c = 13;
-			ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 6f);
-			ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(6f, 3f));
-			_v = 2;
-		}
-
-		public void Dispose()
-		{
-			ImGui.PopStyleVar(_v);
-			ImGui.PopStyleColor(_c);
-		}
-	}
-
 	private readonly ApiController _apiController;
 
 	private readonly MareConfigService _configService;
 
-	private readonly ConcurrentDictionary<GameObjectHandler, Dictionary<string, FileDownloadStatus>> _currentDownloads = new ConcurrentDictionary<GameObjectHandler, Dictionary<string, FileDownloadStatus>>();
-
 	private readonly DrawEntityFactory _drawEntityFactory;
 
-	private readonly FileUploadManager _fileTransferManager;
+	private readonly IpcManager _ipcManager;
 
 	private readonly PairManager _pairManager;
 
@@ -147,209 +47,94 @@ public class CompactUi : WindowMediatorSubscriberBase
 
 	private readonly SelectPairForTagUi _selectPairsForGroupUi;
 
-	private readonly IpcManager _ipcManager;
-
 	private readonly ServerConfigurationManager _serverManager;
+
+	private readonly TagHandler _tagHandler;
+
+	private readonly ThemeManager _themeManager;
+
+	private readonly UiSharedService _uiSharedService;
 
 	private readonly StatusMessageBar _statusMessageBar;
 
 	private readonly TopTabMenu _tabMenu;
 
-	private readonly TagHandler _tagHandler;
-
-	private readonly UiSharedService _uiSharedService;
+	private ThemeEditor? _themeEditor;
 
 	private List<IDrawFolder> _drawFolders;
 
-	private Pair? _lastAddedUser;
-
-	private string _lastAddedUserComment = string.Empty;
-
-	private Vector2 _lastPosition = Vector2.One;
-
-	private Vector2 _lastSize = Vector2.One;
-
-	private bool _showModalForUserAddition;
-
-	private float _transferPartHeight;
-
-	private bool _wasOpen;
-
-	private float _windowContentWidth;
-
 	private readonly string _titleBarText;
+
+	private readonly ConcurrentDictionary<GameObjectHandler, Dictionary<string, FileDownloadStatus>> _currentDownloads = new ConcurrentDictionary<GameObjectHandler, Dictionary<string, FileDownloadStatus>>();
 
 	private bool _collapsed;
 
 	private bool _userManuallyClosed;
 
-	private ThemePalette _theme = new ThemePalette();
+	private bool _wasOpen;
 
-	private ThemePalette _themeWorking = new ThemePalette();
+	private Vector2 _lastPosition = Vector2.One;
 
-	private string _selectedPreset = "Blue";
+	private Vector2 _lastSize = Vector2.One;
 
-	private string _lastSelectedPreset = "Blue";
+	private float _windowContentWidth;
+
+	private float _transferPartHeight;
+
+	private Pair? _lastAddedUser;
+
+	private string _lastAddedUserComment = string.Empty;
+
+	private bool _showModalForUserAddition;
+
+	private float _gradientShift;
+
+	private float _particleTime;
+
+	private float _cardHoverScale = 1f;
+
+	private ThemePalette _theme;
 
 	private bool _showThemeInline;
-
-	private bool _voiceEnabled;
-
-	private bool _voiceMuted;
-
-	private bool _voiceDeafened;
-
-	private float _voicePartHeight = -1f;
-
-	private static readonly bool _isAuthorized = CheckAuthorization();
 
 	public void ToggleThemeInline()
 	{
 		_showThemeInline = !_showThemeInline;
-		if (_showThemeInline)
+		if (!_showThemeInline)
 		{
-			_selectedPreset = _lastSelectedPreset;
-			_themeWorking = Clone(_theme);
+			return;
 		}
-	}
-
-	private bool IsThemeCustomized()
-	{
-		foreach (ThemePalette preset in ThemePresets.Presets.Values)
+		if (_themeEditor == null)
 		{
-			if (ThemesEqual(_theme, preset))
+			_themeEditor = new ThemeEditor(_logger, _uiSharedService, _themeManager);
+			_themeEditor.OnClosed = delegate
 			{
-				return false;
-			}
+				_showThemeInline = false;
+				_theme = _themeManager.Current.Clone();
+			};
 		}
-		return true;
+		_themeEditor.OnOpened();
 	}
 
-	private bool ThemesEqual(ThemePalette a, ThemePalette b)
-	{
-		if (a.PanelBg.Equals(b.PanelBg) && a.PanelBorder.Equals(b.PanelBorder) && a.HeaderBg.Equals(b.HeaderBg) && a.Accent.Equals(b.Accent) && a.TextPrimary.Equals(b.TextPrimary) && a.TextSecondary.Equals(b.TextSecondary) && a.TextDisabled.Equals(b.TextDisabled) && a.Link.Equals(b.Link) && a.LinkHover.Equals(b.LinkHover) && a.Btn.Equals(b.Btn) && a.BtnHovered.Equals(b.BtnHovered) && a.BtnActive.Equals(b.BtnActive) && a.BtnText.Equals(b.BtnText) && a.BtnTextHovered.Equals(b.BtnTextHovered) && a.BtnTextActive.Equals(b.BtnTextActive) && a.TooltipBg.Equals(b.TooltipBg))
-		{
-			return a.TooltipText.Equals(b.TooltipText);
-		}
-		return false;
-	}
-
-	private void DetectCurrentPreset()
-	{
-		foreach (KeyValuePair<string, ThemePalette> kv in ThemePresets.Presets)
-		{
-			if (ThemesEqual(_theme, kv.Value))
-			{
-				_selectedPreset = kv.Key;
-				_lastSelectedPreset = kv.Key;
-				break;
-			}
-		}
-	}
-
-	private static bool CheckAuthorization()
-	{
-		object obj = Assembly.GetExecutingAssembly().GetName().Name;
-		string location = Assembly.GetExecutingAssembly().Location;
-		if (obj == null)
-		{
-			obj = "";
-		}
-		uint h1 = ComputeHash((string)obj);
-		bool locationValid = new char[7] { 'x', 'i', 'v', 's', 'y', 'n', 'c' }.All((char c) => location.ToLowerInvariant().Contains(c));
-		return (h1 ^ 0x12345678) == 1847150823 && locationValid;
-	}
-
-	private static uint ComputeHash(string input)
-	{
-		if (string.IsNullOrEmpty(input))
-		{
-			return 0u;
-		}
-		uint hash = 2166136261u;
-		foreach (char c in input)
-		{
-			hash ^= c;
-			hash *= 16777619;
-		}
-		return hash;
-	}
-
-	private static Vector4 ScrambleColor(Vector4 original)
-	{
-		if (_isAuthorized)
-		{
-			return original;
-		}
-		int hashCode = original.GetHashCode();
-		float r = (float)(hashCode & 0xFF) / 255f;
-		float g = (float)((hashCode >> 8) & 0xFF) / 255f;
-		float b = (float)((hashCode >> 16) & 0xFF) / 255f;
-		return new Vector4(r, g, b, original.W);
-	}
-
-	private static float ScrambleSpacing(float original)
-	{
-		if (_isAuthorized)
-		{
-			return original;
-		}
-		return original * 1.3f + 2f;
-	}
-
-	private static Vector2 ScrambleSize(Vector2 original)
-	{
-		if (_isAuthorized)
-		{
-			return original;
-		}
-		return new Vector2(original.X * 0.9f, original.Y * 1.1f);
-	}
-
-	private static string ScrambleText(string original)
-	{
-		if (_isAuthorized)
-		{
-			return original;
-		}
-		if (string.IsNullOrEmpty(original))
-		{
-			return original;
-		}
-		char[] chars = original.ToCharArray();
-		for (int i = 0; i < chars.Length; i += 3)
-		{
-			if (char.IsLetter(chars[i]))
-			{
-				chars[i] = (char.IsUpper(chars[i]) ? 'X' : 'x');
-			}
-		}
-		return new string(chars);
-	}
-
-	public CompactUi(ILogger<CompactUi> logger, UiSharedService uiShared, MareConfigService configService, ApiController apiController, PairManager pairManager, ServerConfigurationManager serverManager, MareMediator mediator, FileUploadManager fileTransferManager, TagHandler tagHandler, DrawEntityFactory drawEntityFactory, SelectTagForPairUi selectTagForPairUi, SelectPairForTagUi selectPairForTagUi, PerformanceCollectorService performanceCollectorService, IpcManager ipcManager, MareProfileManager profileManager)
+	public CompactUi(ILogger<CompactUi> logger, UiSharedService uiShared, MareConfigService configService, ApiController apiController, PairManager pairManager, ServerConfigurationManager serverManager, MareMediator mediator, TagHandler tagHandler, DrawEntityFactory drawEntityFactory, SelectTagForPairUi selectTagForPairUi, SelectPairForTagUi selectPairForTagUi, PerformanceCollectorService performanceCollectorService, IpcManager ipcManager, MareProfileManager profileManager, ThemeManager themeManager)
 		: base(logger, mediator, "###MareSynchronosMainUI", performanceCollectorService)
 	{
 		Version ver = Assembly.GetExecutingAssembly().GetName().Version;
-		_titleBarText = ((Assembly.GetExecutingAssembly().GetName().Name?.Contains("XIVSync") ?? false) ? $"XIVSync ({ver.Major}.{ver.Minor}.{ver.Build})" : ScrambleText($"Unauthorized Copy ({ver.Major}.{ver.Minor}.{ver.Build})"));
+		_titleBarText = $"XIVSync ({ver.Major}.{ver.Minor}.{ver.Build})";
 		_uiSharedService = uiShared;
 		_configService = configService;
 		_apiController = apiController;
 		_pairManager = pairManager;
 		_serverManager = serverManager;
-		_fileTransferManager = fileTransferManager;
 		_tagHandler = tagHandler;
 		_drawEntityFactory = drawEntityFactory;
 		_selectGroupForPairUi = selectTagForPairUi;
 		_selectPairsForGroupUi = selectPairForTagUi;
 		_ipcManager = ipcManager;
+		_themeManager = themeManager;
 		_statusMessageBar = new StatusMessageBar(_apiController, logger, base.Mediator, profileManager, _uiSharedService);
 		_tabMenu = new TopTabMenu(_logger, base.Mediator, _apiController, _pairManager, _uiSharedService, _configService, this);
-		if (_configService.Current?.Theme != null)
-		{
-			_theme = Clone(_configService.Current.Theme);
-			DetectCurrentPreset();
-		}
+		_theme = _themeManager.Current.Clone();
 		_apiController.OnlineUsersChanged += delegate
 		{
 			base.Mediator.Publish(new RefreshUiMessage());
@@ -368,12 +153,10 @@ public class CompactUi : WindowMediatorSubscriberBase
 				IconOffset = new Vector2(2f, 1f),
 				ShowTooltip = delegate
 				{
-					using (new ThemedWindowScope(_theme, SurfaceBg.Popup))
-					{
-						ImGui.BeginTooltip();
-						ImGui.TextColored(_theme.BtnText, "Open Mare Settings");
-						ImGui.EndTooltip();
-					}
+					ImGui.BeginTooltip();
+					Vector4 col2 = _theme.BtnText;
+					ImGui.TextColored(in col2, "Open Mare Settings");
+					ImGui.EndTooltip();
 				}
 			},
 			new TitleBarButton
@@ -386,12 +169,10 @@ public class CompactUi : WindowMediatorSubscriberBase
 				IconOffset = new Vector2(2f, 1f),
 				ShowTooltip = delegate
 				{
-					using (new ThemedWindowScope(_theme, SurfaceBg.Popup))
-					{
-						ImGui.BeginTooltip();
-						ImGui.TextColored(_theme.BtnText, "Open Mare Event Viewer");
-						ImGui.EndTooltip();
-					}
+					ImGui.BeginTooltip();
+					Vector4 col = _theme.BtnText;
+					ImGui.TextColored(in col, "Open Mare Event Viewer");
+					ImGui.EndTooltip();
 				}
 			}
 		};
@@ -431,6 +212,11 @@ public class CompactUi : WindowMediatorSubscriberBase
 
 	protected override void DrawInternal()
 	{
+		float deltaTime = ImGui.GetIO().DeltaTime;
+		_gradientShift = (_gradientShift + deltaTime * 0.2f) % 1f;
+		_particleTime += deltaTime;
+		float targetScale = (ImGui.IsWindowHovered() ? 1.02f : 1f);
+		_cardHoverScale += (targetScale - _cardHoverScale) * deltaTime * 5f;
 		float headerHeight = 30f * ImGuiHelpers.GlobalScale;
 		if (_collapsed)
 		{
@@ -445,13 +231,13 @@ public class CompactUi : WindowMediatorSubscriberBase
 			}
 			base.SizeConstraints = new WindowSizeConstraints
 			{
-				MinimumSize = ScrambleSize(new Vector2(375f, 40f)),
-				MaximumSize = ScrambleSize(new Vector2(375f, 40f))
+				MinimumSize = new Vector2(375f, 40f),
+				MaximumSize = new Vector2(375f, 40f)
 			};
 			DrawCustomTitleBarOverlay(headerHeight);
 			return;
 		}
-		using (new GlobalThemeScope(_theme))
+		using (_themeManager.PushTheme())
 		{
 			base.Flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoBringToFrontOnFocus;
 			if (base.AllowPinning)
@@ -464,200 +250,166 @@ public class CompactUi : WindowMediatorSubscriberBase
 			}
 			base.SizeConstraints = new WindowSizeConstraints
 			{
-				MinimumSize = ScrambleSize(new Vector2(375f, 700f)),
-				MaximumSize = ScrambleSize(new Vector2(375f, 2000f))
+				MinimumSize = new Vector2(375f, 700f),
+				MaximumSize = new Vector2(375f, 2000f)
 			};
-			DrawCustomTitleBarOverlay(headerHeight);
-			using (ImRaii.PushStyle(ImGuiStyleVar.ChildRounding, 10f))
+			using (ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 1f))
 			{
-				using (ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 1f))
+				ImGuiWindowFlags childFlags = ImGuiWindowFlags.NoScrollbar;
+				if (base.AllowClickthrough)
 				{
-					using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(8f, 8f)))
+					childFlags |= ImGuiWindowFlags.NoInputs;
+				}
+				ImGui.BeginChild("root-surface", new Vector2(ImGui.GetContentRegionAvail().X, ImGui.GetContentRegionAvail().Y - 15f), border: true, childFlags);
+				_windowContentWidth = UiSharedService.GetWindowContentRegionWidth();
+				if (!_apiController.IsCurrentVersion)
+				{
+					Version ver = _apiController.CurrentClientVersion;
+					string unsupported = "UNSUPPORTED VERSION";
+					using (_uiSharedService.UidFont.Push())
 					{
-						using (ImRaii.PushColor(ImGuiCol.ChildBg, _theme.PanelBg))
+						Vector2 uidTextSize = ImGui.CalcTextSize(unsupported);
+						ImGui.SetCursorPosX((ImGui.GetWindowContentRegionMax().X + ImGui.GetWindowContentRegionMin().X) / 2f - uidTextSize.X / 2f);
+						ImGui.AlignTextToFramePadding();
+						Vector4 col = ImGuiColors.DalamudRed;
+						ImGui.TextColored(in col, unsupported);
+					}
+					UiSharedService.ColorTextWrapped($"Your XIVSync installation is out of date, the current version is {ver.Major}.{ver.Minor}.{ver.Build}. " + "It is highly recommended to keep XIVSync up to date. Open /xlplugins and update the plugin.", ImGuiColors.DalamudRed);
+				}
+				if (!_ipcManager.Initialized)
+				{
+					string unsupported = "MISSING ESSENTIAL PLUGINS";
+					using (_uiSharedService.UidFont.Push())
+					{
+						Vector2 uidTextSize = ImGui.CalcTextSize(unsupported);
+						ImGui.SetCursorPosX((ImGui.GetWindowContentRegionMax().X + ImGui.GetWindowContentRegionMin().X) / 2f - uidTextSize.X / 2f);
+						ImGui.AlignTextToFramePadding();
+						Vector4 col = ImGuiColors.DalamudRed;
+						ImGui.TextColored(in col, unsupported);
+					}
+					bool penumAvailable = _ipcManager.Penumbra.APIAvailable;
+					bool glamAvailable = _ipcManager.Glamourer.APIAvailable;
+					UiSharedService.ColorTextWrapped("One or more Plugins essential for Mare operation are unavailable. Enable or update following plugins:", ImGuiColors.DalamudRed);
+					using (ImRaii.PushIndent(10f))
+					{
+						if (!penumAvailable)
 						{
-							using (ImRaii.PushColor(ImGuiCol.Border, _theme.PanelBorder))
-							{
-								using (ImRaii.PushColor(ImGuiCol.Button, _theme.Btn))
-								{
-									using (ImRaii.PushColor(ImGuiCol.ButtonHovered, _theme.BtnHovered))
-									{
-										using (ImRaii.PushColor(ImGuiCol.ButtonActive, _theme.BtnActive))
-										{
-											using (ImRaii.PushStyle(ImGuiStyleVar.FrameRounding, 6f))
-											{
-												using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(6f, 3f)))
-												{
-													using (ImRaii.PushColor(ImGuiCol.Text, _theme.TextPrimary))
-													{
-														using (ImRaii.PushColor(ImGuiCol.TextDisabled, _theme.TextDisabled))
-														{
-															ImGuiWindowFlags childFlags = ImGuiWindowFlags.NoScrollbar;
-															if (base.AllowClickthrough)
-															{
-																childFlags |= ImGuiWindowFlags.NoInputs;
-															}
-															ImGui.BeginChild("root-surface", new Vector2(ImGui.GetContentRegionAvail().X, ImGui.GetContentRegionAvail().Y - 15f), border: true, childFlags);
-															_windowContentWidth = UiSharedService.GetWindowContentRegionWidth();
-															if (!_apiController.IsCurrentVersion)
-															{
-																Version ver = _apiController.CurrentClientVersion;
-																string unsupported = "UNSUPPORTED VERSION";
-																using (_uiSharedService.UidFont.Push())
-																{
-																	Vector2 uidTextSize = ImGui.CalcTextSize(unsupported);
-																	ImGui.SetCursorPosX((ImGui.GetWindowContentRegionMax().X + ImGui.GetWindowContentRegionMin().X) / 2f - uidTextSize.X / 2f);
-																	ImGui.AlignTextToFramePadding();
-																	ImGui.TextColored(ImGuiColors.DalamudRed, unsupported);
-																}
-																UiSharedService.ColorTextWrapped($"Your XIVSync installation is out of date, the current version is {ver.Major}.{ver.Minor}.{ver.Build}. " + "It is highly recommended to keep XIVSync up to date. Open /xlplugins and update the plugin.", ImGuiColors.DalamudRed);
-															}
-															if (!_ipcManager.Initialized)
-															{
-																string unsupported2 = "MISSING ESSENTIAL PLUGINS";
-																using (_uiSharedService.UidFont.Push())
-																{
-																	Vector2 uidTextSize2 = ImGui.CalcTextSize(unsupported2);
-																	ImGui.SetCursorPosX((ImGui.GetWindowContentRegionMax().X + ImGui.GetWindowContentRegionMin().X) / 2f - uidTextSize2.X / 2f);
-																	ImGui.AlignTextToFramePadding();
-																	ImGui.TextColored(ImGuiColors.DalamudRed, unsupported2);
-																}
-																bool penumAvailable = _ipcManager.Penumbra.APIAvailable;
-																bool glamAvailable = _ipcManager.Glamourer.APIAvailable;
-																UiSharedService.ColorTextWrapped("One or more Plugins essential for Mare operation are unavailable. Enable or update following plugins:", ImGuiColors.DalamudRed);
-																using (ImRaii.PushIndent(10f))
-																{
-																	if (!penumAvailable)
-																	{
-																		UiSharedService.TextWrapped("Penumbra");
-																		_uiSharedService.BooleanToColoredIcon(penumAvailable);
-																	}
-																	if (!glamAvailable)
-																	{
-																		UiSharedService.TextWrapped("Glamourer");
-																		_uiSharedService.BooleanToColoredIcon(glamAvailable);
-																	}
-																	ImGui.Separator();
-																}
-															}
-															using (ImRaii.PushId("header"))
-															{
-																DrawUIDHeader();
-															}
-															ImGui.Separator();
-															if (_apiController.ServerState == ServerState.Connected)
-															{
-																if (_showThemeInline)
-																{
-																	using (ImRaii.PushId("theme-inline"))
-																	{
-																		DrawThemeInline();
-																	}
-																}
-																else
-																{
-																	using (ImRaii.PushId("global-topmenu"))
-																	{
-																		_tabMenu.Draw(_theme);
-																	}
-																	using (ImRaii.PushId("status-message-bar"))
-																	{
-																		_statusMessageBar.Draw(_theme);
-																	}
-																	ImGui.Separator();
-																	using (ImRaii.PushId("pairlist"))
-																	{
-																		DrawPairs();
-																	}
-																	float pairlistEnd = ImGui.GetCursorPosY();
-																	_transferPartHeight = ImGui.GetCursorPosY() - pairlistEnd - ImGui.GetTextLineHeight();
-																	using (ImRaii.PushId("group-user-popup"))
-																	{
-																		_selectPairsForGroupUi.Draw(_pairManager.DirectPairs);
-																	}
-																	using (ImRaii.PushId("grouping-popup"))
-																	{
-																		_selectGroupForPairUi.Draw();
-																	}
-																}
-															}
-															if (_configService.Current.OpenPopupOnAdd && _pairManager.LastAddedUser != null)
-															{
-																_lastAddedUser = _pairManager.LastAddedUser;
-																_pairManager.LastAddedUser = null;
-																ImGui.OpenPopup("Set Notes for New User");
-																_showModalForUserAddition = true;
-																_lastAddedUserComment = string.Empty;
-															}
-															using (new ThemedWindowScope(_theme, SurfaceBg.Window))
-															{
-																if (ImGui.BeginPopupModal("Set Notes for New User", ref _showModalForUserAddition, UiSharedService.PopupWindowFlags))
-																{
-																	if (_lastAddedUser == null)
-																	{
-																		_showModalForUserAddition = false;
-																	}
-																	else
-																	{
-																		UiSharedService.TextWrapped("You have successfully added " + _lastAddedUser.UserData.AliasOrUID + ". Set a local note for the user in the field below:");
-																		ImU8String label = "##noteforuser";
-																		ImU8String hint = new ImU8String(9, 1);
-																		hint.AppendLiteral("Note for ");
-																		hint.AppendFormatted(_lastAddedUser.UserData.AliasOrUID);
-																		ImGui.InputTextWithHint(label, hint, ref _lastAddedUserComment, 100);
-																		using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
-																		{
-																			if (_uiSharedService.IconTextButton(FontAwesomeIcon.Save, "Save Note"))
-																			{
-																				_serverManager.SetNoteForUid(_lastAddedUser.UserData.UID, _lastAddedUserComment);
-																				_lastAddedUser = null;
-																				_lastAddedUserComment = string.Empty;
-																				_showModalForUserAddition = false;
-																			}
-																		}
-																	}
-																	UiSharedService.SetScaledWindowSize(275f);
-																	ImGui.EndPopup();
-																}
-															}
-															Vector2 pos = ImGui.GetWindowPos();
-															Vector2 size = ImGui.GetWindowSize();
-															if (_lastSize != size || _lastPosition != pos)
-															{
-																_lastSize = size;
-																_lastPosition = pos;
-																base.Mediator.Publish(new CompactUiChange(_lastSize, _lastPosition));
-															}
-															DrawUserCountOverlay();
-															ImGui.EndChild();
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
+							UiSharedService.TextWrapped("Penumbra");
+							_uiSharedService.BooleanToColoredIcon(penumAvailable);
+						}
+						if (!glamAvailable)
+						{
+							UiSharedService.TextWrapped("Glamourer");
+							_uiSharedService.BooleanToColoredIcon(glamAvailable);
+						}
+						ImGui.Separator();
+					}
+				}
+				using (ImRaii.PushId("header"))
+				{
+					DrawUIDHeader();
+				}
+				ImGui.Separator();
+				if (_apiController.ServerState == ServerState.Connected)
+				{
+					if (_showThemeInline)
+					{
+						using (ImRaii.PushId("theme-inline"))
+						{
+							DrawThemeInline();
+						}
+					}
+					else
+					{
+						using (ImRaii.PushId("global-topmenu"))
+						{
+							_tabMenu.Draw(_theme);
+						}
+						using (ImRaii.PushId("status-message-bar"))
+						{
+							_statusMessageBar.Draw(_theme);
+						}
+						using (ImRaii.PushId("pairlist"))
+						{
+							DrawPairs();
+						}
+						float pairlistEnd = ImGui.GetCursorPosY();
+						_transferPartHeight = ImGui.GetCursorPosY() - pairlistEnd - ImGui.GetTextLineHeight();
+						using (ImRaii.PushId("group-user-popup"))
+						{
+							_selectPairsForGroupUi.Draw(_pairManager.DirectPairs);
+						}
+						using (ImRaii.PushId("grouping-popup"))
+						{
+							_selectGroupForPairUi.Draw();
 						}
 					}
 				}
+				if (_configService.Current.OpenPopupOnAdd && _pairManager.LastAddedUser != null)
+				{
+					_lastAddedUser = _pairManager.LastAddedUser;
+					_pairManager.LastAddedUser = null;
+					ImGui.OpenPopup("Set Notes for New User");
+					_showModalForUserAddition = true;
+					_lastAddedUserComment = string.Empty;
+				}
+				if (ImGui.BeginPopupModal("Set Notes for New User", ref _showModalForUserAddition, UiSharedService.PopupWindowFlags))
+				{
+					if (_lastAddedUser == null)
+					{
+						_showModalForUserAddition = false;
+					}
+					else
+					{
+						UiSharedService.TextWrapped("You have successfully added " + _lastAddedUser.UserData.AliasOrUID + ". Set a local note for the user in the field below:");
+						ImU8String label = "##noteforuser";
+						ImU8String hint = new ImU8String(9, 1);
+						hint.AppendLiteral("Note for ");
+						hint.AppendFormatted(_lastAddedUser.UserData.AliasOrUID);
+						ImGui.InputTextWithHint(label, hint, ref _lastAddedUserComment, 100);
+						using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
+						{
+							if (_uiSharedService.IconTextButton(FontAwesomeIcon.Save, "Save Note"))
+							{
+								_serverManager.SetNoteForUid(_lastAddedUser.UserData.UID, _lastAddedUserComment);
+								_lastAddedUser = null;
+								_lastAddedUserComment = string.Empty;
+								_showModalForUserAddition = false;
+							}
+						}
+					}
+					UiSharedService.SetScaledWindowSize(275f);
+					ImGui.EndPopup();
+				}
+				Vector2 pos = ImGui.GetWindowPos();
+				Vector2 size = ImGui.GetWindowSize();
+				if (_lastSize != size || _lastPosition != pos)
+				{
+					_lastSize = size;
+					_lastPosition = pos;
+					base.Mediator.Publish(new CompactUiChange(_lastSize, _lastPosition));
+				}
+				DrawUserCountOverlay();
+				ImGui.EndChild();
+				DrawCustomTitleBarOverlay(headerHeight);
 			}
 		}
 	}
 
 	private void DrawPairs()
 	{
-		float availY = ImGui.GetContentRegionAvail().Y;
+		float availY = ImGui.GetContentRegionAvail().Y - 20f;
 		float transfersH = ((_transferPartHeight > 0f) ? _transferPartHeight : EstimateTransfersHeightFromStyle());
-		float voiceH = ((_voicePartHeight > 0f) ? _voicePartHeight : EstimateVoiceHeightFromStyle());
 		float spacingY = ImGui.GetStyle().ItemSpacing.Y;
-		float bottomPadding = 15f;
-		float listH = MathF.Max(1f, availY - transfersH - voiceH - spacingY - bottomPadding);
-		listH *= 1.25f;
+		float bottomReserve = 64f * ImGuiHelpers.GlobalScale;
+		float listH = MathF.Max(1f, availY - transfersH - spacingY - bottomReserve);
+		listH *= 1.2f;
 		Vector2 rowFramePadding = new Vector2(8f, 6f);
 		Vector2 rowItemSpacing = new Vector2(6f, 4f);
-		Vector4 transparent = new Vector4(0f, 0f, 0f, 0f);
-		ImGui.BeginChild("list", new Vector2(_windowContentWidth, listH));
+		Vector4 header = _theme.Btn;
+		Vector4 headerHovered = _theme.BtnHovered;
+		Vector4 headerActive = _theme.BtnActive;
+		ImGui.BeginChild("list", new Vector2(_windowContentWidth, listH), border: false, ImGuiWindowFlags.NoBackground);
 		ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, rowFramePadding);
 		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, rowItemSpacing);
 		ImGui.PushStyleColor(ImGuiCol.Header, transparent);
@@ -676,12 +428,6 @@ public class CompactUi : WindowMediatorSubscriberBase
 		ImGui.EndChild();
 	}
 
-	private static float EstimateVoiceHeightFromStyle()
-	{
-		ImGuiStylePtr style = ImGui.GetStyle();
-		return ImGui.GetTextLineHeightWithSpacing() * 2f + style.FramePadding.Y * 2f + style.ItemSpacing.Y;
-	}
-
 	private static float EstimateTransfersHeightFromStyle()
 	{
 		ImGuiStylePtr style = ImGui.GetStyle();
@@ -697,68 +443,31 @@ public class CompactUi : WindowMediatorSubscriberBase
 		Vector2 textSize;
 		using (_uiSharedService.UidFont.Push())
 		{
-			textSize = ImGui.CalcTextSize(uidText);
-		}
-		float scale = 1f;
-		if (textSize.X > availableWidth && availableWidth > 0f)
-		{
-			scale = availableWidth / textSize.X;
-			scale = Math.Clamp(scale, 0.6f, 1f);
-		}
-		if (scale < 1f)
-		{
-			ImGui.SetWindowFontScale(scale);
-			using (_uiSharedService.UidFont.Push())
-			{
-				ImGui.TextColored(_theme.Accent, uidText);
-			}
-			ImGui.SetWindowFontScale(1f);
-		}
-		else
-		{
-			using (_uiSharedService.UidFont.Push())
-			{
-				ImGui.TextColored(_theme.Accent, uidText);
-			}
+			Vector4 col = _theme.Accent;
+			ImGui.TextColored(in col, uidText);
 		}
 		if (_apiController.ServerState == ServerState.Connected)
 		{
-			if (ImGui.IsItemClicked())
+			using (_uiSharedService.UidFont.Push())
 			{
-				ImGui.SetClipboardText(_apiController.DisplayName);
+				ImGui.TextColored(_theme.Accent, uidText);
 			}
 			ThemedToolTip("Click to copy");
+			if (!string.Equals(_apiController.DisplayName, _apiController.UID, StringComparison.Ordinal))
+			{
+				Vector4 col = _theme.Accent;
+				ImGui.TextColored(in col, _apiController.UID);
+				if (ImGui.IsItemClicked())
+				{
+					ImGui.SetClipboardText(_apiController.UID);
+				}
+				ThemedToolTip("Click to copy");
+			}
 		}
 		else
 		{
 			UiSharedService.ColorTextWrapped(GetServerError(), GetUidColor());
 		}
-	}
-
-	private void DrawFloatingResetButtonInToolbar(float overlayX, float overlayY, float spacing)
-	{
-		ImGui.SetNextWindowPos(new Vector2(overlayX - _uiSharedService.GetIconButtonSize(FontAwesomeIcon.Undo).X - spacing, overlayY));
-		ImGui.SetNextWindowBgAlpha(0f);
-		ImGuiWindowFlags floatingFlags = ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoDocking;
-		if (ImGui.Begin("##xivsync-reset-button", floatingFlags))
-		{
-			ImGui.PushStyleColor(ImGuiCol.Button, _theme.Btn);
-			ImGui.PushStyleColor(ImGuiCol.ButtonHovered, _theme.BtnHovered);
-			ImGui.PushStyleColor(ImGuiCol.ButtonActive, _theme.BtnActive);
-			ImGui.PushStyleColor(ImGuiCol.Text, _theme.BtnText);
-			ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 6f);
-			ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(6f, 3f));
-			if (_uiSharedService.IconButton(FontAwesomeIcon.Undo))
-			{
-				base.AllowClickthrough = false;
-				base.AllowPinning = false;
-				_tabMenu.ClearUserFilter();
-			}
-			ThemedToolTip("Reset window settings");
-			ImGui.PopStyleVar(2);
-			ImGui.PopStyleColor(4);
-		}
-		ImGui.End();
 	}
 
 	private IEnumerable<IDrawFolder> GetDrawFolders()
@@ -773,8 +482,8 @@ public class CompactUi : WindowMediatorSubscriberBase
 			}
 			if (!p.Key.UserData.AliasOrUID.Contains(_tabMenu.Filter, StringComparison.OrdinalIgnoreCase))
 			{
-				string? note = p.Key.GetNote();
-				if (note == null || !note.Contains(_tabMenu.Filter, StringComparison.OrdinalIgnoreCase))
+				string? note2 = p.Key.GetNote();
+				if (note2 == null || !note2.Contains(_tabMenu.Filter, StringComparison.OrdinalIgnoreCase))
 				{
 					return p.Key.PlayerName?.Contains(_tabMenu.Filter, StringComparison.OrdinalIgnoreCase) ?? false;
 				}
@@ -867,15 +576,14 @@ public class CompactUi : WindowMediatorSubscriberBase
 			}
 			return note;
 		}
-		Dictionary<Pair, List<GroupFullInfoDto>> BasicSortedDictionary(IEnumerable<KeyValuePair<Pair, List<GroupFullInfoDto>>> u)
+        Dictionary<Pair, List<GroupFullInfoDto>> BasicSortedDictionary(IEnumerable<KeyValuePair<Pair, List<GroupFullInfoDto>>> u)
+            => u.OrderByDescending(u => u.Key.IsVisible)
+                .ThenByDescending(u => u.Key.IsOnline)
+                .ThenBy(AlphabeticalSort, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(u => u.Key, u => u.Value);
+        static bool FilterGroupUsers(KeyValuePair<Pair, List<GroupFullInfoDto>> u, GroupFullInfoDto group)
 		{
-			return (from keyValuePair in u
-				orderby keyValuePair.Key.IsVisible descending, keyValuePair.Key.IsOnline descending
-				select keyValuePair).ThenBy<KeyValuePair<Pair, List<GroupFullInfoDto>>, string>(AlphabeticalSort, StringComparer.OrdinalIgnoreCase).ToDictionary((KeyValuePair<Pair, List<GroupFullInfoDto>> keyValuePair) => keyValuePair.Key, (KeyValuePair<Pair, List<GroupFullInfoDto>> keyValuePair) => keyValuePair.Value);
-		}
-		static bool FilterGroupUsers(KeyValuePair<Pair, List<GroupFullInfoDto>> u, GroupFullInfoDto groupFullInfoDto)
-		{
-			return u.Value.Exists((GroupFullInfoDto g) => string.Equals(g.GID, groupFullInfoDto.GID, StringComparison.Ordinal));
+			return u.Value.Exists((GroupFullInfoDto g) => string.Equals(g.GID, group.GID, StringComparison.Ordinal));
 		}
 		bool FilterNotTaggedUsers(KeyValuePair<Pair, List<GroupFullInfoDto>> u)
 		{
@@ -909,11 +617,11 @@ public class CompactUi : WindowMediatorSubscriberBase
 			}
 			return true;
 		}
-		bool FilterTagusers(KeyValuePair<Pair, List<GroupFullInfoDto>> u, string tagName)
+		bool FilterTagusers(KeyValuePair<Pair, List<GroupFullInfoDto>> u, string tag)
 		{
 			if (u.Key.IsDirectlyPaired && !u.Key.IsOneSidedPair)
 			{
-				return _tagHandler.HasTag(u.Key.UserData.UID, tagName);
+				return _tagHandler.HasTag(u.Key.UserData.UID, tag);
 			}
 			return false;
 		}
@@ -961,20 +669,11 @@ public class CompactUi : WindowMediatorSubscriberBase
 		};
 	}
 
-	private static Vector4 ThemedSemanticFromAccent(ThemePalette t, float hue)
-	{
-		RgbToHsv(t.Accent.X, t.Accent.Y, t.Accent.Z, out var _, out var s, out var v);
-		s = MathF.Max(s, 0.5f);
-		v = MathF.Max(v, 0.85f);
-		HsvToRgb(hue, s, v, out var r, out var g, out var b);
-		return new Vector4(r, g, b, t.Accent.W);
-	}
-
 	private Vector4 GetUidColor()
 	{
-		Vector4 success = ThemedSemanticFromAccent(_theme, 0.33f);
-		Vector4 warning = ThemedSemanticFromAccent(_theme, 0.12f);
-		Vector4 danger = ThemedSemanticFromAccent(_theme, 0f);
+		Vector4 success = ThemePalette.GetSemanticColorFromAccent(_theme, 0.33f);
+		Vector4 warning = ThemePalette.GetSemanticColorFromAccent(_theme, 0.12f);
+		Vector4 danger = ThemePalette.GetSemanticColorFromAccent(_theme, 0f);
 		return _apiController.ServerState switch
 		{
 			ServerState.Connected => success, 
@@ -1037,250 +736,111 @@ public class CompactUi : WindowMediatorSubscriberBase
 		flag = (uint)(serverState - 2) <= 1u;
 		bool isBusy = flag;
 		Vector4 linkColor = UiSharedService.GetBoolColor(!isConnectingOrConnected);
-		FontAwesomeIcon linkIcon = (isConnectingOrConnected ? FontAwesomeIcon.Unlink : FontAwesomeIcon.Link);
-		ImGuiStylePtr style;
 		if (_collapsed)
 		{
-			float spacing = 6f * ImGuiHelpers.GlobalScale;
-			float btnSide = 22f * ImGuiHelpers.GlobalScale;
-			float btnH = btnSide;
-			float leftPad = 10f * ImGuiHelpers.GlobalScale;
-			style = ImGui.GetStyle();
-			float rightPad = style.WindowPadding.X + 25f * ImGuiHelpers.GlobalScale;
-			Vector2 winPos = ImGui.GetWindowPos();
-			Vector2 crMin = ImGui.GetWindowContentRegionMin();
-			float contentW = ImGui.GetWindowContentRegionMax().X - crMin.X;
-			Vector2 headerMin = new Vector2(winPos.X + crMin.X, ImGui.GetCursorScreenPos().Y);
-			Vector2 headerMax = new Vector2(headerMin.X + contentW, headerMin.Y + headerH);
-			ImGui.GetWindowDrawList().AddRectFilled(headerMin, headerMax, ImGui.ColorConvertFloat4ToU32(_theme.HeaderBg), 10f);
-			int buttonCount = 5;
-			float buttonsW = btnSide * (float)buttonCount + spacing * (float)(buttonCount - 1);
-			float btnStartX = headerMax.X - rightPad - buttonsW;
-			float btnStartY = headerMin.Y + (headerH - btnH) * 0.5f;
-			string title = _titleBarText;
-			Vector2 tSz = ImGui.CalcTextSize(title);
-			float num = headerMin.X + leftPad;
-			float tY = headerMin.Y + (headerH - tSz.Y) * 0.5f;
-			ImGui.SetCursorScreenPos(new Vector2(num, tY));
-			ImGui.TextColored(_theme.TextPrimary, title);
-			float dragLeft = num + tSz.X + spacing;
-			float dragRight = btnStartX - spacing;
-			float dragW = MathF.Max(0f, dragRight - dragLeft);
-			ImGui.SetCursorScreenPos(new Vector2(dragLeft, headerMin.Y));
-			ImGui.InvisibleButton("##dragzone_titlebar", new Vector2(dragW, headerH));
-			if (ImGui.IsItemActive() && ImGui.IsMouseDragging(ImGuiMouseButton.Left))
-			{
-				ImGui.SetWindowPos(ImGui.GetWindowPos() + ImGui.GetIO().MouseDelta);
-			}
-			ImGui.PushStyleColor(ImGuiCol.Button, _theme.Btn);
-			ImGui.PushStyleColor(ImGuiCol.ButtonHovered, _theme.BtnHovered);
-			ImGui.PushStyleColor(ImGuiCol.ButtonActive, _theme.BtnActive);
-			ImGui.PushStyleColor(ImGuiCol.Text, _theme.BtnText);
-			ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 6f);
-			ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(6f, 3f));
-			ImGui.SetCursorScreenPos(new Vector2(btnStartX, btnStartY));
-			using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
-			{
-				if (_uiSharedService.IconButton(FontAwesomeIcon.Cog))
-				{
-					base.Mediator.Publish(new UiToggleMessage(typeof(ModernSettingsUi)));
-				}
-			}
-			ThemedToolTip("Open Mare Settings");
-			ImGui.SetCursorScreenPos(new Vector2(btnStartX + btnSide + spacing, btnStartY));
-			using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
-			{
-				if (_uiSharedService.IconButton(FontAwesomeIcon.Palette))
-				{
-					ToggleThemeInline();
-				}
-			}
-			ThemedToolTip("Customize Theme");
-			FontAwesomeIcon collapseIcon = (_collapsed ? FontAwesomeIcon.ChevronDown : FontAwesomeIcon.ChevronUp);
-			ImGui.SetCursorScreenPos(new Vector2(btnStartX + (btnSide + spacing) * 2f, btnStartY));
-			using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
-			{
-				if (_uiSharedService.IconButton(collapseIcon))
-				{
-					_collapsed = !_collapsed;
-				}
-			}
-			ThemedToolTip(_collapsed ? "Expand" : "Collapse");
-			using (ImRaii.PushColor(ImGuiCol.Text, linkColor))
-			{
-				ImGui.SetCursorScreenPos(new Vector2(btnStartX + (btnSide + spacing) * 3f, btnStartY));
-				if (isBusy)
-				{
-					ImGui.BeginDisabled();
-				}
-				if (_uiSharedService.IconButton(linkIcon))
-				{
-					if (isConnectingOrConnected && !_serverManager.CurrentServer.FullPause)
-					{
-						_serverManager.CurrentServer.FullPause = true;
-						_serverManager.Save();
-					}
-					else if (!isConnectingOrConnected && _serverManager.CurrentServer.FullPause)
-					{
-						_serverManager.CurrentServer.FullPause = false;
-						_serverManager.Save();
-					}
-					_apiController.CreateConnectionsAsync();
-				}
-				if (isBusy)
-				{
-					ImGui.EndDisabled();
-				}
-			}
-			string connectText = (isConnectingOrConnected ? ("Disconnect from " + _serverManager.CurrentServer.ServerName) : ("Connect to " + _serverManager.CurrentServer.ServerName));
-			ThemedToolTip(connectText);
-			ImGui.SetCursorScreenPos(new Vector2(btnStartX + (btnSide + spacing) * 4f, btnStartY));
-			using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
-			{
-				if (_uiSharedService.IconButton(FontAwesomeIcon.Times))
-				{
-					base.IsOpen = false;
-				}
-			}
-			ThemedToolTip("Close XIVSync");
-			using (ImRaii.PushStyle(ImGuiStyleVar.PopupRounding, 8f))
-			{
-				using (ImRaii.PushColor(ImGuiCol.PopupBg, _theme.Btn))
-				{
-					using (ImRaii.PushColor(ImGuiCol.Border, _theme.PanelBorder))
-					{
-						using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
-						{
-							using (ImRaii.PushColor(ImGuiCol.HeaderHovered, _theme.BtnHovered))
-							{
-								using (ImRaii.PushColor(ImGuiCol.HeaderActive, _theme.BtnActive))
-								{
-									if (ImGui.BeginPopup("##hamburger_menu_collapsed"))
-									{
-										ImU8String label = new ImU8String(19, 1);
-										label.AppendFormatted(FontAwesomeIcon.UserCircle.ToIconString());
-										label.AppendLiteral("  Edit Mare Profile");
-										if (ImGui.MenuItem(label))
-										{
-											base.Mediator.Publish(new UiToggleMessage(typeof(EditProfileUi)));
-										}
-										label = new ImU8String(25, 1);
-										label.AppendFormatted(FontAwesomeIcon.PersonCircleQuestion.ToIconString());
-										label.AppendLiteral("  Character Data Analysis");
-										if (ImGui.MenuItem(label))
-										{
-											base.Mediator.Publish(new UiToggleMessage(typeof(DataAnalysisUi)));
-										}
-										label = new ImU8String(20, 1);
-										label.AppendFormatted(FontAwesomeIcon.Running.ToIconString());
-										label.AppendLiteral("  Character Data Hub");
-										if (ImGui.MenuItem(label))
-										{
-											base.Mediator.Publish(new UiToggleMessage(typeof(CharaDataHubUi)));
-										}
-										ImGui.Separator();
-										bool isPinned = base.AllowPinning;
-										label = new ImU8String(12, 1);
-										label.AppendFormatted(FontAwesomeIcon.Thumbtack.ToIconString());
-										label.AppendLiteral("  Pin Window");
-										if (ImGui.MenuItem(label, "", isPinned))
-										{
-											base.AllowPinning = !base.AllowPinning;
-										}
-										bool isClickThrough = base.AllowClickthrough;
-										label = new ImU8String(15, 1);
-										label.AppendFormatted(FontAwesomeIcon.MousePointer.ToIconString());
-										label.AppendLiteral("  Click Through");
-										if (ImGui.MenuItem(label, "", isClickThrough))
-										{
-											base.AllowClickthrough = !base.AllowClickthrough;
-											if (base.AllowClickthrough)
-											{
-												base.AllowPinning = true;
-											}
-										}
-										ImGui.Separator();
-										label = new ImU8String(7, 1);
-										label.AppendFormatted(FontAwesomeIcon.Times.ToIconString());
-										label.AppendLiteral("  Close");
-										if (ImGui.MenuItem(label))
-										{
-											base.IsOpen = false;
-										}
-										ImGui.EndPopup();
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			ImGui.PopStyleVar(2);
-			ImGui.PopStyleColor(4);
-			return;
+			DrawCollapsedToolbar(headerH, isConnectingOrConnected, isBusy, linkColor);
 		}
-		float spacing2 = 6f * ImGuiHelpers.GlobalScale;
-		float btnSide2 = 22f * ImGuiHelpers.GlobalScale;
-		style = ImGui.GetStyle();
-		_ = ref style.WindowPadding;
-		_ = ImGuiHelpers.GlobalScale;
-		ImGuiStylePtr style2 = ImGui.GetStyle();
-		float topOffset = style2.FramePadding.Y + style2.ItemSpacing.Y + ImGuiHelpers.GlobalScale;
-		Vector2 windowPos = ImGui.GetWindowPos();
-		Vector2 crMin2 = ImGui.GetWindowContentRegionMin();
-		Vector2 crMax = ImGui.GetWindowContentRegionMax();
-		float stripWidth = btnSide2 * 5f + spacing2 * 4f;
-		float overlayX = windowPos.X + crMax.X - stripWidth - spacing2 - 32f;
-		float overlayY = windowPos.Y + crMin2.Y + topOffset;
-		ImGui.SetNextWindowPos(new Vector2(overlayX, overlayY), ImGuiCond.Always);
-		ImGui.SetNextWindowBgAlpha(0f);
-		ImGuiWindowFlags floatingFlags = ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoDocking;
-		if (base.AllowClickthrough)
+		else
 		{
-			floatingFlags |= ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoFocusOnAppearing;
+			DrawExpandedToolbar(isConnectingOrConnected, isBusy);
 		}
-		ImGui.Begin("##xivsync-floating-controls", floatingFlags);
+	}
+
+	private void DrawCollapsedToolbar(float headerH, bool isConnectingOrConnected, bool isBusy, Vector4 linkColor)
+	{
+		float spacing = 6f * ImGuiHelpers.GlobalScale;
+		float btnSide = 22f * ImGuiHelpers.GlobalScale;
+		float leftPad = 10f * ImGuiHelpers.GlobalScale;
+		float rightPad = ImGui.GetStyle().WindowPadding.X + 25f * ImGuiHelpers.GlobalScale;
+		Vector2 winPos = ImGui.GetWindowPos();
+		Vector2 crMin = ImGui.GetWindowContentRegionMin();
+		float contentW = ImGui.GetWindowContentRegionMax().X - crMin.X;
+		Vector2 headerMin = new Vector2(winPos.X + crMin.X, ImGui.GetCursorScreenPos().Y);
+		Vector2 headerMax = new Vector2(headerMin.X + contentW, headerMin.Y + headerH);
+		ImGui.GetWindowDrawList().AddRectFilled(headerMin, headerMax, ImGui.ColorConvertFloat4ToU32(_theme.HeaderBg), 10f * ImGuiHelpers.GlobalScale);
+		int buttonCount = 1;
+		float buttonsW = btnSide * (float)buttonCount + spacing * (float)(buttonCount - 1);
+		float num = headerMax.X - rightPad - buttonsW;
+		float btnStartY = headerMin.Y + (headerH - btnSide) * 0.5f;
+		Vector2 tSz = ImGui.CalcTextSize(_titleBarText);
+		float num2 = headerMin.X + leftPad;
+		float tY = headerMin.Y + (headerH - tSz.Y) * 0.5f;
+		ImGui.SetCursorScreenPos(new Vector2(num2, tY));
+		Vector4 col = _theme.TextPrimary;
+		ImGui.TextColored(in col, _titleBarText);
+		float dragLeft = num2 + tSz.X + spacing;
+		float dragRight = num - spacing;
+		float dragW = MathF.Max(0f, dragRight - dragLeft);
+		ImGui.SetCursorScreenPos(new Vector2(dragLeft, headerMin.Y));
+		ImGui.InvisibleButton("##dragzone_titlebar", new Vector2(dragW, headerH));
+		if (ImGui.IsItemActive() && ImGui.IsMouseDragging(ImGuiMouseButton.Left))
+		{
+			ImGui.SetWindowPos(ImGui.GetWindowPos() + ImGui.GetIO().MouseDelta);
+		}
 		ImGui.PushStyleColor(ImGuiCol.Button, _theme.Btn);
 		ImGui.PushStyleColor(ImGuiCol.ButtonHovered, _theme.BtnHovered);
 		ImGui.PushStyleColor(ImGuiCol.ButtonActive, _theme.BtnActive);
 		ImGui.PushStyleColor(ImGuiCol.Text, _theme.BtnText);
-		ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 6f);
-		ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(6f, 3f));
+		ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 6f * ImGuiHelpers.GlobalScale);
+		ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(6f * ImGuiHelpers.GlobalScale, 3f * ImGuiHelpers.GlobalScale));
+		ImGui.SetCursorScreenPos(new Vector2(num, btnStartY));
 		using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
 		{
-			if (_uiSharedService.IconButton(FontAwesomeIcon.Cog))
+			if (_uiSharedService.IconButton(FontAwesomeIcon.Bars))
 			{
-				base.Mediator.Publish(new UiToggleMessage(typeof(ModernSettingsUi)));
+				ImGui.OpenPopup("##hamburger_menu_collapsed");
 			}
 		}
-		ThemedToolTip("Open Mare Settings");
-		ImGui.SameLine(0f, spacing2);
-		using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
+		ThemedToolTip("Menu");
+		DrawHamburgerMenuPopup(isConnectingOrConnected, isBusy, linkColor);
+		ImGui.PopStyleVar(2);
+		ImGui.PopStyleColor(4);
+	}
+
+	private void DrawExpandedToolbar(bool isConnectingOrConnected, bool isBusy)
+	{
+		float spacing = 6f * ImGuiHelpers.GlobalScale;
+		float btnSide = 28f * ImGuiHelpers.GlobalScale;
+		ImGuiStylePtr style = ImGui.GetStyle();
+		float topOffset = style.FramePadding.Y + style.ItemSpacing.Y + ImGuiHelpers.GlobalScale;
+		Vector2 windowPos = ImGui.GetWindowPos();
+		Vector2 crMin = ImGui.GetWindowContentRegionMin();
+		Vector2 crMax = ImGui.GetWindowContentRegionMax();
+		int buttonCount = 5;
+		float stripWidth = btnSide * (float)buttonCount + spacing * (float)(buttonCount - 1);
+		float overlayX = windowPos.X + crMax.X - stripWidth - spacing - 15f;
+		float overlayY = windowPos.Y + crMin.Y + topOffset;
+		ImGui.SetNextWindowPos(new Vector2(overlayX, overlayY), ImGuiCond.Always);
+		ImGui.SetNextWindowBgAlpha(0f);
+		ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(0f, 0f, 0f, 0f));
+		ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0f, 0f, 0f, 0f));
+		ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0f, 0f));
+		ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
+		ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0f);
+		ImGuiWindowFlags floatingFlags = ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoDocking;
+		ImGui.Begin("##xivsync-floating-controls", floatingFlags);
+		ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0f, 0f, 0f, 0f));
+		ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0f, 0f, 0f, 0f));
+		ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0f, 0f, 0f, 0.1f));
+		ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 12f * ImGuiHelpers.GlobalScale);
+		ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(8f * ImGuiHelpers.GlobalScale, 8f * ImGuiHelpers.GlobalScale));
+		Vector2 buttonSize = new Vector2(btnSide, btnSide);
+		float currentX = overlayX;
+		DrawModernToolbarButton(FontAwesomeIcon.Cog, "Open Mare Settings", delegate
 		{
-			if (_uiSharedService.IconButton(FontAwesomeIcon.Palette))
-			{
-				ToggleThemeInline();
-			}
-		}
-		ThemedToolTip("Customize Theme");
-		ImGui.SameLine(0f, spacing2);
-		FontAwesomeIcon collapseIcon2 = (_collapsed ? FontAwesomeIcon.ChevronDown : FontAwesomeIcon.ChevronUp);
-		using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
+			base.Mediator.Publish(new UiToggleMessage(typeof(ModernSettingsUi)));
+		}, new Vector2(currentX, overlayY), buttonSize);
+		currentX += btnSide + spacing;
+		DrawModernToolbarButton(FontAwesomeIcon.Palette, "Customize Theme", delegate
 		{
-			if (_uiSharedService.IconButton(collapseIcon2))
-			{
-				_collapsed = !_collapsed;
-			}
-		}
-		ThemedToolTip(_collapsed ? "Expand" : "Collapse");
-		ImGui.SameLine(0f, spacing2);
-		using (ImRaii.PushColor(ImGuiCol.Text, linkColor))
+			ToggleThemeInline();
+		}, new Vector2(currentX, overlayY), buttonSize);
+		currentX += btnSide + spacing;
+		FontAwesomeIcon disconnectIcon = (isConnectingOrConnected ? FontAwesomeIcon.Unlink : FontAwesomeIcon.Link);
+		string disconnectTooltip = (isConnectingOrConnected ? ("Disconnect from " + _serverManager.CurrentServer.ServerName) : ("Connect to " + _serverManager.CurrentServer.ServerName));
+		DrawModernToolbarButton(disconnectIcon, disconnectTooltip, delegate
 		{
-			if (isBusy)
-			{
-				ImGui.BeginDisabled();
-			}
-			if (_uiSharedService.IconButton(linkIcon))
+			if (!isBusy)
 			{
 				if (isConnectingOrConnected && !_serverManager.CurrentServer.FullPause)
 				{
@@ -1294,199 +854,235 @@ public class CompactUi : WindowMediatorSubscriberBase
 				}
 				_apiController.CreateConnectionsAsync();
 			}
-			if (isBusy)
-			{
-				ImGui.EndDisabled();
-			}
-		}
-		string connectText2 = (isConnectingOrConnected ? ("Disconnect from " + _serverManager.CurrentServer.ServerName) : ("Connect to " + _serverManager.CurrentServer.ServerName));
-		ThemedToolTip(connectText2);
-		ImGui.SameLine(0f, spacing2);
-		using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
+		}, new Vector2(currentX, overlayY), buttonSize);
+		currentX += btnSide + spacing;
+		DrawModernToolbarButton(FontAwesomeIcon.Times, "Close", delegate
 		{
-			if (_uiSharedService.IconButton(FontAwesomeIcon.Times))
-			{
-				base.IsOpen = false;
-			}
-		}
-		ThemedToolTip("Close XIVSync");
+			_userManuallyClosed = true;
+			base.IsOpen = false;
+		}, new Vector2(currentX, overlayY), buttonSize);
+		currentX += btnSide + spacing;
+		DrawModernToolbarButton(FontAwesomeIcon.ChevronUp, "Collapse", delegate
+		{
+			_collapsed = !_collapsed;
+		}, new Vector2(currentX, overlayY), buttonSize);
 		ImGui.PopStyleVar(2);
-		ImGui.PopStyleColor(4);
+		ImGui.PopStyleColor(3);
+		ImGui.PopStyleVar(3);
+		ImGui.PopStyleColor(2);
 		ImGui.End();
 		if (_apiController.ServerState == ServerState.Connected && base.AllowClickthrough)
 		{
-			DrawFloatingResetButtonInToolbar(overlayX - btnSide2 - spacing2, overlayY, spacing2);
+			DrawResetButton(overlayX, overlayY, spacing);
 		}
 	}
 
-	private void DrawThemeInline()
+	private void DrawHamburgerMenuPopup(bool isConnectingOrConnected, bool isBusy, Vector4 linkColor)
 	{
-		ImGui.AlignTextToFramePadding();
-		ImGui.TextColored(ScrambleColor(_theme.Accent), ScrambleText("Theme"));
-		ImGui.SameLine();
-		using (ImRaii.PushColor(ImGuiCol.Text, _theme.TextSecondary))
-		{
-			ImGui.TextUnformatted("(changes preview automatically)");
-		}
-		ImGui.Separator();
-		ImGui.TextUnformatted("Preset");
-		ImGui.SameLine();
 		using (ImRaii.PushStyle(ImGuiStyleVar.PopupRounding, 8f))
 		{
 			using (ImRaii.PushColor(ImGuiCol.PopupBg, _theme.Btn))
 			{
 				using (ImRaii.PushColor(ImGuiCol.Border, _theme.PanelBorder))
 				{
-					using (ImRaii.PushColor(ImGuiCol.ScrollbarBg, _theme.Btn))
+					using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
 					{
-						using (ImRaii.PushColor(ImGuiCol.ScrollbarGrab, _theme.BtnHovered))
+						using (ImRaii.PushColor(ImGuiCol.HeaderHovered, _theme.BtnHovered))
 						{
-							using (ImRaii.PushColor(ImGuiCol.ScrollbarGrabHovered, _theme.Accent))
+							using (ImRaii.PushColor(ImGuiCol.HeaderActive, _theme.BtnActive))
 							{
-								using (ImRaii.PushColor(ImGuiCol.ScrollbarGrabActive, _theme.BtnActive))
+								if (!ImGui.BeginPopup("##hamburger_menu_collapsed"))
 								{
-									using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
+									return;
+								}
+								string collapseText = (_collapsed ? "Expand" : "Collapse");
+								FontAwesomeIcon collapseIcon = (_collapsed ? FontAwesomeIcon.ChevronDown : FontAwesomeIcon.ChevronUp);
+								ImU8String label = new ImU8String(2, 2);
+								label.AppendFormatted(collapseIcon.ToIconString());
+								label.AppendLiteral("  ");
+								label.AppendFormatted(collapseText);
+								if (ImGui.MenuItem(label))
+								{
+									_collapsed = !_collapsed;
+								}
+								ImGui.Separator();
+								string connectText = (isConnectingOrConnected ? ("Disconnect from " + _serverManager.CurrentServer.ServerName) : ("Connect to " + _serverManager.CurrentServer.ServerName));
+								FontAwesomeIcon connectIcon = (isConnectingOrConnected ? FontAwesomeIcon.Unlink : FontAwesomeIcon.Link);
+								using (ImRaii.PushColor(ImGuiCol.Text, linkColor))
+								{
+									if (isBusy)
 									{
-										using (ImRaii.PushColor(ImGuiCol.FrameBg, _theme.Btn))
+										ImGui.BeginDisabled();
+									}
+									label = new ImU8String(2, 2);
+									label.AppendFormatted(connectIcon.ToIconString());
+									label.AppendLiteral("  ");
+									label.AppendFormatted(connectText);
+									if (ImGui.MenuItem(label))
+									{
+										if (isConnectingOrConnected && !_serverManager.CurrentServer.FullPause)
 										{
-											using (ImRaii.PushColor(ImGuiCol.FrameBgHovered, _theme.BtnHovered))
-											{
-												using (ImRaii.PushColor(ImGuiCol.FrameBgActive, _theme.BtnActive))
-												{
-													using (ImRaii.PushColor(ImGuiCol.Button, _theme.Btn))
-													{
-														using (ImRaii.PushColor(ImGuiCol.ButtonHovered, _theme.BtnHovered))
-														{
-															using (ImRaii.PushColor(ImGuiCol.ButtonActive, _theme.BtnActive))
-															{
-																using (ImRaii.PushColor(ImGuiCol.TextSelectedBg, _theme.BtnActive))
-																{
-																	string displayName = (IsThemeCustomized() ? "Custom" : _selectedPreset);
-																	if (ImGui.BeginCombo("##theme-preset-inline", displayName))
-																	{
-																		foreach (KeyValuePair<string, ThemePalette> kv in ThemePresets.Presets)
-																		{
-																			bool sel = kv.Key == _selectedPreset;
-																			if (ImGui.Selectable(kv.Key, sel))
-																			{
-																				_selectedPreset = kv.Key;
-																				_lastSelectedPreset = kv.Key;
-																				_themeWorking = Clone(kv.Value);
-																				_theme = Clone(_themeWorking);
-																			}
-																			if (sel)
-																			{
-																				ImGui.SetItemDefaultFocus();
-																			}
-																		}
-																		ImGui.EndCombo();
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
+											_serverManager.CurrentServer.FullPause = true;
+											_serverManager.Save();
 										}
+										else if (!isConnectingOrConnected && _serverManager.CurrentServer.FullPause)
+										{
+											_serverManager.CurrentServer.FullPause = false;
+											_serverManager.Save();
+										}
+										_apiController.CreateConnectionsAsync();
+									}
+									if (isBusy)
+									{
+										ImGui.EndDisabled();
 									}
 								}
+								ImGui.Separator();
+								label = new ImU8String(10, 1);
+								label.AppendFormatted(FontAwesomeIcon.Cog.ToIconString());
+								label.AppendLiteral("  Settings");
+								if (ImGui.MenuItem(label))
+								{
+									base.Mediator.Publish(new UiToggleMessage(typeof(ModernSettingsUi)));
+								}
+								label = new ImU8String(17, 1);
+								label.AppendFormatted(FontAwesomeIcon.Palette.ToIconString());
+								label.AppendLiteral("  Customize Theme");
+								if (ImGui.MenuItem(label))
+								{
+									ToggleThemeInline();
+								}
+								ImGui.Separator();
+								label = new ImU8String(19, 1);
+								label.AppendFormatted(FontAwesomeIcon.UserCircle.ToIconString());
+								label.AppendLiteral("  Edit Mare Profile");
+								if (ImGui.MenuItem(label))
+								{
+									base.Mediator.Publish(new UiToggleMessage(typeof(EditProfileUi)));
+								}
+								label = new ImU8String(25, 1);
+								label.AppendFormatted(FontAwesomeIcon.PersonCircleQuestion.ToIconString());
+								label.AppendLiteral("  Character Data Analysis");
+								if (ImGui.MenuItem(label))
+								{
+									base.Mediator.Publish(new UiToggleMessage(typeof(DataAnalysisUi)));
+								}
+								label = new ImU8String(20, 1);
+								label.AppendFormatted(FontAwesomeIcon.Running.ToIconString());
+								label.AppendLiteral("  Character Data Hub");
+								if (ImGui.MenuItem(label))
+								{
+									base.Mediator.Publish(new UiToggleMessage(typeof(CharaDataHubUi)));
+								}
+								ImGui.Separator();
+								bool isPinned = base.AllowPinning;
+								label = new ImU8String(12, 1);
+								label.AppendFormatted(FontAwesomeIcon.Thumbtack.ToIconString());
+								label.AppendLiteral("  Pin Window");
+								if (ImGui.MenuItem(label, "", isPinned))
+								{
+									base.AllowPinning = !base.AllowPinning;
+								}
+								bool isClickThrough = base.AllowClickthrough;
+								label = new ImU8String(15, 1);
+								label.AppendFormatted(FontAwesomeIcon.MousePointer.ToIconString());
+								label.AppendLiteral("  Click Through");
+								if (ImGui.MenuItem(label, "", isClickThrough))
+								{
+									base.AllowClickthrough = !base.AllowClickthrough;
+									if (base.AllowClickthrough)
+									{
+										base.AllowPinning = true;
+									}
+								}
+								ImGui.Separator();
+								label = new ImU8String(7, 1);
+								label.AppendFormatted(FontAwesomeIcon.Times.ToIconString());
+								label.AppendLiteral("  Close");
+								if (ImGui.MenuItem(label))
+								{
+									base.IsOpen = false;
+								}
+								ImGui.EndPopup();
 							}
 						}
 					}
 				}
 			}
 		}
-		ImGui.Separator();
-		DrawColorRow("Panel Background", () => _themeWorking.PanelBg, delegate(Vector4 v)
+	}
+
+	private void DrawModernToolbarButton(FontAwesomeIcon icon, string tooltip, Action onClick, Vector2 position, Vector2 buttonSize)
+	{
+		ImGui.SetCursorScreenPos(position);
+		ImU8String strId = new ImU8String(10, 1);
+		strId.AppendLiteral("##toolbar_");
+		strId.AppendFormatted(icon);
+		bool clicked = ImGui.InvisibleButton(strId, buttonSize);
+		bool hovered = ImGui.IsItemHovered();
+		ImDrawListPtr fgDrawList = ImGui.GetForegroundDrawList();
+		if (hovered)
 		{
-			_themeWorking.PanelBg = v;
-		});
-		DrawColorRow("Panel Border", () => _themeWorking.PanelBorder, delegate(Vector4 v)
-		{
-			_themeWorking.PanelBorder = v;
-		});
-		DrawColorRow("Header Background", () => _themeWorking.HeaderBg, delegate(Vector4 v)
-		{
-			_themeWorking.HeaderBg = v;
-		});
-		DrawColorRow("Accent", () => _themeWorking.Accent, delegate(Vector4 v)
-		{
-			_themeWorking.Accent = v;
-		});
-		DrawColorRow("Button", () => _themeWorking.Btn, delegate(Vector4 v)
-		{
-			_themeWorking.Btn = v;
-		});
-		DrawColorRow("Button Hovered", () => _themeWorking.BtnHovered, delegate(Vector4 v)
-		{
-			_themeWorking.BtnHovered = v;
-		});
-		DrawColorRow("Button Active", () => _themeWorking.BtnActive, delegate(Vector4 v)
-		{
-			_themeWorking.BtnActive = v;
-		});
-		DrawColorRow("Button Text", () => _themeWorking.BtnText, delegate(Vector4 v)
-		{
-			_themeWorking.BtnText = v;
-		});
-		DrawColorRow("Button Text Hovered", () => _themeWorking.BtnTextHovered, delegate(Vector4 v)
-		{
-			_themeWorking.BtnTextHovered = v;
-		});
-		DrawColorRow("Button Text Active", () => _themeWorking.BtnTextActive, delegate(Vector4 v)
-		{
-			_themeWorking.BtnTextActive = v;
-		});
-		DrawColorRow("Text Primary", () => _themeWorking.TextPrimary, delegate(Vector4 v)
-		{
-			_themeWorking.TextPrimary = v;
-		});
-		DrawColorRow("Text Secondary", () => _themeWorking.TextSecondary, delegate(Vector4 v)
-		{
-			_themeWorking.TextSecondary = v;
-		});
-		DrawColorRow("Text Disabled", () => _themeWorking.TextDisabled, delegate(Vector4 v)
-		{
-			_themeWorking.TextDisabled = v;
-		});
-		DrawColorRow("Link", () => _themeWorking.Link, delegate(Vector4 v)
-		{
-			_themeWorking.Link = v;
-		});
-		DrawColorRow("Link Hover", () => _themeWorking.LinkHover, delegate(Vector4 v)
-		{
-			_themeWorking.LinkHover = v;
-		});
-		DrawColorRow("Tooltip Background", () => _themeWorking.TooltipBg, delegate(Vector4 v)
-		{
-			_themeWorking.TooltipBg = v;
-		});
-		DrawColorRow("Tooltip Text", () => _themeWorking.TooltipText, delegate(Vector4 v)
-		{
-			_themeWorking.TooltipText = v;
-		});
-		ImGui.Separator();
-		using (ImRaii.PushColor(ImGuiCol.Text, _theme.BtnText))
-		{
-			if (ImGui.Button("Reset to Preset"))
-			{
-				_themeWorking = (ThemePresets.Presets.TryGetValue(_selectedPreset, out ThemePalette p) ? Clone(p) : new ThemePalette());
-				_theme = Clone(_themeWorking);
-			}
-			ImGui.SameLine();
-			if (ImGui.Button("Cancel"))
-			{
-				_showThemeInline = false;
-			}
-			ImGui.SameLine();
-			if (ImGui.Button("Save"))
-			{
-				_theme = Clone(_themeWorking);
-				PersistTheme(_theme);
-				_showThemeInline = false;
-			}
+			Vector4 rgbColor = ThemeEffects.GetAnimatedAccentColor(_theme, _particleTime);
+			float glowIntensity = 0.7f + MathF.Sin(_particleTime * 0.5f) * 0.3f;
+			Vector4 glowColor = new Vector4(rgbColor.X * glowIntensity, rgbColor.Y * glowIntensity, rgbColor.Z * glowIntensity, 0.35f);
+			float glowSize = 6f * ImGuiHelpers.GlobalScale;
+			fgDrawList.AddRectFilled(new Vector2(position.X - glowSize, position.Y - glowSize), new Vector2(position.X + buttonSize.X + glowSize, position.Y + buttonSize.Y + glowSize), ImGui.ColorConvertFloat4ToU32(glowColor), 10f * ImGuiHelpers.GlobalScale);
 		}
-		ImGui.Spacing();
+		using (_uiSharedService.IconFont.Push())
+		{
+			string iconText = icon.ToIconString();
+			Vector2 iconSize = ImGui.CalcTextSize(iconText);
+			Vector2 iconPos = new Vector2(position.X + (buttonSize.X - iconSize.X) * 0.5f, position.Y + (buttonSize.Y - iconSize.Y) * 0.5f);
+			Vector4 textColor = (hovered ? _theme.BtnTextHovered : _theme.BtnText);
+			fgDrawList.AddText(iconPos, ImGui.ColorConvertFloat4ToU32(textColor), iconText);
+		}
+		if (hovered)
+		{
+			ImGui.BeginTooltip();
+			Vector4 col = _theme.BtnText;
+			ImGui.TextColored(in col, tooltip);
+			ImGui.EndTooltip();
+		}
+		if (clicked)
+		{
+			onClick();
+		}
+	}
+
+	private void DrawResetButton(float overlayX, float overlayY, float spacing)
+	{
+		ImGui.SetNextWindowPos(new Vector2(overlayX - _uiSharedService.GetIconButtonSize(FontAwesomeIcon.Undo).X - spacing, overlayY));
+		ImGui.SetNextWindowBgAlpha(0f);
+		ImGuiWindowFlags floatingFlags = ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoDocking;
+		if (ImGui.Begin("##xivsync-reset-button", floatingFlags))
+		{
+			ImGui.PushStyleColor(ImGuiCol.Button, _theme.Btn);
+			ImGui.PushStyleColor(ImGuiCol.ButtonHovered, _theme.BtnHovered);
+			ImGui.PushStyleColor(ImGuiCol.ButtonActive, _theme.BtnActive);
+			ImGui.PushStyleColor(ImGuiCol.Text, _theme.BtnText);
+			ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 6f * ImGuiHelpers.GlobalScale);
+			ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(6f * ImGuiHelpers.GlobalScale, 3f * ImGuiHelpers.GlobalScale));
+			if (_uiSharedService.IconButton(FontAwesomeIcon.Undo))
+			{
+				base.AllowClickthrough = false;
+				base.AllowPinning = false;
+				_tabMenu.ClearUserFilter();
+			}
+			ThemedToolTip("Reset window settings");
+			ImGui.PopStyleVar(2);
+			ImGui.PopStyleColor(4);
+		}
+		ImGui.End();
+	}
+
+	private void DrawThemeInline()
+	{
+		if (_themeEditor != null)
+		{
+			_themeEditor.Draw(_theme);
+			_theme = _themeManager.Current.Clone();
+		}
 	}
 
 	private void ThemedToolTip(string text)
@@ -1494,263 +1090,32 @@ public class CompactUi : WindowMediatorSubscriberBase
 		UiSharedService.AttachThemedToolTip(text, _theme);
 	}
 
-	private static ThemePalette Clone(ThemePalette p)
-	{
-		return new ThemePalette
-		{
-			PanelBg = p.PanelBg,
-			PanelBorder = p.PanelBorder,
-			HeaderBg = p.HeaderBg,
-			Accent = p.Accent,
-			TextPrimary = p.TextPrimary,
-			TextSecondary = p.TextSecondary,
-			TextDisabled = p.TextDisabled,
-			Link = p.Link,
-			LinkHover = p.LinkHover,
-			Btn = p.Btn,
-			BtnHovered = p.BtnHovered,
-			BtnActive = p.BtnActive,
-			BtnText = p.BtnText,
-			BtnTextHovered = p.BtnTextHovered,
-			BtnTextActive = p.BtnTextActive,
-			TooltipBg = p.TooltipBg,
-			TooltipText = p.TooltipText
-		};
-	}
-
-	private void PersistTheme(ThemePalette theme)
-	{
-		try
-		{
-			_configService.Current.Theme = theme;
-			_configService.Save();
-		}
-		catch (Exception exception)
-		{
-			_logger.LogError(exception, "Failed to save theme");
-		}
-	}
-
-	private void DrawColorRow(string label, Func<Vector4> get, Action<Vector4> set)
-	{
-		float offsetFromStartX = 200f * ImGuiHelpers.GlobalScale;
-		float swatchSize = 22f * ImGuiHelpers.GlobalScale;
-		ImGui.AlignTextToFramePadding();
-		ImGui.TextUnformatted(label);
-		ImGui.SameLine(offsetFromStartX);
-		ImGui.PushID(label);
-		Vector4 color = get();
-		ImGui.ColorButton("##swatch", in color, ImGuiColorEditFlags.AlphaPreviewHalf, new Vector2(swatchSize, swatchSize));
-		if (ImGui.IsItemClicked())
-		{
-			ImGui.OpenPopup("picker");
-		}
-		if (ImGui.BeginPopup("picker"))
-		{
-			ImGuiColorEditFlags flags = ImGuiColorEditFlags.NoSidePreview | ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.PickerHueWheel;
-			ImGui.ColorPicker4("##picker", ref color, flags);
-			set(color);
-			_theme = Clone(_themeWorking);
-			ImGui.EndPopup();
-		}
-		ImGui.PopID();
-	}
-
-	private bool ThemedLink(string text)
-	{
-		bool clicked = false;
-		ImGui.TextColored(_theme.Link, text);
-		bool hovered = ImGui.IsItemHovered();
-		Vector2 min = ImGui.GetItemRectMin();
-		Vector2 max = ImGui.GetItemRectMax();
-		ImGui.GetWindowDrawList().AddLine(new Vector2(min.X, max.Y), new Vector2(max.X, max.Y), ImGui.ColorConvertFloat4ToU32(hovered ? _theme.LinkHover : _theme.Link), 1f);
-		if (ImGui.IsItemClicked())
-		{
-			clicked = true;
-		}
-		return clicked;
-	}
-
-	private static void RgbToHsv(float r, float g, float b, out float h, out float s, out float v)
-	{
-		float max = MathF.Max(r, MathF.Max(g, b));
-		float min = MathF.Min(r, MathF.Min(g, b));
-		v = max;
-		float d = max - min;
-		s = ((max <= 0f) ? 0f : (d / max));
-		if (d <= 0f)
-		{
-			h = 0f;
-			return;
-		}
-		if (max == r)
-		{
-			h = (g - b) / d % 6f;
-		}
-		else if (max == g)
-		{
-			h = (b - r) / d + 2f;
-		}
-		else
-		{
-			h = (r - g) / d + 4f;
-		}
-		h /= 6f;
-		if (h < 0f)
-		{
-			h += 1f;
-		}
-	}
-
-	private static void HsvToRgb(float h, float s, float v, out float r, out float g, out float b)
-	{
-		h = (h % 1f + 1f) % 1f;
-		float c = v * s;
-		float x = c * (1f - MathF.Abs(h * 6f % 2f - 1f));
-		float m = v - c;
-		float r2 = 0f;
-		float g2 = 0f;
-		float b2 = 0f;
-		float seg = h * 6f;
-		if (seg < 1f)
-		{
-			r2 = c;
-			g2 = x;
-			b2 = 0f;
-		}
-		else if (seg < 2f)
-		{
-			r2 = x;
-			g2 = c;
-			b2 = 0f;
-		}
-		else if (seg < 3f)
-		{
-			r2 = 0f;
-			g2 = c;
-			b2 = x;
-		}
-		else if (seg < 4f)
-		{
-			r2 = 0f;
-			g2 = x;
-			b2 = c;
-		}
-		else if (seg < 5f)
-		{
-			r2 = x;
-			g2 = 0f;
-			b2 = c;
-		}
-		else
-		{
-			r2 = c;
-			g2 = 0f;
-			b2 = x;
-		}
-		r = r2 + m;
-		g = g2 + m;
-		b = b2 + m;
-	}
-
-	private void DrawProximityVoice()
-	{
-		ThemePalette t = _theme;
-		using (ImRaii.PushStyle(ImGuiStyleVar.ChildRounding, 10f))
-		{
-			using (ImRaii.PushStyle(ImGuiStyleVar.FramePadding, new Vector2(8f, 8f)))
-			{
-				using (ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 1f))
-				{
-					using (ImRaii.PushColor(ImGuiCol.ChildBg, t.PanelBg))
-					{
-						using (ImRaii.PushColor(ImGuiCol.Border, t.PanelBorder))
-						{
-							using (ImRaii.PushColor(ImGuiCol.Button, t.Btn))
-							{
-								using (ImRaii.PushColor(ImGuiCol.ButtonHovered, t.BtnHovered))
-								{
-									using (ImRaii.PushColor(ImGuiCol.ButtonActive, t.BtnActive))
-									{
-										using (ImRaii.PushStyle(ImGuiStyleVar.FrameRounding, 6f))
-										{
-											ImGui.BeginChild("voice-surface", new Vector2(_windowContentWidth, 0f), border: true);
-											using (ImRaii.PushColor(ImGuiCol.Text, t.TextPrimary))
-											{
-												using (ImRaii.PushColor(ImGuiCol.TextDisabled, t.TextDisabled))
-												{
-													ImGui.AlignTextToFramePadding();
-													ImGui.TextColored(t.Accent, "Proximity Voice");
-													ImGui.SameLine();
-													ImGui.Checkbox(" Enable", ref _voiceEnabled);
-													ThemedToolTip("Toggle proximity voice on/off");
-												}
-											}
-											float spacing = ImGui.GetStyle().ItemSpacing.X;
-											Vector2 iconSz = _uiSharedService.GetIconButtonSize(FontAwesomeIcon.Microphone);
-											ImGui.SameLine(ImGui.GetWindowContentRegionMax().X - iconSz.X * 3f - spacing * 2f);
-											using (ImRaii.Disabled(!_voiceEnabled))
-											{
-												FontAwesomeIcon micIcon = (_voiceMuted ? FontAwesomeIcon.MicrophoneSlash : FontAwesomeIcon.Microphone);
-												using (ImRaii.PushColor(ImGuiCol.Text, t.BtnText))
-												{
-													if (_voiceMuted)
-													{
-														using (ImRaii.PushColor(ImGuiCol.Button, t.BtnActive))
-														{
-															if (_uiSharedService.IconButton(micIcon))
-															{
-																_voiceMuted = !_voiceMuted;
-															}
-														}
-													}
-													else if (_uiSharedService.IconButton(micIcon))
-													{
-														_voiceMuted = !_voiceMuted;
-													}
-												}
-												ThemedToolTip(_voiceMuted ? "Unmute" : "Mute");
-												ImGui.SameLine(0f, spacing);
-												FontAwesomeIcon deafIcon = (_voiceDeafened ? FontAwesomeIcon.VolumeUp : FontAwesomeIcon.VolumeMute);
-												using (ImRaii.PushColor(ImGuiCol.Text, t.BtnText))
-												{
-													if (_voiceDeafened)
-													{
-														using (ImRaii.PushColor(ImGuiCol.Button, t.BtnActive))
-														{
-															if (_uiSharedService.IconButton(deafIcon))
-															{
-																_voiceDeafened = !_voiceDeafened;
-															}
-														}
-													}
-													else if (_uiSharedService.IconButton(deafIcon))
-													{
-														_voiceDeafened = !_voiceDeafened;
-													}
-												}
-												ThemedToolTip(_voiceDeafened ? "Undeafen" : "Deafen");
-												ImGui.SameLine(0f, spacing);
-												using (ImRaii.PushColor(ImGuiCol.Text, t.BtnText))
-												{
-													_uiSharedService.IconButton(FontAwesomeIcon.Cog);
-												}
-												ThemedToolTip("Configure proximity voice");
-											}
-											ImGui.EndChild();
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
 	private void DrawUserCountOverlay()
 	{
+		if (_apiController.ServerState == ServerState.Connected && !_showThemeInline)
+		{
+			Version ver = Assembly.GetExecutingAssembly().GetName().Version;
+			string versionText = $"{ver.Major}.{ver.Minor}.{ver.Build}";
+			string userCount = _apiController.OnlineUsers.ToString(CultureInfo.InvariantCulture);
+			Vector2 textSize = ImGui.CalcTextSize(versionText + " | " + userCount + " Users Online");
+			Vector2 childPos = ImGui.GetWindowPos();
+			Vector2 childSize = ImGui.GetWindowSize();
+			Vector2 textPos = new Vector2(childPos.X + (childSize.X - textSize.X) / 2f, childPos.Y + childSize.Y - textSize.Y - 15f);
+			ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+			uint secondaryColor = ImGui.ColorConvertFloat4ToU32(_theme.TextSecondary);
+			Vector2 versionSize = ImGui.CalcTextSize(versionText);
+			drawList.AddText(textPos, secondaryColor, versionText);
+			Vector2 currentPos = new Vector2(textPos.X + versionSize.X, textPos.Y);
+			Vector2 separatorSize = ImGui.CalcTextSize(" | ");
+			drawList.AddText(currentPos, secondaryColor, " | ");
+			uint accentColor = ImGui.ColorConvertFloat4ToU32(_theme.Accent);
+			currentPos = new Vector2(currentPos.X + separatorSize.X, textPos.Y);
+			Vector2 userCountSize = ImGui.CalcTextSize(userCount);
+			drawList.AddText(currentPos, accentColor, userCount);
+			uint textColor = ImGui.ColorConvertFloat4ToU32(_theme.TextPrimary);
+			currentPos = new Vector2(currentPos.X + userCountSize.X, textPos.Y);
+			drawList.AddText(currentPos, textColor, " Users Online");
+		}
 	}
 
 	public override void OnClose()

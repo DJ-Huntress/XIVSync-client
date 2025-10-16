@@ -100,10 +100,10 @@ internal static class ExportGuard
 		string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 		string downloads = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
 		string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-		
-		string dalamud = Path.Combine([appData, "XIVLauncher", "addon", "Hooks", "dev"]);
-		string penumbra = Path.Combine(appData, "XIVLauncher", "pluginConfigs", "Penumbra");
-		return new string[6]
+        string dalamud = Path.Combine([appData, "XIVLauncher", "addon", "Hooks", "dev"]);
+        string penumbra = Path.Combine(appData, "XIVLauncher", "pluginConfigs", "Penumbra");
+
+        return new string[6]
 		{
 			Path.Combine(docs, "Penumbra"),
 			Path.Combine(docs, "Penumbra", "Exports"),

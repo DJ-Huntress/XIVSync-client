@@ -94,9 +94,9 @@ public sealed class IpcCallerPetNames : IIpcCaller, IDisposable
 			string localNameData = _getPlayerData.InvokeFunc();
 			return string.IsNullOrEmpty(localNameData) ? string.Empty : localNameData;
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Could not obtain Pet Nicknames data");
+			_logger.LogWarning(e, "Could not obtain Pet Nicknames data");
 		}
 		return string.Empty;
 	}
@@ -123,11 +123,11 @@ public sealed class IpcCallerPetNames : IIpcCaller, IDisposable
 				{
 					_setPlayerData.InvokeAction(playerData);
 				}
-			}, "SetPlayerData", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPetNames.cs", 107).ConfigureAwait(continueOnCapturedContext: false);
+			}, "SetPlayerData", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPetNames.cs", 107).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Could not apply Pet Nicknames data");
+			_logger.LogWarning(e, "Could not apply Pet Nicknames data");
 		}
 	}
 
@@ -146,11 +146,11 @@ public sealed class IpcCallerPetNames : IIpcCaller, IDisposable
 					_logger.LogTrace("Pet Nicknames removing for {addr}", ((IntPtr)playerCharacter.Address).ToString("X"));
 					_clearPlayerData.InvokeAction(playerCharacter.ObjectIndex);
 				}
-			}, "ClearPlayerData", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPetNames.cs", 134).ConfigureAwait(continueOnCapturedContext: false);
+			}, "ClearPlayerData", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPetNames.cs", 134).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Could not clear Pet Nicknames data");
+			_logger.LogWarning(e, "Could not clear Pet Nicknames data");
 		}
 	}
 

@@ -12,11 +12,10 @@ public record GroupPairFullInfoDto : GroupPairDto
 
 	public UserPermissions OtherToSelfPermissions { get; init; }
 
-	public GroupPairFullInfoDto(GroupData Group, UserData User, UserPermissions SelfToOtherPermissions, UserPermissions OtherToSelfPermissions)
+	public GroupPairFullInfoDto(GroupData Group, UserData User, UserPermissions SelfToOtherPermissions, UserPermissions OtherToSelfPermissions) : base(Group, User)
 	{
 		this.SelfToOtherPermissions = SelfToOtherPermissions;
 		this.OtherToSelfPermissions = OtherToSelfPermissions;
-		base._002Ector(Group, User);
 	}
 
 	[CompilerGenerated]

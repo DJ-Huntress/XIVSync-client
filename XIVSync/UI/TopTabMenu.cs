@@ -17,6 +17,7 @@ using XIVSync.API.Dto.User;
 using XIVSync.MareConfiguration;
 using XIVSync.PlayerData.Pairs;
 using XIVSync.Services.Mediator;
+using XIVSync.UI.Theming;
 using XIVSync.WebAPI;
 
 namespace XIVSync.UI;
@@ -53,6 +54,10 @@ public class TopTabMenu
 	private string _pairToAdd = string.Empty;
 
 	private SelectedTab _selectedTab;
+
+	private float _rgbHue;
+
+	private float _tabPulse;
 
 	public string Filter
 	{
@@ -110,15 +115,53 @@ public class TopTabMenu
 		}
 	}
 
+	private void DrawCyberpunkTab(FontAwesomeIcon icon, Vector2 buttonSize, Vector2 spacing, SelectedTab tab, string tooltip, ImDrawListPtr drawList, ThemePalette? theme)
+	{
+		bool isSelected = TabSelection == tab;
+		Vector2 cursorBefore = ImGui.GetCursorScreenPos();
+		ThemePalette activeTheme = theme ?? new ThemePalette();
+		if (isSelected)
+		{
+			ThemeEffects.DrawBackgroundGlow(cursorBefore, new Vector2(cursorBefore.X + buttonSize.X, cursorBefore.Y + buttonSize.Y), activeTheme, _tabPulse);
+		}
+		using (ImRaii.PushFont(UiBuilder.IconFont))
+		{
+			Vector2 x = ImGui.GetCursorScreenPos();
+			if (ImGui.Button(icon.ToIconString(), buttonSize))
+			{
+				TabSelection = ((TabSelection != tab) ? tab : SelectedTab.None);
+			}
+			bool isHovered = ImGui.IsItemHovered();
+			if (!isSelected && isHovered)
+			{
+				ThemeEffects.DrawHoverGlow(x, new Vector2(x.X + buttonSize.X, x.Y + buttonSize.Y), activeTheme, _rgbHue);
+			}
+			if (isSelected)
+			{
+				ThemeEffects.DrawPulsingBorder(x, new Vector2(x.X + buttonSize.X, x.Y + buttonSize.Y), activeTheme, _tabPulse);
+				float lineY = x.Y + buttonSize.Y + spacing.Y;
+				ThemeEffects.DrawAccentLine(new Vector2(x.X, lineY), new Vector2(x.X + buttonSize.X, lineY), activeTheme, _tabPulse);
+			}
+			else
+			{
+				ThemeEffects.DrawPulsingBorder(x, new Vector2(x.X + buttonSize.X, x.Y + buttonSize.Y), activeTheme, _tabPulse, 1.5f, 0.4f, 0.2f, 1.5f);
+			}
+			ImGui.SameLine();
+		}
+	}
+
 	public void Draw(ThemePalette? theme = null)
 	{
+		float deltaTime = ImGui.GetIO().DeltaTime;
+		_rgbHue = (_rgbHue + deltaTime * 0.3f) % 1f;
+		_tabPulse += deltaTime * 2f;
 		float availableWidth = ImGui.GetWindowContentRegionMax().X - ImGui.GetWindowContentRegionMin().X;
 		Vector2 spacing = ImGui.GetStyle().ItemSpacing;
 		float buttonX = (availableWidth - spacing.X * 3f) / 4f;
-		float buttonY = _uiSharedService.GetIconButtonSize(FontAwesomeIcon.Pause).Y;
+		float buttonY = _uiSharedService.GetIconButtonSize(FontAwesomeIcon.Pause).Y + 8f;
 		Vector2 buttonSize = new Vector2(buttonX, buttonY);
 		ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-		uint underlineColor = ImGui.GetColorU32(ImGuiCol.Separator);
+		ImGui.GetColorU32(ImGuiCol.Separator);
 		int colorsPushed = 0;
 		if (theme != null)
 		{
@@ -134,91 +177,15 @@ public class TopTabMenu
 			colorsPushed = 1;
 		}
 		ImGuiHelpers.ScaledDummy(spacing.Y / 2f);
-		using (ImRaii.PushFont(UiBuilder.IconFont))
-		{
-			Vector2 x = ImGui.GetCursorScreenPos();
-			if (ImGui.Button(FontAwesomeIcon.User.ToIconString(), buttonSize))
-			{
-				TabSelection = ((TabSelection != SelectedTab.Individual) ? SelectedTab.Individual : SelectedTab.None);
-			}
-			ImGui.SameLine();
-			Vector2 xAfter = ImGui.GetCursorScreenPos();
-			if (TabSelection == SelectedTab.Individual)
-			{
-				Vector2 vector = x;
-				vector.Y = x.Y + buttonSize.Y + spacing.Y;
-				Vector2 p = vector;
-				vector = xAfter;
-				vector.Y = xAfter.Y + buttonSize.Y + spacing.Y;
-				vector.X = xAfter.X - spacing.X;
-				drawList.AddLine(p, vector, underlineColor, 2f);
-			}
-		}
+		DrawCyberpunkTab(FontAwesomeIcon.User, buttonSize, spacing, SelectedTab.Individual, "Individual Pair Menu", drawList, theme);
 		AttachTooltip("Individual Pair Menu", theme);
-		using (ImRaii.PushFont(UiBuilder.IconFont))
-		{
-			Vector2 x2 = ImGui.GetCursorScreenPos();
-			if (ImGui.Button(FontAwesomeIcon.Users.ToIconString(), buttonSize))
-			{
-				TabSelection = ((TabSelection != SelectedTab.Syncshell) ? SelectedTab.Syncshell : SelectedTab.None);
-			}
-			ImGui.SameLine();
-			Vector2 xAfter2 = ImGui.GetCursorScreenPos();
-			if (TabSelection == SelectedTab.Syncshell)
-			{
-				Vector2 vector = x2;
-				vector.Y = x2.Y + buttonSize.Y + spacing.Y;
-				Vector2 p2 = vector;
-				vector = xAfter2;
-				vector.Y = xAfter2.Y + buttonSize.Y + spacing.Y;
-				vector.X = xAfter2.X - spacing.X;
-				drawList.AddLine(p2, vector, underlineColor, 2f);
-			}
-		}
+		DrawCyberpunkTab(FontAwesomeIcon.Users, buttonSize, spacing, SelectedTab.Syncshell, "Syncshell Menu", drawList, theme);
 		AttachTooltip("Syncshell Menu", theme);
 		ImGui.SameLine();
-		using (ImRaii.PushFont(UiBuilder.IconFont))
-		{
-			Vector2 x3 = ImGui.GetCursorScreenPos();
-			if (ImGui.Button(FontAwesomeIcon.Filter.ToIconString(), buttonSize))
-			{
-				TabSelection = ((TabSelection != SelectedTab.Filter) ? SelectedTab.Filter : SelectedTab.None);
-			}
-			ImGui.SameLine();
-			Vector2 xAfter3 = ImGui.GetCursorScreenPos();
-			if (TabSelection == SelectedTab.Filter)
-			{
-				Vector2 vector = x3;
-				vector.Y = x3.Y + buttonSize.Y + spacing.Y;
-				Vector2 p3 = vector;
-				vector = xAfter3;
-				vector.Y = xAfter3.Y + buttonSize.Y + spacing.Y;
-				vector.X = xAfter3.X - spacing.X;
-				drawList.AddLine(p3, vector, underlineColor, 2f);
-			}
-		}
+		DrawCyberpunkTab(FontAwesomeIcon.Filter, buttonSize, spacing, SelectedTab.Filter, "Filter", drawList, theme);
 		AttachTooltip("Filter", theme);
 		ImGui.SameLine();
-		using (ImRaii.PushFont(UiBuilder.IconFont))
-		{
-			Vector2 x4 = ImGui.GetCursorScreenPos();
-			if (ImGui.Button(FontAwesomeIcon.UserCog.ToIconString(), buttonSize))
-			{
-				TabSelection = ((TabSelection != SelectedTab.UserConfig) ? SelectedTab.UserConfig : SelectedTab.None);
-			}
-			ImGui.SameLine();
-			Vector2 xAfter4 = ImGui.GetCursorScreenPos();
-			if (TabSelection == SelectedTab.UserConfig)
-			{
-				Vector2 vector = x4;
-				vector.Y = x4.Y + buttonSize.Y + spacing.Y;
-				Vector2 p4 = vector;
-				vector = xAfter4;
-				vector.Y = xAfter4.Y + buttonSize.Y + spacing.Y;
-				vector.X = xAfter4.X - spacing.X;
-				drawList.AddLine(p4, vector, underlineColor, 2f);
-			}
-		}
+		DrawCyberpunkTab(FontAwesomeIcon.UserCog, buttonSize, spacing, SelectedTab.UserConfig, "Your User Menu", drawList, theme);
 		AttachTooltip("Your User Menu", theme);
 		ImGui.NewLine();
 		if (colorsPushed > 0)
@@ -244,11 +211,10 @@ public class TopTabMenu
 		{
 			DrawUserConfig(availableWidth, spacing.X, theme);
 		}
-		if (TabSelection != SelectedTab.None)
+		if (TabSelection != 0)
 		{
 			ImGuiHelpers.ScaledDummy(3f);
 		}
-		ImGui.Separator();
 	}
 
 	private void DrawAddPair(float availableXWidth, float spacingX, ThemePalette? theme)
@@ -272,8 +238,8 @@ public class TopTabMenu
 	{
 		float buttonSize = _uiSharedService.GetIconTextButtonSize(FontAwesomeIcon.Ban, "Clear");
 		ImGui.SetNextItemWidth(availableWidth - buttonSize - spacingX);
-		string filter = Filter;
-		if (ImGui.InputTextWithHint("##filter", "Filter for UID/notes", ref filter, 255))
+        string filter = Filter;
+        if (ImGui.InputTextWithHint("##filter", "Filter for UID/notes", ref filter, 255))
 		{
 			Filter = filter;
 		}
@@ -289,6 +255,7 @@ public class TopTabMenu
 
 	private void DrawGlobalIndividualButtons(float availableXWidth, float spacingX, ThemePalette? theme)
 	{
+		ThemePalette activeTheme = theme ?? new ThemePalette();
 		float buttonX = (availableXWidth - spacingX * 3f) / 4f;
 		float buttonY = _uiSharedService.GetIconButtonSize(FontAwesomeIcon.Pause).Y;
 		Vector2 buttonSize = new Vector2(buttonX, buttonY);
@@ -296,7 +263,7 @@ public class TopTabMenu
 		{
 			using (ImRaii.Disabled(_globalControlCountdown > 0))
 			{
-				if (ImGui.Button(FontAwesomeIcon.Pause.ToIconString(), buttonSize))
+				if (ThemeEffects.DrawIconButtonWithGlow(FontAwesomeIcon.Pause, buttonSize, activeTheme, _tabPulse))
 				{
 					ImGui.OpenPopup("Individual Pause");
 				}
@@ -308,7 +275,7 @@ public class TopTabMenu
 		{
 			using (ImRaii.Disabled(_globalControlCountdown > 0))
 			{
-				if (ImGui.Button(FontAwesomeIcon.VolumeUp.ToIconString(), buttonSize))
+				if (ThemeEffects.DrawIconButtonWithGlow(FontAwesomeIcon.VolumeUp, buttonSize, activeTheme, _tabPulse))
 				{
 					ImGui.OpenPopup("Individual Sounds");
 				}
@@ -320,7 +287,7 @@ public class TopTabMenu
 		{
 			using (ImRaii.Disabled(_globalControlCountdown > 0))
 			{
-				if (ImGui.Button(FontAwesomeIcon.Running.ToIconString(), buttonSize))
+				if (ThemeEffects.DrawIconButtonWithGlow(FontAwesomeIcon.Running, buttonSize, activeTheme, _tabPulse))
 				{
 					ImGui.OpenPopup("Individual Animations");
 				}
@@ -332,7 +299,7 @@ public class TopTabMenu
 		{
 			using (ImRaii.Disabled(_globalControlCountdown > 0))
 			{
-				if (ImGui.Button(FontAwesomeIcon.Sun.ToIconString(), buttonSize))
+				if (ThemeEffects.DrawIconButtonWithGlow(FontAwesomeIcon.Sun, buttonSize, activeTheme, _tabPulse))
 				{
 					ImGui.OpenPopup("Individual VFX");
 				}
@@ -398,6 +365,7 @@ public class TopTabMenu
 
 	private void DrawGlobalSyncshellButtons(float availableXWidth, float spacingX, ThemePalette? theme)
 	{
+		ThemePalette activeTheme = theme ?? new ThemePalette();
 		float buttonX = (availableXWidth - spacingX * 4f) / 5f;
 		float buttonY = _uiSharedService.GetIconButtonSize(FontAwesomeIcon.Pause).Y;
 		Vector2 buttonSize = new Vector2(buttonX, buttonY);
@@ -405,7 +373,7 @@ public class TopTabMenu
 		{
 			using (ImRaii.Disabled(_globalControlCountdown > 0))
 			{
-				if (ImGui.Button(FontAwesomeIcon.Pause.ToIconString(), buttonSize))
+				if (ThemeEffects.DrawIconButtonWithGlow(FontAwesomeIcon.Pause, buttonSize, activeTheme, _tabPulse))
 				{
 					ImGui.OpenPopup("Syncshell Pause");
 				}
@@ -417,7 +385,7 @@ public class TopTabMenu
 		{
 			using (ImRaii.Disabled(_globalControlCountdown > 0))
 			{
-				if (ImGui.Button(FontAwesomeIcon.VolumeUp.ToIconString(), buttonSize))
+				if (ThemeEffects.DrawIconButtonWithGlow(FontAwesomeIcon.VolumeUp, buttonSize, activeTheme, _tabPulse))
 				{
 					ImGui.OpenPopup("Syncshell Sounds");
 				}
@@ -429,7 +397,7 @@ public class TopTabMenu
 		{
 			using (ImRaii.Disabled(_globalControlCountdown > 0))
 			{
-				if (ImGui.Button(FontAwesomeIcon.Running.ToIconString(), buttonSize))
+				if (ThemeEffects.DrawIconButtonWithGlow(FontAwesomeIcon.Running, buttonSize, activeTheme, _tabPulse))
 				{
 					ImGui.OpenPopup("Syncshell Animations");
 				}
@@ -441,7 +409,7 @@ public class TopTabMenu
 		{
 			using (ImRaii.Disabled(_globalControlCountdown > 0))
 			{
-				if (ImGui.Button(FontAwesomeIcon.Sun.ToIconString(), buttonSize))
+				if (ThemeEffects.DrawIconButtonWithGlow(FontAwesomeIcon.Sun, buttonSize, activeTheme, _tabPulse))
 				{
 					ImGui.OpenPopup("Syncshell VFX");
 				}
@@ -489,16 +457,16 @@ public class TopTabMenu
 		{
 			using (ImRaii.Disabled(_globalControlCountdown > 0 || !UiSharedService.CtrlPressed()))
 			{
-				if (ImGui.Button(FontAwesomeIcon.Check.ToIconString(), buttonSize))
+				if (ThemeEffects.DrawIconButtonWithGlow(FontAwesomeIcon.Check, buttonSize, activeTheme, _tabPulse))
 				{
 					GlobalControlCountdown(10);
 					Dictionary<string, GroupUserPreferredPermissions> bulkSyncshells = _pairManager.GroupPairs.Keys.OrderBy<GroupFullInfoDto, string>((GroupFullInfoDto g) => g.GroupAliasOrGID, StringComparer.OrdinalIgnoreCase).ToDictionary<GroupFullInfoDto, string, GroupUserPreferredPermissions>((GroupFullInfoDto g) => g.Group.GID, delegate(GroupFullInfoDto g)
 					{
-						GroupUserPreferredPermissions perm = g.GroupUserPermissions;
-						perm.SetDisableSounds(g.GroupPermissions.IsPreferDisableSounds());
-						perm.SetDisableAnimations(g.GroupPermissions.IsPreferDisableAnimations());
-						perm.SetDisableVFX(g.GroupPermissions.IsPreferDisableVFX());
-						return perm;
+						GroupUserPreferredPermissions perm2 = g.GroupUserPermissions;
+						perm2.SetDisableSounds(g.GroupPermissions.IsPreferDisableSounds());
+						perm2.SetDisableAnimations(g.GroupPermissions.IsPreferDisableAnimations());
+						perm2.SetDisableVFX(g.GroupPermissions.IsPreferDisableVFX());
+						return perm2;
 					}, StringComparer.Ordinal);
 					_apiController.SetBulkPermissions(new BulkPermissionsDto(new Dictionary<string, UserPermissions>(StringComparer.Ordinal), bulkSyncshells)).ConfigureAwait(continueOnCapturedContext: false);
 				}
@@ -627,8 +595,8 @@ public class TopTabMenu
 		if (_uiSharedService.IconTextButton(disableIcon, disableText, null, isInPopup: true))
 		{
 			GlobalControlCountdown(10);
-			Dictionary<string, UserPermissions> bulkIndividualPairs2 = _pairManager.PairsWithGroups.Keys.Where((Pair g) => g.IndividualPairStatus == IndividualPairStatus.Bidirectional).ToDictionary<Pair, string, UserPermissions>((Pair g) => g.UserPair.User.UID, (Pair g) => actDisable(g.UserPair.OwnPermissions), StringComparer.Ordinal);
-			_apiController.SetBulkPermissions(new BulkPermissionsDto(bulkIndividualPairs2, new Dictionary<string, GroupUserPreferredPermissions>(StringComparer.Ordinal))).ConfigureAwait(continueOnCapturedContext: false);
+			Dictionary<string, UserPermissions> bulkIndividualPairs = _pairManager.PairsWithGroups.Keys.Where((Pair g) => g.IndividualPairStatus == IndividualPairStatus.Bidirectional).ToDictionary<Pair, string, UserPermissions>((Pair g) => g.UserPair.User.UID, (Pair g) => actDisable(g.UserPair.OwnPermissions), StringComparer.Ordinal);
+			_apiController.SetBulkPermissions(new BulkPermissionsDto(bulkIndividualPairs, new Dictionary<string, GroupUserPreferredPermissions>(StringComparer.Ordinal))).ConfigureAwait(continueOnCapturedContext: false);
 			ImGui.CloseCurrentPopup();
 		}
 		ImGui.EndPopup();
@@ -650,8 +618,8 @@ public class TopTabMenu
 		if (_uiSharedService.IconTextButton(disableIcon, disableText, null, isInPopup: true))
 		{
 			GlobalControlCountdown(10);
-			Dictionary<string, GroupUserPreferredPermissions> bulkSyncshells2 = _pairManager.GroupPairs.Keys.OrderBy<GroupFullInfoDto, string>((GroupFullInfoDto u) => u.GroupAliasOrGID, StringComparer.OrdinalIgnoreCase).ToDictionary<GroupFullInfoDto, string, GroupUserPreferredPermissions>((GroupFullInfoDto g) => g.Group.GID, (GroupFullInfoDto g) => actDisable(g.GroupUserPermissions), StringComparer.Ordinal);
-			_apiController.SetBulkPermissions(new BulkPermissionsDto(new Dictionary<string, UserPermissions>(StringComparer.Ordinal), bulkSyncshells2)).ConfigureAwait(continueOnCapturedContext: false);
+			Dictionary<string, GroupUserPreferredPermissions> bulkSyncshells = _pairManager.GroupPairs.Keys.OrderBy<GroupFullInfoDto, string>((GroupFullInfoDto u) => u.GroupAliasOrGID, StringComparer.OrdinalIgnoreCase).ToDictionary<GroupFullInfoDto, string, GroupUserPreferredPermissions>((GroupFullInfoDto g) => g.Group.GID, (GroupFullInfoDto g) => actDisable(g.GroupUserPermissions), StringComparer.Ordinal);
+			_apiController.SetBulkPermissions(new BulkPermissionsDto(new Dictionary<string, UserPermissions>(StringComparer.Ordinal), bulkSyncshells)).ConfigureAwait(continueOnCapturedContext: false);
 			ImGui.CloseCurrentPopup();
 		}
 		ImGui.EndPopup();

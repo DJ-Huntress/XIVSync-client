@@ -15,13 +15,13 @@ public record UserProfileDto : UserDto
 
 	public string? Description { get; init; }
 
-	public UserProfileDto(UserData User, bool Disabled, bool? IsNSFW, string? ProfilePictureBase64, string? Description)
+	public UserProfileDto(UserData User, bool Disabled, bool? IsNSFW, string? ProfilePictureBase64, string? Description) : base(User)
 	{
 		this.Disabled = Disabled;
 		this.IsNSFW = IsNSFW;
 		this.ProfilePictureBase64 = ProfilePictureBase64;
 		this.Description = Description;
-		base._002Ector(User);
+
 	}
 
 	[CompilerGenerated]

@@ -149,7 +149,7 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public MareMediator Mediator { get; }
 
-	public DalamudUtilService(ILogger<DalamudUtilService> logger, IClientState clientState, IObjectTable objectTable, IFramework framework, IGameGui gameGui, ICondition condition, IDataManager gameData, ITargetManager targetManager, IGameConfig gameConfig, BlockedCharacterHandler blockedCharacterHandler, MareMediator mediator, PerformanceCollectorService performanceCollector, MareConfigService configService)
+	public DalamudUtilService(ILogger<DalamudUtilService> logger, IClientState clientState, IObjectTable objectTable, IFramework framework, IGameGui gameGui, ICondition condition, IDataManager gameData, ITargetManager targetManager, IGameConfig gameConfig, BlockedCharacterHandler blockedCharacterHandler, MareMediator mediator, PerformanceCollectorService performanceCollector, MareConfigService configService) : base()
 	{
 		int num = 1;
 		List<uint> list = new List<uint>(num);
@@ -162,7 +162,6 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 		_lastGlobalBlockReason = string.Empty;
 		_playerCharas = new Dictionary<string, (string, nint)>(StringComparer.Ordinal);
 		_notUpdatedCharas = new List<string>();
-		base._002Ector();
 		DalamudUtilService dalamudUtilService = this;
 		_logger = logger;
 		_clientState = clientState;
@@ -184,14 +183,14 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 			where w.RowId != 0
 			select w).ToDictionary((TerritoryType w) => w.RowId, delegate(TerritoryType w)
 		{
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.Append(w.PlaceNameRegion.Value.Name);
+			StringBuilder stringBuilder2 = new StringBuilder();
+			stringBuilder2.Append(w.PlaceNameRegion.Value.Name);
 			if (w.PlaceName.ValueNullable.HasValue)
 			{
-				stringBuilder.Append(" - ");
-				stringBuilder.Append(w.PlaceName.Value.Name);
+				stringBuilder2.Append(" - ");
+				stringBuilder2.Append(w.PlaceName.Value.Name);
 			}
-			return stringBuilder.ToString();
+			return stringBuilder2.ToString();
 		}));
 		MapData = new Lazy<Dictionary<uint, (Map, string)>>(() => (from w in gameData.GetExcelSheet<Map>(ClientLanguage.English)
 			where w.RowId != 0
@@ -232,7 +231,7 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 							{
 								targetManager.Target = dalamudUtilService.CreateGameObject(addr);
 							}
-						}, ".ctor", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 126).ConfigureAwait(continueOnCapturedContext: false);
+						}, ".ctor", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 126).ConfigureAwait(continueOnCapturedContext: false);
 					}
 				}
 			}
@@ -263,7 +262,7 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public async Task<IGameObject?> CreateGameObjectAsync(nint reference)
 	{
-		return await RunOnFrameworkThread(() => _objectTable.CreateObjectReference(reference), "CreateGameObjectAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 183).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread(() => _objectTable.CreateObjectReference(reference), "CreateGameObjectAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 183).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public void EnsureIsOnFramework()
@@ -305,12 +304,12 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public async Task<nint> GetCompanionAsync(nint? playerPointer = null)
 	{
-		return await RunOnFrameworkThread(() => GetCompanionPtr(playerPointer), "GetCompanionAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 210).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread(() => GetCompanionPtr(playerPointer), "GetCompanionAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 210).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task<ICharacter?> GetGposeCharacterFromObjectTableByNameAsync(string name, bool onlyGposeCharacters = false)
 	{
-		return await RunOnFrameworkThread(() => GetGposeCharacterFromObjectTableByName(name, onlyGposeCharacters), "GetGposeCharacterFromObjectTableByNameAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 215).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread(() => GetGposeCharacterFromObjectTableByName(name, onlyGposeCharacters), "GetGposeCharacterFromObjectTableByNameAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 215).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public ICharacter? GetGposeCharacterFromObjectTableByName(string name, bool onlyGposeCharacters = false)
@@ -336,7 +335,7 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public async Task<bool> GetIsPlayerPresentAsync()
 	{
-		return await RunOnFrameworkThread((Func<bool>)GetIsPlayerPresent, "GetIsPlayerPresentAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 238).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread((Func<bool>)GetIsPlayerPresent, "GetIsPlayerPresentAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 238).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public unsafe nint GetMinionOrMountPtr(nint? playerPointer = null)
@@ -359,7 +358,7 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public async Task<nint> GetMinionOrMountAsync(nint? playerPointer = null)
 	{
-		return await RunOnFrameworkThread(() => GetMinionOrMountPtr(playerPointer), "GetMinionOrMountAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 251).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread(() => GetMinionOrMountPtr(playerPointer), "GetMinionOrMountAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 251).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public unsafe nint GetPetPtr(nint? playerPointer = null)
@@ -386,12 +385,12 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public async Task<nint> GetPetAsync(nint? playerPointer = null)
 	{
-		return await RunOnFrameworkThread(() => GetPetPtr(playerPointer), "GetPetAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 266).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread(() => GetPetPtr(playerPointer), "GetPetAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 266).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task<IPlayerCharacter> GetPlayerCharacterAsync()
 	{
-		return await RunOnFrameworkThread((Func<IPlayerCharacter>)GetPlayerCharacter, "GetPlayerCharacterAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 271).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread((Func<IPlayerCharacter>)GetPlayerCharacter, "GetPlayerCharacterAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 271).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public IPlayerCharacter GetPlayerCharacter()
@@ -402,9 +401,9 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public nint GetPlayerCharacterFromCachedTableByIdent(string characterName)
 	{
-		if (_playerCharas.TryGetValue(characterName, out (string, nint) pchar))
+		if (_playerCharas.TryGetValue(characterName, out (string Name, nint Address) pchar))
 		{
-			return pchar.Item2;
+			return pchar.Address;
 		}
 		return IntPtr.Zero;
 	}
@@ -417,12 +416,12 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public async Task<string> GetPlayerNameAsync()
 	{
-		return await RunOnFrameworkThread((Func<string>)GetPlayerName, "GetPlayerNameAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 294).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread((Func<string>)GetPlayerName, "GetPlayerNameAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 294).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task<ulong> GetCIDAsync()
 	{
-		return await RunOnFrameworkThread((Func<ulong>)GetCID, "GetCIDAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 299).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread((Func<ulong>)GetCID, "GetCIDAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 299).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public unsafe ulong GetCID()
@@ -433,7 +432,7 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public async Task<string> GetPlayerNameHashedAsync()
 	{
-		return await RunOnFrameworkThread(() => _cid.Value.ToString().GetHash256(), "GetPlayerNameHashedAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 311).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread(() => _cid.Value.ToString().GetHash256(), "GetPlayerNameHashedAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 311).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	private unsafe static string GetHashedCIDFromPlayerPointer(nint ptr)
@@ -449,7 +448,7 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public async Task<nint> GetPlayerPointerAsync()
 	{
-		return await RunOnFrameworkThread((Func<nint>)GetPlayerPtr, "GetPlayerPointerAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 327).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread((Func<nint>)GetPlayerPtr, "GetPlayerPointerAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 327).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public uint GetHomeWorldId()
@@ -496,16 +495,15 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 			territoryId = HousingManager.GetOriginalHouseTerritoryTypeId();
 		}
 		uint roomId = (uint)((houseMan != null) ? houseMan->GetCurrentRoom() : 0);
-		return new LocationInfo
-		{
-			ServerId = serverId,
-			MapId = mapId,
-			TerritoryId = territoryId,
-			DivisionId = divisionId,
-			WardId = wardId,
-			HouseId = houseId,
-			RoomId = roomId
-		};
+		LocationInfo result = default(LocationInfo);
+		result.ServerId = serverId;
+		result.MapId = mapId;
+		result.TerritoryId = territoryId;
+		result.DivisionId = divisionId;
+		result.WardId = wardId;
+		result.HouseId = houseId;
+		result.RoomId = roomId;
+		return result;
 	}
 
 	public unsafe void SetMarkerAndOpenMap(Vector3 position, Map map)
@@ -521,17 +519,17 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public async Task<LocationInfo> GetMapDataAsync()
 	{
-		return await RunOnFrameworkThread((Func<LocationInfo>)GetMapData, "GetMapDataAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 393).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread((Func<LocationInfo>)GetMapData, "GetMapDataAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 393).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task<uint> GetWorldIdAsync()
 	{
-		return await RunOnFrameworkThread((Func<uint>)GetWorldId, "GetWorldIdAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 398).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread((Func<uint>)GetWorldId, "GetWorldIdAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 398).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task<uint> GetHomeWorldIdAsync()
 	{
-		return await RunOnFrameworkThread((Func<uint>)GetHomeWorldId, "GetHomeWorldIdAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 403).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread((Func<uint>)GetHomeWorldId, "GetHomeWorldIdAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 403).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public bool IsGameObjectPresent(nint key)
@@ -547,7 +545,7 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	public async Task<bool> IsObjectPresentAsync(IGameObject? obj)
 	{
-		return await RunOnFrameworkThread(() => IsObjectPresent(obj), "IsObjectPresentAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 419).ConfigureAwait(continueOnCapturedContext: false);
+		return await RunOnFrameworkThread(() => IsObjectPresent(obj), "IsObjectPresentAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\DalamudUtilService.cs", 419).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task RunOnFrameworkThread(System.Action act, [CallerMemberName] string callerMember = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
@@ -663,13 +661,13 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 			}
 			logger.LogTrace("[{redrawId}] Finished drawing after {curWaitTime}ms", redrawId, curWaitTime);
 		}
-		catch (NullReferenceException exception)
+		catch (NullReferenceException ex)
 		{
-			logger.LogWarning(exception, "Error accessing {handler}, object does not exist anymore?", handler);
+			logger.LogWarning(ex, "Error accessing {handler}, object does not exist anymore?", handler);
 		}
-		catch (AccessViolationException exception2)
+		catch (AccessViolationException ex)
 		{
-			logger.LogWarning(exception2, "Error accessing {handler}, object does not exist anymore?", handler);
+			logger.LogWarning(ex, "Error accessing {handler}, object does not exist anymore?", handler);
 		}
 	}
 
@@ -702,7 +700,7 @@ public class DalamudUtilService : IHostedService, IMediatorSubscriber
 
 	internal (string Name, nint Address) FindPlayerByNameHash(string ident)
 	{
-		_playerCharas.TryGetValue(ident, out (string, nint) result);
+		_playerCharas.TryGetValue(ident, out (string Name, nint Address) result);
 		return result;
 	}
 

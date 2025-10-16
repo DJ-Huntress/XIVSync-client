@@ -359,17 +359,17 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 			ImGui.Spacing();
 			ImGui.Separator();
 			ImGui.Spacing();
-			bool v = _configService.Current.OpenPopupOnAdd;
-			if (ImGui.Checkbox("Open Notes Popup on user addition", ref v))
+			bool v6 = _configService.Current.OpenPopupOnAdd;
+			if (ImGui.Checkbox("Open Notes Popup on user addition", ref v6))
 			{
-				_configService.Current.OpenPopupOnAdd = v;
+				_configService.Current.OpenPopupOnAdd = v6;
 				_configService.Save();
 			}
 			DrawHelpIcon("Shows a popup to add notes when adding a new user");
-			bool v2 = _configService.Current.AutoPopulateEmptyNotesFromCharaName;
-			if (ImGui.Checkbox("Automatically populate notes using player names", ref v2))
+			bool v7 = _configService.Current.AutoPopulateEmptyNotesFromCharaName;
+			if (ImGui.Checkbox("Automatically populate notes using player names", ref v7))
 			{
-				_configService.Current.AutoPopulateEmptyNotesFromCharaName = v2;
+				_configService.Current.AutoPopulateEmptyNotesFromCharaName = v7;
 				_configService.Save();
 			}
 			DrawHelpIcon("Automatically fills in notes with character names when empty");
@@ -503,8 +503,8 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 			text.AppendFormatted(i);
 			if (ImGui.ColorEdit3(text, ref glowColor, ImGuiColorEditFlags.NoInputs | ImGuiColorEditFlags.NoLabel))
 			{
-				DtrEntry.Colors newColor2 = new DtrEntry.Colors(colorConfig.Foreground, ConvertVector3ToColor(glowColor));
-				SetDtrColor(i, newColor2);
+				DtrEntry.Colors newColor = new DtrEntry.Colors(colorConfig.Foreground, ConvertVector3ToColor(glowColor));
+				SetDtrColor(i, newColor);
 			}
 			if (i < colors.Length - 1)
 			{
@@ -793,7 +793,7 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 		if (string.IsNullOrEmpty(_cacheMonitor.MareWatcher?.Path))
 		{
 			ImGui.SameLine();
-			if (ImGui.Button("Try to reinitialize Monitor##mare"))
+			if (ImGui.Button("Try to reinitialize Monitor##xivsync"))
 			{
 				_cacheMonitor.StartMareWatcher(_configService.Current.CacheFolder);
 			}
@@ -951,7 +951,7 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 		}
 		ImGui.SameLine();
 		ImGui.SetNextItemWidth(100f);
-        _uiSharedService.DrawCombo("###speed", [DownloadSpeeds.Bps, DownloadSpeeds.KBps, DownloadSpeeds.MBps],
+		_uiSharedService.DrawCombo("###speed", [DownloadSpeeds.Bps, DownloadSpeeds.KBps, DownloadSpeeds.MBps],
             (s) => s switch
 		{
 			DownloadSpeeds.Bps => "Byte/s", 
@@ -1087,15 +1087,15 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 				ImGui.Text("Are you sure you want to continue?");
 				ImGui.Separator();
 				ImGui.Spacing();
-				float buttonSize2 = (ImGui.GetWindowContentRegionMax().X - ImGui.GetWindowContentRegionMin().X - ImGui.GetStyle().ItemSpacing.X) / 2f;
-				if (ImGui.Button("Delete account", new Vector2(buttonSize2, 0f)))
+				float buttonSize = (ImGui.GetWindowContentRegionMax().X - ImGui.GetWindowContentRegionMin().X - ImGui.GetStyle().ItemSpacing.X) / 2f;
+				if (ImGui.Button("Delete account", new Vector2(buttonSize, 0f)))
 				{
 					Task.Run((Func<Task?>)_apiController.UserDelete);
 					_deleteAccountPopupModalShown = false;
 					base.Mediator.Publish(new SwitchToIntroUiMessage());
 				}
 				ImGui.SameLine();
-				if (ImGui.Button("Cancel##cancelDelete", new Vector2(buttonSize2, 0f)))
+				if (ImGui.Button("Cancel##cancelDelete", new Vector2(buttonSize, 0f)))
 				{
 					_deleteAccountPopupModalShown = false;
 				}
@@ -1380,23 +1380,23 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 		{
 			return "Plugin";
 		}
-		string cat2 = cat;
-		if (cat2.Contains("auth") || cat2.Contains("login") || cat2.Contains("token"))
+		cat = cat;
+		if (cat.Contains("auth") || cat.Contains("login") || cat.Contains("token"))
 		{
 			return "Auth";
 		}
-		string cat3 = cat;
-		if (cat3.Contains("service") || cat3.Contains("manager") || cat3.Contains("controller"))
+		cat = cat;
+		if (cat.Contains("service") || cat.Contains("manager") || cat.Contains("controller"))
 		{
 			return "Services";
 		}
-		string cat4 = cat;
-		if (cat4.Contains("network") || cat4.Contains("connection") || cat4.Contains("signalr") || cat4.Contains("api"))
+		cat = cat;
+		if (cat.Contains("network") || cat.Contains("connection") || cat.Contains("signalr") || cat.Contains("api"))
 		{
 			return "Network";
 		}
-		string cat5 = cat;
-		if (cat5.Contains("file") || cat5.Contains("cache") || cat5.Contains("download") || cat5.Contains("upload"))
+		cat = cat;
+		if (cat.Contains("file") || cat.Contains("cache") || cat.Contains("download") || cat.Contains("upload"))
 		{
 			return "File";
 		}
@@ -1474,9 +1474,9 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 				ImGui.SetClipboardText(logText.ToString());
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogError(exception, "Failed to copy logs to clipboard");
+			_logger.LogError(ex, "Failed to copy logs to clipboard");
 		}
 	}
 
@@ -1843,7 +1843,7 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 
 	private Vector3 ConvertColorToVector3(uint color)
 	{
-		return new Vector3((float)((color >> 16) & 0xFF) / 255f, (float)((color >> 8) & 0xFF) / 255f, (float)(color & 0xFF) / 255f);
+		return new Vector3((float)((color >> 16) & 0xFFu) / 255f, (float)((color >> 8) & 0xFFu) / 255f, (float)(color & 0xFFu) / 255f);
 	}
 
 	private uint ConvertVector3ToColor(Vector3 color)
@@ -1875,9 +1875,9 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 			ImGui.SetClipboardText("Export functionality coming soon...");
 			_logger.LogInformation("Notes export requested - feature coming soon");
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogError(exception, "Failed to export notes");
+			_logger.LogError(ex, "Failed to export notes");
 		}
 	}
 
@@ -1887,9 +1887,9 @@ public class ModernSettingsUi : WindowMediatorSubscriberBase
 		{
 			_logger.LogInformation("Notes import requested - feature coming soon");
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogError(exception, "Failed to import notes");
+			_logger.LogError(ex, "Failed to import notes");
 		}
 	}
 }

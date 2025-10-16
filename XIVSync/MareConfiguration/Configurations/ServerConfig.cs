@@ -19,9 +19,11 @@ public class ServerConfig : IMareConfiguration
 		}
 	};
 
+
 	public bool SendCensusData { get; set; }
 
 	public bool ShownCensusPopup { get; set; }
 
 	public int Version { get; set; } = 2;
+
 }

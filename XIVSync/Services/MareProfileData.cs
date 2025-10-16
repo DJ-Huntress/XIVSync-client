@@ -6,5 +6,7 @@ public record MareProfileData(bool IsFlagged, bool IsNSFW, string Base64ProfileP
 {
 	public Lazy<byte[]> ImageData { get; } = new Lazy<byte[]>(Convert.FromBase64String(Base64ProfilePicture));
 
+
 	public Lazy<byte[]> SupporterImageData { get; } = new Lazy<byte[]>(string.IsNullOrEmpty(Base64SupporterPicture) ? Array.Empty<byte>() : Convert.FromBase64String(Base64SupporterPicture));
+
 }

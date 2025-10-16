@@ -26,6 +26,7 @@ public class FileReplacement
 
 	public string Hash { get; set; } = string.Empty;
 
+
 	public bool IsFileSwap
 	{
 		get
@@ -65,6 +66,6 @@ public class FileReplacement
 	[GeneratedCode("System.Text.RegularExpressions.Generator", "9.0.12.6610")]
 	private static Regex LocalPathRegex()
 	{
-		return _003CRegexGenerator_g_003EF3957ABF6C996F283E6D5A99861D1FFD1A039295BD532E2416D998903D178A004__LocalPathRegex_0.Instance;
+		return _003CRegexGenerator_g_003EF7C2A3A4E3E23D9AAD8AD182C53AF1445029BB959A191641E99FAF6FAA9B714AC__LocalPathRegex_0.Instance;
 	}
 }

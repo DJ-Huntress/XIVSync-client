@@ -92,7 +92,7 @@ public sealed class CharaDataCharacterHandler : DisposableMediatorSubscriberBase
 			return false;
 		}
 		_handledCharaData.Remove(handled);
-		await _dalamudUtilService.RunOnFrameworkThread(() => RevertChara(handled.Name, handled.CustomizePlus), "RevertHandledChara", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataCharacterHandler.cs", 83).ConfigureAwait(continueOnCapturedContext: false);
+		await _dalamudUtilService.RunOnFrameworkThread(() => RevertChara(handled.Name, handled.CustomizePlus), "RevertHandledChara", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataCharacterHandler.cs", 83).ConfigureAwait(continueOnCapturedContext: false);
 		return true;
 	}
 
@@ -103,7 +103,7 @@ public sealed class CharaDataCharacterHandler : DisposableMediatorSubscriberBase
 			return Task.CompletedTask;
 		}
 		_handledCharaData.Remove(handled);
-		return _dalamudUtilService.RunOnFrameworkThread(() => RevertChara(handled.Name, handled.CustomizePlus), "RevertHandledChara", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataCharacterHandler.cs", 91);
+		return _dalamudUtilService.RunOnFrameworkThread(() => RevertChara(handled.Name, handled.CustomizePlus), "RevertHandledChara", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataCharacterHandler.cs", 91);
 	}
 
 	internal void AddHandledChara(HandledCharaDataEntry handledCharaDataEntry)

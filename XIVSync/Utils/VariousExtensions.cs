@@ -104,7 +104,7 @@ public static class VariousExtensions
 				{
 					logger.LogDebug("[BASE-{appBase}] Updating {object}/{kind} (FileReplacements not equal) => {change}", applicationBase, cachedPlayer, objectKind, PlayerChanges.ModFiles);
 					charaDataToUpdate[objectKind].Add(PlayerChanges.ModFiles);
-					if (forceApplyMods || objectKind != XIVSync.API.Data.Enum.ObjectKind.Player)
+					if (forceApplyMods || objectKind != 0)
 					{
 						charaDataToUpdate[objectKind].Add(PlayerChanges.ForcedRedraw);
 					}
@@ -116,8 +116,8 @@ public static class VariousExtensions
 						List<FileReplacementData> newFace = newFileReplacements.Where((FileReplacementData g) => g.GamePaths.Any((string p) => p.Contains("/face/", StringComparison.OrdinalIgnoreCase))).OrderBy<FileReplacementData, string>((FileReplacementData g) => (!string.IsNullOrEmpty(g.Hash)) ? g.Hash : g.FileSwapPath, StringComparer.OrdinalIgnoreCase).ToList();
 						List<FileReplacementData> newHair = newFileReplacements.Where((FileReplacementData g) => g.GamePaths.Any((string p) => p.Contains("/hair/", StringComparison.OrdinalIgnoreCase))).OrderBy<FileReplacementData, string>((FileReplacementData g) => (!string.IsNullOrEmpty(g.Hash)) ? g.Hash : g.FileSwapPath, StringComparer.OrdinalIgnoreCase).ToList();
 						List<FileReplacementData> newTail = newFileReplacements.Where((FileReplacementData g) => g.GamePaths.Any((string p) => p.Contains("/tail/", StringComparison.OrdinalIgnoreCase))).OrderBy<FileReplacementData, string>((FileReplacementData g) => (!string.IsNullOrEmpty(g.Hash)) ? g.Hash : g.FileSwapPath, StringComparer.OrdinalIgnoreCase).ToList();
-						List<FileReplacementData> existingTransients = existingFileReplacements.Where((FileReplacementData g) => g.GamePaths.Any((string text) => !text.EndsWith("mdl") && !text.EndsWith("tex") && !text.EndsWith("mtrl"))).OrderBy<FileReplacementData, string>((FileReplacementData g) => (!string.IsNullOrEmpty(g.Hash)) ? g.Hash : g.FileSwapPath, StringComparer.OrdinalIgnoreCase).ToList();
-						List<FileReplacementData> newTransients = newFileReplacements.Where((FileReplacementData g) => g.GamePaths.Any((string text) => !text.EndsWith("mdl") && !text.EndsWith("tex") && !text.EndsWith("mtrl"))).OrderBy<FileReplacementData, string>((FileReplacementData g) => (!string.IsNullOrEmpty(g.Hash)) ? g.Hash : g.FileSwapPath, StringComparer.OrdinalIgnoreCase).ToList();
+						List<FileReplacementData> existingTransients = existingFileReplacements.Where((FileReplacementData g) => g.GamePaths.Any((string g) => !g.EndsWith("mdl") && !g.EndsWith("tex") && !g.EndsWith("mtrl"))).OrderBy<FileReplacementData, string>((FileReplacementData g) => (!string.IsNullOrEmpty(g.Hash)) ? g.Hash : g.FileSwapPath, StringComparer.OrdinalIgnoreCase).ToList();
+						List<FileReplacementData> newTransients = newFileReplacements.Where((FileReplacementData g) => g.GamePaths.Any((string g) => !g.EndsWith("mdl") && !g.EndsWith("tex") && !g.EndsWith("mtrl"))).OrderBy<FileReplacementData, string>((FileReplacementData g) => (!string.IsNullOrEmpty(g.Hash)) ? g.Hash : g.FileSwapPath, StringComparer.OrdinalIgnoreCase).ToList();
 						logger.LogTrace("[BASE-{appbase}] ExistingFace: {of}, NewFace: {fc}; ExistingHair: {eh}, NewHair: {nh}; ExistingTail: {et}, NewTail: {nt}; ExistingTransient: {etr}, NewTransient: {ntr}", applicationBase, existingFace.Count, newFace.Count, existingHair.Count, newHair.Count, existingTail.Count, newTail.Count, existingTransients.Count, newTransients.Count);
 						bool differentFace = !existingFace.SequenceEqual(newFace, FileReplacementDataComparer.Instance);
 						bool differentHair = !existingHair.SequenceEqual(newHair, FileReplacementDataComparer.Instance);

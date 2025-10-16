@@ -113,9 +113,9 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
 
 	public string PlayerNameHash => Pair.Ident;
 
-	public PairHandler(ILogger<PairHandler> logger, Pair pair, GameObjectHandlerFactory gameObjectHandlerFactory, IpcManager ipcManager, FileDownloadManager transferManager, PluginWarningNotificationService pluginWarningNotificationManager, DalamudUtilService dalamudUtil, IHostApplicationLifetime lifetime, FileCacheManager fileDbManager, MareMediator mediator, PlayerPerformanceService playerPerformanceService, ServerConfigurationManager serverConfigManager)
-		: base(logger, mediator)
+	public PairHandler(ILogger<PairHandler> logger, Pair pair, GameObjectHandlerFactory gameObjectHandlerFactory, IpcManager ipcManager, FileDownloadManager transferManager, PluginWarningNotificationService pluginWarningNotificationManager, DalamudUtilService dalamudUtil, IHostApplicationLifetime lifetime, FileCacheManager fileDbManager, MareMediator mediator, PlayerPerformanceService playerPerformanceService, ServerConfigurationManager serverConfigManager) : base(logger, mediator)
 	{
+
 		PairHandler pairHandler = this;
 		Pair = pair;
 		_gameObjectHandlerFactory = gameObjectHandlerFactory;
@@ -292,16 +292,16 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
 				{
 					RevertCustomizationDataAsync(item.Key, name, applicationId, cts.Token).GetAwaiter().GetResult();
 				}
-				catch (InvalidOperationException exception)
+				catch (InvalidOperationException ex)
 				{
-					base.Logger.LogWarning(exception, "Failed disposing player (not present anymore?)");
+					base.Logger.LogWarning(ex, "Failed disposing player (not present anymore?)");
 					break;
 				}
 			}
 		}
-		catch (Exception exception2)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception2, "Error on disposal of {name}", name);
+			base.Logger.LogWarning(ex, "Error on disposal of {name}", name);
 		}
 		finally
 		{
@@ -439,7 +439,10 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
 					return;
 				}
 				toDownloadReplacements = TryCalculateModdedDictionary(applicationBase, charaData, out moddedPaths, downloadToken);
-				if (toDownloadReplacements.TrueForAll((FileReplacementData c) => _downloadManager.ForbiddenTransfers.Exists((FileTransfer f) => string.Equals(f.Hash, c.Hash, StringComparison.Ordinal))))
+				if (toDownloadReplacements.TrueForAll(delegate(FileReplacementData c)
+				{
+					return _downloadManager.ForbiddenTransfers.Exists((FileTransfer f) => string.Equals(f.Hash, c.Hash, StringComparison.Ordinal));
+				}))
 				{
 					break;
 				}
@@ -486,7 +489,7 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
 			token.ThrowIfCancellationRequested();
 			if (updateModdedPaths)
 			{
-				ushort objIndex = await _dalamudUtil.RunOnFrameworkThread(() => _charaHandler.GetGameObject().ObjectIndex, "ApplyCharacterDataAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\PlayerData\\Handlers\\PairHandler.cs", 479).ConfigureAwait(continueOnCapturedContext: false);
+				ushort objIndex = await _dalamudUtil.RunOnFrameworkThread(() => _charaHandler.GetGameObject().ObjectIndex, "ApplyCharacterDataAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\PlayerData\\Handlers\\PairHandler.cs", 479).ConfigureAwait(continueOnCapturedContext: false);
 				await _ipcManager.Penumbra.AssignTemporaryCollectionAsync(base.Logger, _penumbraCollection, objIndex).ConfigureAwait(continueOnCapturedContext: false);
 				await _ipcManager.Penumbra.SetTemporaryModsAsync(base.Logger, _applicationId, _penumbraCollection, moddedPaths.ToDictionary<KeyValuePair<(string, string), string>, string, string>((KeyValuePair<(string GamePath, string Hash), string> k) => k.Key.GamePath, (KeyValuePair<(string GamePath, string Hash), string> k) => k.Value, StringComparer.Ordinal)).ConfigureAwait(continueOnCapturedContext: false);
 				LastAppliedDataBytes = -1L;
@@ -535,16 +538,16 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
 	{
 		if (string.IsNullOrEmpty(PlayerName))
 		{
-			(string, nint) pc = _dalamudUtil.FindPlayerByNameHash(Pair.Ident);
+			(string Name, nint Address) pc = _dalamudUtil.FindPlayerByNameHash(Pair.Ident);
 			(string, nint) tuple = pc;
 			if (tuple.Item1 == null && tuple.Item2 == 0)
 			{
 				return;
 			}
 			base.Logger.LogDebug("One-Time Initializing {this}", this);
-			Initialize(pc.Item1);
+			Initialize(pc.Name);
 			base.Logger.LogDebug("One-Time Initialized {this}", this);
-			base.Mediator.Publish(new EventMessage(new Event(PlayerName, Pair.UserData, "PairHandler", EventSeverity.Informational, "Initializing User For Character " + pc.Item1)));
+			base.Mediator.Publish(new EventMessage(new Event(PlayerName, Pair.UserData, "PairHandler", EventSeverity.Informational, "Initializing User For Character " + pc.Name)));
 		}
 		if (_charaHandler?.Address != IntPtr.Zero && !IsVisible)
 		{
@@ -686,27 +689,27 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
 			{
 				CancellationToken = token,
 				MaxDegreeOfParallelism = 4
-			}, delegate(FileReplacementData fileReplacementData)
+			}, delegate(FileReplacementData item)
 			{
 				token.ThrowIfCancellationRequested();
-				FileCacheEntity fileCacheEntity = _fileDbManager.GetFileCacheByHash(fileReplacementData.Hash);
+				FileCacheEntity fileCacheEntity = _fileDbManager.GetFileCacheByHash(item.Hash);
 				if (fileCacheEntity != null)
 				{
 					if (string.IsNullOrEmpty(new FileInfo(fileCacheEntity.ResolvedFilepath).Extension))
 					{
 						hasMigrationChanges = true;
-						fileCacheEntity = _fileDbManager.MigrateFileHashToExtension(fileCacheEntity, fileReplacementData.GamePaths[0].Split(".")[^1]);
+						fileCacheEntity = _fileDbManager.MigrateFileHashToExtension(fileCacheEntity, item.GamePaths[0].Split(".")[^1]);
 					}
-					string[] gamePaths2 = fileReplacementData.GamePaths;
+					string[] gamePaths2 = item.GamePaths;
 					foreach (string item2 in gamePaths2)
 					{
-						outputDict[(item2, fileReplacementData.Hash)] = fileCacheEntity.ResolvedFilepath;
+						outputDict[(item2, item.Hash)] = fileCacheEntity.ResolvedFilepath;
 					}
 				}
 				else
 				{
-					base.Logger.LogTrace("Missing file: {hash}", fileReplacementData.Hash);
-					missingFiles.Add(fileReplacementData);
+					base.Logger.LogTrace("Missing file: {hash}", item.Hash);
+					missingFiles.Add(item);
 				}
 			});
 			moddedDictionary = outputDict.ToDictionary<KeyValuePair<(string, string), string>, (string, string), string>((KeyValuePair<(string GamePath, string Hash), string> k) => k.Key, (KeyValuePair<(string GamePath, string Hash), string> k) => k.Value);
@@ -720,9 +723,9 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
 				}
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogError(exception, "[BASE-{appBase}] Something went wrong during calculation replacements", applicationBase);
+			base.Logger.LogError(ex, "[BASE-{appBase}] Something went wrong during calculation replacements", applicationBase);
 		}
 		if (hasMigrationChanges)
 		{

@@ -18,6 +18,7 @@ public class FileCacheEntity
 
 	public string ResolvedFilepath { get; private set; } = string.Empty;
 
+
 	public long? Size { get; set; }
 
 	public FileCacheEntity(string hash, string path, string lastModifiedDateTicks, long? size = null, long? compressedSize = null)

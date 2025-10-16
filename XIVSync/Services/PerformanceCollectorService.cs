@@ -25,6 +25,7 @@ public sealed class PerformanceCollectorService : IHostedService
 
 	public ConcurrentDictionary<string, RollingList<(TimeOnly, long)>> PerformanceCounters { get; } = new ConcurrentDictionary<string, RollingList<(TimeOnly, long)>>(StringComparer.Ordinal);
 
+
 	public PerformanceCollectorService(ILogger<PerformanceCollectorService> logger, MareConfigService mareConfigService)
 	{
 		_logger = logger;
@@ -40,8 +41,8 @@ public sealed class PerformanceCollectorService : IHostedService
 		string cn = sender.GetType().Name + "=>" + counterName.BuildMessage();
 		if (!PerformanceCounters.TryGetValue(cn, out RollingList<(TimeOnly, long)> list))
 		{
-			RollingList<(TimeOnly, long)> rollingList = (PerformanceCounters[cn] = new RollingList<(TimeOnly, long)>(maxEntries));
-			list = rollingList;
+			RollingList<(TimeOnly, long)> rollingList2 = (PerformanceCounters[cn] = new RollingList<(TimeOnly, long)>(maxEntries));
+			list = rollingList2;
 		}
 		long dt = DateTime.UtcNow.Ticks;
 		try
@@ -65,8 +66,8 @@ public sealed class PerformanceCollectorService : IHostedService
 		string cn = sender.GetType().Name + "=>" + counterName.BuildMessage();
 		if (!PerformanceCounters.TryGetValue(cn, out RollingList<(TimeOnly, long)> list))
 		{
-			RollingList<(TimeOnly, long)> rollingList = (PerformanceCounters[cn] = new RollingList<(TimeOnly, long)>(maxEntries));
-			list = rollingList;
+			RollingList<(TimeOnly, long)> rollingList2 = (PerformanceCounters[cn] = new RollingList<(TimeOnly, long)>(maxEntries));
+			list = rollingList2;
 		}
 		long dt = DateTime.UtcNow.Ticks;
 		try
@@ -192,9 +193,9 @@ public sealed class PerformanceCollectorService : IHostedService
 						_logger.LogDebug("Could not remove performance counter {counter}", entries.Key);
 					}
 				}
-				catch (Exception exception)
+				catch (Exception e)
 				{
-					_logger.LogWarning(exception, "Error removing performance counter {counter}", entries.Key);
+					_logger.LogWarning(e, "Error removing performance counter {counter}", entries.Key);
 				}
 			}
 		}

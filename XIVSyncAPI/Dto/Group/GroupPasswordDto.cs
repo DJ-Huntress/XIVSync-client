@@ -9,10 +9,9 @@ public record GroupPasswordDto : GroupDto
 {
 	public string Password { get; init; }
 
-	public GroupPasswordDto(GroupData Group, string Password)
+	public GroupPasswordDto(GroupData Group, string Password) : base(Group)
 	{
 		this.Password = Password;
-		base._002Ector(Group);
 	}
 
 	[CompilerGenerated]

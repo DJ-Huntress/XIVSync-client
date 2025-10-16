@@ -173,9 +173,9 @@ public class StandaloneProfileUi : WindowMediatorSubscriberBase
 				drawList.AddImage(_supporterTextureWrap.Handle, new Vector2(rectMax.X - 38f - spacing.X, rectMin.Y + textPos / 2f - 19f), new Vector2(rectMax.X - spacing.X, rectMin.Y + 38f + textPos / 2f - 19f));
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Error during draw tooltip");
+			_logger.LogWarning(ex, "Error during draw tooltip");
 		}
 	}
 

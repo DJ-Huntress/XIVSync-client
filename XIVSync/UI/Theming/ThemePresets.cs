@@ -16,7 +16,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.55f, 0.82f, 1f, 1f),
 			BtnText = new Vector4(0.85f, 0.9f, 1f, 1f),
 			BtnTextHovered = new Vector4(1f, 1f, 1f, 1f),
-			BtnTextActive = new Vector4(0.95f, 0.98f, 1f, 1f)
+			BtnTextActive = new Vector4(0.95f, 0.98f, 1f, 1f),
+			FolderVisible = new Vector4(0f, 1f, 0.5f, 1f),
+			FolderOnline = new Vector4(0.25f, 0.75f, 1f, 1f),
+			FolderOffline = new Vector4(0.9f, 0.2f, 0.3f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.9f, 0.2f, 0.3f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.6f, 0f, 1f),
+			FolderAll = new Vector4(0.6f, 0.4f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.3f, 0.8f, 1f)
 		},
 		["Mint"] = new ThemePalette
 		{
@@ -34,7 +41,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.36f, 0.96f, 0.86f, 1f),
 			BtnText = new Vector4(0.86f, 0.96f, 0.92f, 1f),
 			BtnTextHovered = new Vector4(0.1f, 0.16f, 0.16f, 1f),
-			BtnTextActive = new Vector4(0.95f, 1f, 0.98f, 1f)
+			BtnTextActive = new Vector4(0.95f, 1f, 0.98f, 1f),
+			FolderVisible = new Vector4(0.2f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(0.1f, 0.9f, 0.75f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.2f, 1f),
+			FolderAll = new Vector4(0.5f, 0.7f, 0.9f, 1f),
+			FolderCustom = new Vector4(1f, 0.4f, 0.8f, 1f)
 		},
 		["Purple"] = new ThemePalette
 		{
@@ -52,7 +66,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.88f, 0.72f, 1f, 1f),
 			BtnText = new Vector4(0.9f, 0.88f, 0.98f, 1f),
 			BtnTextHovered = new Vector4(0.18f, 0.15f, 0.28f, 1f),
-			BtnTextActive = new Vector4(0.98f, 0.96f, 1f, 1f)
+			BtnTextActive = new Vector4(0.98f, 0.96f, 1f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(0.6f, 0.7f, 1f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.5f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.5f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.7f, 0.5f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.4f, 1f, 1f)
 		},
 		["Dark"] = new ThemePalette
 		{
@@ -70,7 +91,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.62f, 0.85f, 1f, 1f),
 			BtnText = new Vector4(0.88f, 0.88f, 0.9f, 1f),
 			BtnTextHovered = new Vector4(0.14f, 0.14f, 0.14f, 1f),
-			BtnTextActive = new Vector4(0.96f, 0.96f, 0.98f, 1f)
+			BtnTextActive = new Vector4(0.96f, 0.96f, 0.98f, 1f),
+			FolderVisible = new Vector4(0.5f, 0.8f, 0.5f, 1f),
+			FolderOnline = new Vector4(0.7f, 0.7f, 0.7f, 1f),
+			FolderOffline = new Vector4(0.7f, 0.3f, 0.3f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.7f, 0.3f, 0.3f, 1f),
+			FolderUnpaired = new Vector4(0.8f, 0.6f, 0.3f, 1f),
+			FolderAll = new Vector4(0.6f, 0.6f, 0.6f, 1f),
+			FolderCustom = new Vector4(0.8f, 0.8f, 0.8f, 1f)
 		},
 		["Sakura Daylight"] = new ThemePalette
 		{
@@ -88,7 +116,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.93f, 0.46f, 0.74f, 1f),
 			BtnText = new Vector4(0.12f, 0.1f, 0.14f, 1f),
 			BtnTextHovered = new Vector4(0.98f, 0.95f, 0.97f, 1f),
-			BtnTextActive = new Vector4(1f, 0.98f, 0.99f, 1f)
+			BtnTextActive = new Vector4(1f, 0.98f, 0.99f, 1f),
+			FolderVisible = new Vector4(0.2f, 0.7f, 0.4f, 1f),
+			FolderOnline = new Vector4(0.8f, 0.3f, 0.6f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.15f, 0.25f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.15f, 0.25f, 1f),
+			FolderUnpaired = new Vector4(0.9f, 0.5f, 0.1f, 1f),
+			FolderAll = new Vector4(0.6f, 0.3f, 0.8f, 1f),
+			FolderCustom = new Vector4(0.95f, 0.2f, 0.7f, 1f)
 		},
 		["Cotton Candy"] = new ThemePalette
 		{
@@ -106,7 +141,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.4f, 0.7f, 1f, 1f),
 			BtnText = new Vector4(0.1f, 0.12f, 0.16f, 1f),
 			BtnTextHovered = new Vector4(0.97f, 0.98f, 1f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.2f, 0.7f, 0.4f, 1f),
+			FolderOnline = new Vector4(0.4f, 0.6f, 0.95f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.2f, 0.3f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.2f, 0.3f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.5f, 0.1f, 1f),
+			FolderAll = new Vector4(0.6f, 0.4f, 0.85f, 1f),
+			FolderCustom = new Vector4(0.95f, 0.45f, 0.7f, 1f)
 		},
 		["Peach Sunrise"] = new ThemePalette
 		{
@@ -124,7 +166,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.98f, 0.52f, 0.42f, 1f),
 			BtnText = new Vector4(0.14f, 0.1f, 0.06f, 1f),
 			BtnTextHovered = new Vector4(1f, 0.97f, 0.93f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 0.98f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 0.98f, 1f),
+			FolderVisible = new Vector4(0.3f, 0.7f, 0.3f, 1f),
+			FolderOnline = new Vector4(0.95f, 0.5f, 0.25f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.15f, 0.2f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.15f, 0.2f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.55f, 0.1f, 1f),
+			FolderAll = new Vector4(0.6f, 0.35f, 0.7f, 1f),
+			FolderCustom = new Vector4(0.9f, 0.3f, 0.5f, 1f)
 		},
 		["Seafoam Day"] = new ThemePalette
 		{
@@ -142,7 +191,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.24f, 0.8f, 0.68f, 1f),
 			BtnText = new Vector4(0.08f, 0.12f, 0.1f, 1f),
 			BtnTextHovered = new Vector4(0.95f, 0.99f, 0.97f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.2f, 0.75f, 0.5f, 1f),
+			FolderOnline = new Vector4(0.15f, 0.7f, 0.6f, 1f),
+			FolderOffline = new Vector4(0.8f, 0.2f, 0.25f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.8f, 0.2f, 0.25f, 1f),
+			FolderUnpaired = new Vector4(0.9f, 0.5f, 0.15f, 1f),
+			FolderAll = new Vector4(0.5f, 0.4f, 0.75f, 1f),
+			FolderCustom = new Vector4(0.85f, 0.3f, 0.65f, 1f)
 		},
 		["Sky Light"] = new ThemePalette
 		{
@@ -157,7 +213,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.32f, 0.38f, 0.5f, 1f),
 			TextDisabled = new Vector4(0.58f, 0.64f, 0.74f, 1f),
 			Link = new Vector4(0.24f, 0.52f, 0.95f, 1f),
-			LinkHover = new Vector4(0.36f, 0.64f, 1f, 1f)
+			LinkHover = new Vector4(0.36f, 0.64f, 1f, 1f),
+			BtnText = new Vector4(0.1f, 0.12f, 0.18f, 1f),
+			BtnTextHovered = new Vector4(0.97f, 0.98f, 1f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.2f, 0.7f, 0.4f, 1f),
+			FolderOnline = new Vector4(0.2f, 0.5f, 0.9f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.15f, 0.25f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.15f, 0.25f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.5f, 0.1f, 1f),
+			FolderAll = new Vector4(0.5f, 0.35f, 0.8f, 1f),
+			FolderCustom = new Vector4(0.9f, 0.3f, 0.7f, 1f)
 		},
 		["Lilac Cream"] = new ThemePalette
 		{
@@ -172,7 +238,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.34f, 0.3f, 0.46f, 1f),
 			TextDisabled = new Vector4(0.58f, 0.54f, 0.7f, 1f),
 			Link = new Vector4(0.56f, 0.42f, 0.98f, 1f),
-			LinkHover = new Vector4(0.68f, 0.54f, 1f, 1f)
+			LinkHover = new Vector4(0.68f, 0.54f, 1f, 1f),
+			BtnText = new Vector4(0.12f, 0.1f, 0.18f, 1f),
+			BtnTextHovered = new Vector4(0.98f, 0.97f, 1f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.25f, 0.7f, 0.4f, 1f),
+			FolderOnline = new Vector4(0.6f, 0.45f, 0.95f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.2f, 0.3f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.2f, 0.3f, 1f),
+			FolderUnpaired = new Vector4(0.9f, 0.5f, 0.15f, 1f),
+			FolderAll = new Vector4(0.65f, 0.45f, 0.9f, 1f),
+			FolderCustom = new Vector4(0.9f, 0.35f, 0.8f, 1f)
 		},
 		["Rose Quartz"] = new ThemePalette
 		{
@@ -187,7 +263,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.4f, 0.28f, 0.34f, 1f),
 			TextDisabled = new Vector4(0.64f, 0.54f, 0.58f, 1f),
 			Link = new Vector4(0.9f, 0.38f, 0.56f, 1f),
-			LinkHover = new Vector4(0.98f, 0.48f, 0.66f, 1f)
+			LinkHover = new Vector4(0.98f, 0.48f, 0.66f, 1f),
+			BtnText = new Vector4(0.16f, 0.1f, 0.12f, 1f),
+			BtnTextHovered = new Vector4(1f, 0.98f, 0.99f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.25f, 0.7f, 0.35f, 1f),
+			FolderOnline = new Vector4(0.9f, 0.35f, 0.55f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.15f, 0.25f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.15f, 0.25f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.5f, 0.1f, 1f),
+			FolderAll = new Vector4(0.6f, 0.35f, 0.75f, 1f),
+			FolderCustom = new Vector4(0.95f, 0.25f, 0.65f, 1f)
 		},
 		["High Contrast Light"] = new ThemePalette
 		{
@@ -202,7 +288,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.3f, 0.3f, 0.34f, 1f),
 			TextDisabled = new Vector4(0.58f, 0.58f, 0.62f, 1f),
 			Link = new Vector4(0f, 0.45f, 0.9f, 1f),
-			LinkHover = new Vector4(0.12f, 0.56f, 1f, 1f)
+			LinkHover = new Vector4(0.12f, 0.56f, 1f, 1f),
+			BtnText = new Vector4(0.08f, 0.08f, 0.1f, 1f),
+			BtnTextHovered = new Vector4(1f, 1f, 1f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0f, 0.7f, 0.2f, 1f),
+			FolderOnline = new Vector4(0f, 0.4f, 0.85f, 1f),
+			FolderOffline = new Vector4(0.85f, 0f, 0f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0f, 0f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.5f, 0f, 1f),
+			FolderAll = new Vector4(0.5f, 0f, 0.8f, 1f),
+			FolderCustom = new Vector4(1f, 0f, 0.6f, 1f)
 		},
 		["Midnight Neon"] = new ThemePalette
 		{
@@ -217,7 +313,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.7f, 0.84f, 0.9f, 1f),
 			TextDisabled = new Vector4(0.52f, 0.68f, 0.72f, 1f),
 			Link = new Vector4(0.14f, 0.92f, 0.92f, 1f),
-			LinkHover = new Vector4(0.28f, 0.98f, 0.98f, 1f)
+			LinkHover = new Vector4(0.28f, 0.98f, 0.98f, 1f),
+			BtnText = new Vector4(0.86f, 0.94f, 0.98f, 1f),
+			BtnTextHovered = new Vector4(0.05f, 0.06f, 0.09f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.3f, 1f, 0.6f, 1f),
+			FolderOnline = new Vector4(0.1f, 0.9f, 0.85f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.2f, 1f),
+			FolderAll = new Vector4(0.7f, 0.5f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.4f, 0.9f, 1f)
 		},
 		["Ocean Deep"] = new ThemePalette
 		{
@@ -232,7 +338,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.72f, 0.82f, 0.9f, 1f),
 			TextDisabled = new Vector4(0.54f, 0.66f, 0.78f, 1f),
 			Link = new Vector4(0.22f, 0.7f, 1f, 1f),
-			LinkHover = new Vector4(0.38f, 0.8f, 1f, 1f)
+			LinkHover = new Vector4(0.38f, 0.8f, 1f, 1f),
+			BtnText = new Vector4(0.86f, 0.92f, 0.98f, 1f),
+			BtnTextHovered = new Vector4(0.04f, 0.07f, 0.11f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.3f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(0.2f, 0.7f, 1f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.2f, 1f),
+			FolderAll = new Vector4(0.7f, 0.5f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.4f, 0.85f, 1f)
 		},
 		["Forest Night"] = new ThemePalette
 		{
@@ -247,7 +363,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.74f, 0.86f, 0.8f, 1f),
 			TextDisabled = new Vector4(0.54f, 0.7f, 0.64f, 1f),
 			Link = new Vector4(0.26f, 0.88f, 0.6f, 1f),
-			LinkHover = new Vector4(0.36f, 0.96f, 0.72f, 1f)
+			LinkHover = new Vector4(0.36f, 0.96f, 0.72f, 1f),
+			BtnText = new Vector4(0.88f, 0.94f, 0.9f, 1f),
+			BtnTextHovered = new Vector4(0.05f, 0.07f, 0.06f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.4f, 1f, 0.6f, 1f),
+			FolderOnline = new Vector4(0.25f, 0.85f, 0.5f, 1f),
+			FolderOffline = new Vector4(1f, 0.35f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.35f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.2f, 1f),
+			FolderAll = new Vector4(0.7f, 0.5f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.45f, 0.85f, 1f)
 		},
 		["Rose Gold Dark"] = new ThemePalette
 		{
@@ -262,7 +388,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.82f, 0.76f, 0.78f, 1f),
 			TextDisabled = new Vector4(0.6f, 0.56f, 0.58f, 1f),
 			Link = new Vector4(1f, 0.72f, 0.62f, 1f),
-			LinkHover = new Vector4(1f, 0.82f, 0.74f, 1f)
+			LinkHover = new Vector4(1f, 0.82f, 0.74f, 1f),
+			BtnText = new Vector4(0.96f, 0.9f, 0.92f, 1f),
+			BtnTextHovered = new Vector4(0.09f, 0.07f, 0.08f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(1f, 0.7f, 0.6f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.8f, 0.6f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.5f, 0.8f, 1f)
 		},
 		["Grape Twilight"] = new ThemePalette
 		{
@@ -277,7 +413,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.78f, 0.76f, 0.9f, 1f),
 			TextDisabled = new Vector4(0.58f, 0.56f, 0.74f, 1f),
 			Link = new Vector4(0.84f, 0.66f, 1f, 1f),
-			LinkHover = new Vector4(0.92f, 0.76f, 1f, 1f)
+			LinkHover = new Vector4(0.92f, 0.76f, 1f, 1f),
+			BtnText = new Vector4(0.92f, 0.9f, 0.98f, 1f),
+			BtnTextHovered = new Vector4(0.07f, 0.06f, 0.1f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(0.75f, 0.6f, 1f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.5f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.5f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.8f, 0.6f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.5f, 1f, 1f)
 		},
 		["Cyberpunk"] = new ThemePalette
 		{
@@ -292,7 +438,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.76f, 0.74f, 0.88f, 1f),
 			TextDisabled = new Vector4(0.58f, 0.56f, 0.74f, 1f),
 			Link = new Vector4(0.98f, 0.24f, 0.7f, 1f),
-			LinkHover = new Vector4(1f, 0.36f, 0.78f, 1f)
+			LinkHover = new Vector4(1f, 0.36f, 0.78f, 1f),
+			BtnText = new Vector4(0.92f, 0.9f, 0.98f, 1f),
+			BtnTextHovered = new Vector4(0.06f, 0.05f, 0.09f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.3f, 1f, 0.5f, 1f),
+			FolderOnline = new Vector4(0.2f, 0.9f, 0.95f, 1f),
+			FolderOffline = new Vector4(1f, 0.2f, 0.5f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.2f, 0.5f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.2f, 1f),
+			FolderAll = new Vector4(0.7f, 0.4f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.3f, 0.7f, 1f)
 		},
 		["Chocolate Mint"] = new ThemePalette
 		{
@@ -307,7 +463,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.82f, 0.78f, 0.76f, 1f),
 			TextDisabled = new Vector4(0.62f, 0.58f, 0.56f, 1f),
 			Link = new Vector4(0.16f, 0.88f, 0.72f, 1f),
-			LinkHover = new Vector4(0.28f, 0.96f, 0.82f, 1f)
+			LinkHover = new Vector4(0.28f, 0.96f, 0.82f, 1f),
+			BtnText = new Vector4(0.95f, 0.92f, 0.9f, 1f),
+			BtnTextHovered = new Vector4(0.08f, 0.06f, 0.05f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.3f, 1f, 0.6f, 1f),
+			FolderOnline = new Vector4(0.15f, 0.9f, 0.7f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.35f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.35f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.25f, 1f),
+			FolderAll = new Vector4(0.7f, 0.5f, 0.9f, 1f),
+			FolderCustom = new Vector4(1f, 0.4f, 0.75f, 1f)
 		},
 		["Slate"] = new ThemePalette
 		{
@@ -322,7 +488,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.76f, 0.8f, 0.86f, 1f),
 			TextDisabled = new Vector4(0.58f, 0.62f, 0.7f, 1f),
 			Link = new Vector4(0.64f, 0.78f, 0.96f, 1f),
-			LinkHover = new Vector4(0.74f, 0.86f, 1f, 1f)
+			LinkHover = new Vector4(0.74f, 0.86f, 1f, 1f),
+			BtnText = new Vector4(0.9f, 0.92f, 0.96f, 1f),
+			BtnTextHovered = new Vector4(0.09f, 0.1f, 0.12f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.4f, 1f, 0.6f, 1f),
+			FolderOnline = new Vector4(0.6f, 0.75f, 0.9f, 1f),
+			FolderOffline = new Vector4(1f, 0.35f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.35f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.7f, 0.7f, 0.7f, 1f),
+			FolderCustom = new Vector4(0.9f, 0.6f, 0.9f, 1f)
 		},
 		["Sunset Pop"] = new ThemePalette
 		{
@@ -337,7 +513,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.84f, 0.74f, 0.78f, 1f),
 			TextDisabled = new Vector4(0.64f, 0.56f, 0.6f, 1f),
 			Link = new Vector4(1f, 0.48f, 0.4f, 1f),
-			LinkHover = new Vector4(1f, 0.6f, 0.52f, 1f)
+			LinkHover = new Vector4(1f, 0.6f, 0.52f, 1f),
+			BtnText = new Vector4(0.96f, 0.9f, 0.92f, 1f),
+			BtnTextHovered = new Vector4(0.12f, 0.08f, 0.1f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.6f, 1f),
+			FolderOnline = new Vector4(1f, 0.6f, 0.35f, 1f),
+			FolderOffline = new Vector4(1f, 0.25f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.25f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.2f, 1f),
+			FolderAll = new Vector4(0.8f, 0.5f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.45f, 0.6f, 1f)
 		},
 		["Neon Bubblegum"] = new ThemePalette
 		{
@@ -352,7 +538,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.82f, 0.78f, 0.9f, 1f),
 			TextDisabled = new Vector4(0.62f, 0.58f, 0.74f, 1f),
 			Link = new Vector4(1f, 0.4f, 0.78f, 1f),
-			LinkHover = new Vector4(1f, 0.52f, 0.86f, 1f)
+			LinkHover = new Vector4(1f, 0.52f, 0.86f, 1f),
+			BtnText = new Vector4(0.94f, 0.92f, 0.98f, 1f),
+			BtnTextHovered = new Vector4(0.1f, 0.07f, 0.1f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.4f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(0.35f, 0.85f, 1f, 1f),
+			FolderOffline = new Vector4(1f, 0.25f, 0.5f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.25f, 0.5f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.8f, 0.5f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.35f, 0.75f, 1f)
 		},
 		["Tropical"] = new ThemePalette
 		{
@@ -367,7 +563,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.3f, 0.4f, 0.35f, 1f),
 			TextDisabled = new Vector4(0.56f, 0.64f, 0.6f, 1f),
 			Link = new Vector4(0.12f, 0.76f, 0.64f, 1f),
-			LinkHover = new Vector4(0.2f, 0.86f, 0.74f, 1f)
+			LinkHover = new Vector4(0.2f, 0.86f, 0.74f, 1f),
+			BtnText = new Vector4(0.1f, 0.14f, 0.12f, 1f),
+			BtnTextHovered = new Vector4(0.95f, 0.99f, 0.97f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.1f, 0.7f, 0.5f, 1f),
+			FolderOnline = new Vector4(0.1f, 0.7f, 0.6f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.2f, 0.25f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.2f, 0.25f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.6f, 0.1f, 1f),
+			FolderAll = new Vector4(0.6f, 0.3f, 0.75f, 1f),
+			FolderCustom = new Vector4(0.9f, 0.3f, 0.6f, 1f)
 		},
 		["Berry Sorbet"] = new ThemePalette
 		{
@@ -382,7 +588,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.82f, 0.78f, 0.9f, 1f),
 			TextDisabled = new Vector4(0.62f, 0.58f, 0.74f, 1f),
 			Link = new Vector4(0.92f, 0.36f, 0.58f, 1f),
-			LinkHover = new Vector4(0.98f, 0.48f, 0.7f, 1f)
+			LinkHover = new Vector4(0.98f, 0.48f, 0.7f, 1f),
+			BtnText = new Vector4(0.94f, 0.92f, 0.98f, 1f),
+			BtnTextHovered = new Vector4(0.11f, 0.08f, 0.11f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(0.7f, 0.35f, 0.95f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.45f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.45f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.75f, 0.5f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.4f, 0.65f, 1f)
 		},
 		["Aqua Coral"] = new ThemePalette
 		{
@@ -397,7 +613,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.78f, 0.86f, 0.9f, 1f),
 			TextDisabled = new Vector4(0.6f, 0.68f, 0.72f, 1f),
 			Link = new Vector4(0.18f, 0.82f, 0.9f, 1f),
-			LinkHover = new Vector4(0.3f, 0.92f, 0.98f, 1f)
+			LinkHover = new Vector4(0.3f, 0.92f, 0.98f, 1f),
+			BtnText = new Vector4(0.92f, 0.96f, 0.98f, 1f),
+			BtnTextHovered = new Vector4(0.07f, 0.09f, 0.1f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.3f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(0.2f, 0.85f, 0.9f, 1f),
+			FolderOffline = new Vector4(1f, 0.4f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.4f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.7f, 0.6f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.5f, 0.5f, 1f)
 		},
 		["Mono Light"] = new ThemePalette
 		{
@@ -412,7 +638,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.32f, 0.32f, 0.36f, 1f),
 			TextDisabled = new Vector4(0.58f, 0.58f, 0.62f, 1f),
 			Link = new Vector4(0.15f, 0.6f, 0.95f, 1f),
-			LinkHover = new Vector4(0.26f, 0.7f, 1f, 1f)
+			LinkHover = new Vector4(0.26f, 0.7f, 1f, 1f),
+			BtnText = new Vector4(0.1f, 0.1f, 0.12f, 1f),
+			BtnTextHovered = new Vector4(0.98f, 0.98f, 0.98f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.15f, 0.7f, 0.35f, 1f),
+			FolderOnline = new Vector4(0.1f, 0.55f, 0.9f, 1f),
+			FolderOffline = new Vector4(0.8f, 0.1f, 0.1f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.8f, 0.1f, 0.1f, 1f),
+			FolderUnpaired = new Vector4(0.9f, 0.5f, 0f, 1f),
+			FolderAll = new Vector4(0.4f, 0.4f, 0.4f, 1f),
+			FolderCustom = new Vector4(0.6f, 0.6f, 0.6f, 1f)
 		},
 		["Solarized Light-ish"] = new ThemePalette
 		{
@@ -427,7 +663,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.36f, 0.38f, 0.3f, 1f),
 			TextDisabled = new Vector4(0.6f, 0.62f, 0.52f, 1f),
 			Link = new Vector4(0.15f, 0.55f, 0.82f, 1f),
-			LinkHover = new Vector4(0.26f, 0.66f, 0.92f, 1f)
+			LinkHover = new Vector4(0.26f, 0.66f, 0.92f, 1f),
+			BtnText = new Vector4(0.12f, 0.12f, 0.08f, 1f),
+			BtnTextHovered = new Vector4(0.99f, 0.96f, 0.89f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.4f, 0.7f, 0.3f, 1f),
+			FolderOnline = new Vector4(0.1f, 0.5f, 0.75f, 1f),
+			FolderOffline = new Vector4(0.8f, 0.2f, 0.2f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.8f, 0.2f, 0.2f, 1f),
+			FolderUnpaired = new Vector4(0.9f, 0.5f, 0.1f, 1f),
+			FolderAll = new Vector4(0.5f, 0.4f, 0.6f, 1f),
+			FolderCustom = new Vector4(0.8f, 0.35f, 0.55f, 1f)
 		},
 		["Solarized Dark-ish"] = new ThemePalette
 		{
@@ -442,7 +688,17 @@ public static class ThemePresets
 			TextSecondary = new Vector4(0.72f, 0.82f, 0.78f, 1f),
 			TextDisabled = new Vector4(0.54f, 0.66f, 0.62f, 1f),
 			Link = new Vector4(0.65f, 0.77f, 0.55f, 1f),
-			LinkHover = new Vector4(0.76f, 0.86f, 0.66f, 1f)
+			LinkHover = new Vector4(0.76f, 0.86f, 0.66f, 1f),
+			BtnText = new Vector4(0.86f, 0.92f, 0.88f, 1f),
+			BtnTextHovered = new Vector4(0f, 0.17f, 0.21f, 1f),
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.6f, 1f),
+			FolderOnline = new Vector4(0.5f, 0.7f, 0.65f, 1f),
+			FolderOffline = new Vector4(1f, 0.4f, 0.35f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.4f, 0.35f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.7f, 0.6f, 0.8f, 1f),
+			FolderCustom = new Vector4(0.9f, 0.6f, 0.7f, 1f)
 		},
 		["Pride 'The Rainbow Warrior'"] = new ThemePalette
 		{
@@ -460,7 +716,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(1f, 1f, 0f, 1f),
 			BtnText = new Vector4(0.15f, 0.08f, 0.05f, 1f),
 			BtnTextHovered = new Vector4(1f, 1f, 1f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0f, 0.75f, 0f, 1f),
+			FolderOnline = new Vector4(0f, 0.45f, 0.95f, 1f),
+			FolderOffline = new Vector4(0.95f, 0f, 0f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.95f, 0f, 0f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.6f, 0f, 1f),
+			FolderAll = new Vector4(0.55f, 0f, 0.95f, 1f),
+			FolderCustom = new Vector4(1f, 0f, 0.5f, 1f)
 		},
 		["Pride 'The Shadow Rainbow'"] = new ThemePalette
 		{
@@ -478,7 +741,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.8f, 0.8f, 0f, 1f),
 			BtnText = new Vector4(0.95f, 0.92f, 0.95f, 1f),
 			BtnTextHovered = new Vector4(0.08f, 0.05f, 0.08f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.3f, 1f, 0.3f, 1f),
+			FolderOnline = new Vector4(0.3f, 0.6f, 1f, 1f),
+			FolderOffline = new Vector4(1f, 0.2f, 0.2f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.2f, 0.2f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.2f, 1f),
+			FolderAll = new Vector4(0.7f, 0.3f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.3f, 0.7f, 1f)
 		},
 		["Trans 'The Transcendent Soul'"] = new ThemePalette
 		{
@@ -496,7 +766,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.96f, 0.63f, 0.76f, 1f),
 			BtnText = new Vector4(0.1f, 0.15f, 0.2f, 1f),
 			BtnTextHovered = new Vector4(0.96f, 0.98f, 1f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.15f, 0.7f, 0.45f, 1f),
+			FolderOnline = new Vector4(0.3f, 0.75f, 0.95f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.2f, 0.3f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.2f, 0.3f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.5f, 0.15f, 1f),
+			FolderAll = new Vector4(0.6f, 0.45f, 0.85f, 1f),
+			FolderCustom = new Vector4(0.95f, 0.55f, 0.7f, 1f)
 		},
 		["Lesbian 'The Sapphic Flame'"] = new ThemePalette
 		{
@@ -514,7 +791,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(1f, 0.42f, 0f, 1f),
 			BtnText = new Vector4(0.15f, 0.08f, 0.05f, 1f),
 			BtnTextHovered = new Vector4(1f, 0.95f, 0.9f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.25f, 0.7f, 0.35f, 1f),
+			FolderOnline = new Vector4(1f, 0.4f, 0f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.15f, 0.25f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.15f, 0.25f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.55f, 0.1f, 1f),
+			FolderAll = new Vector4(0.65f, 0.3f, 0.75f, 1f),
+			FolderCustom = new Vector4(0.85f, 0.3f, 0.55f, 1f)
 		},
 		["Bi 'The Dual Heart'"] = new ThemePalette
 		{
@@ -532,7 +816,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.85f, 0.2f, 0.55f, 1f),
 			BtnText = new Vector4(0.1f, 0.08f, 0.15f, 1f),
 			BtnTextHovered = new Vector4(0.92f, 0.88f, 0.98f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.2f, 0.7f, 0.4f, 1f),
+			FolderOnline = new Vector4(0.35f, 0.2f, 0.7f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.15f, 0.3f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.15f, 0.3f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.5f, 0.1f, 1f),
+			FolderAll = new Vector4(0.6f, 0.4f, 0.85f, 1f),
+			FolderCustom = new Vector4(0.85f, 0.15f, 0.5f, 1f)
 		},
 		["Ace 'The Void Walker'"] = new ThemePalette
 		{
@@ -550,7 +841,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.8f, 0.5f, 0.9f, 1f),
 			BtnText = new Vector4(0.95f, 0.95f, 0.95f, 1f),
 			BtnTextHovered = new Vector4(0.15f, 0.15f, 0.15f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.6f, 1f),
+			FolderOnline = new Vector4(0.65f, 0.35f, 0.85f, 1f),
+			FolderOffline = new Vector4(1f, 0.35f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.35f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.7f, 0.7f, 0.7f, 1f),
+			FolderCustom = new Vector4(0.8f, 0.5f, 0.9f, 1f)
 		},
 		["PixxieStixx 'The Fairy Prankster'"] = new ThemePalette
 		{
@@ -568,7 +866,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(1f, 0.35f, 0.75f, 1f),
 			BtnText = new Vector4(1f, 1f, 1f, 1f),
 			BtnTextHovered = new Vector4(1f, 1f, 1f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.25f, 0.7f, 0.4f, 1f),
+			FolderOnline = new Vector4(1f, 0.35f, 0.65f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.15f, 0.25f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.15f, 0.25f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.5f, 0.1f, 1f),
+			FolderAll = new Vector4(0.7f, 0.3f, 0.8f, 1f),
+			FolderCustom = new Vector4(0.95f, 0.2f, 0.6f, 1f)
 		},
 		["Mitsuko 'The Cow Whisperer'"] = new ThemePalette
 		{
@@ -586,7 +891,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.95f, 0.55f, 1f, 1f),
 			BtnText = new Vector4(0.95f, 0.9f, 0.98f, 1f),
 			BtnTextHovered = new Vector4(0.08f, 0.05f, 0.1f, 1f),
-			BtnTextActive = new Vector4(0.98f, 0.95f, 1f, 1f)
+			BtnTextActive = new Vector4(0.98f, 0.95f, 1f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(0.85f, 0.45f, 0.95f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.45f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.45f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.8f, 0.5f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.5f, 0.95f, 1f)
 		},
 		["Maysi 'The Ice Mouse'"] = new ThemePalette
 		{
@@ -604,7 +916,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.1f, 0.6f, 1f, 1f),
 			BtnText = new Vector4(0.05f, 0.15f, 0.25f, 1f),
 			BtnTextHovered = new Vector4(0.9f, 0.98f, 1f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.2f, 0.7f, 0.5f, 1f),
+			FolderOnline = new Vector4(0.05f, 0.55f, 0.95f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.2f, 0.3f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.2f, 0.3f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.5f, 0.1f, 1f),
+			FolderAll = new Vector4(0.5f, 0.4f, 0.8f, 1f),
+			FolderCustom = new Vector4(0.85f, 0.3f, 0.7f, 1f)
 		},
 		["Sera 'The Silent Jester'"] = new ThemePalette
 		{
@@ -622,7 +941,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.8f, 0.55f, 1f, 1f),
 			BtnText = new Vector4(0.9f, 0.85f, 0.95f, 1f),
 			BtnTextHovered = new Vector4(0.25f, 0.15f, 0.35f, 1f),
-			BtnTextActive = new Vector4(0.95f, 0.9f, 0.98f, 1f)
+			BtnTextActive = new Vector4(0.95f, 0.9f, 0.98f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.65f, 1f),
+			FolderOnline = new Vector4(0.65f, 0.4f, 0.85f, 1f),
+			FolderOffline = new Vector4(1f, 0.4f, 0.45f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.4f, 0.45f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.35f, 1f),
+			FolderAll = new Vector4(0.75f, 0.6f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.5f, 0.9f, 1f)
 		},
 		["Verenea 'The Deep Thinker'"] = new ThemePalette
 		{
@@ -640,7 +966,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.45f, 0.9f, 0.9f, 1f),
 			BtnText = new Vector4(0.85f, 0.95f, 0.95f, 1f),
 			BtnTextHovered = new Vector4(0.03f, 0.08f, 0.08f, 1f),
-			BtnTextActive = new Vector4(0.9f, 0.98f, 0.98f, 1f)
+			BtnTextActive = new Vector4(0.9f, 0.98f, 0.98f, 1f),
+			FolderVisible = new Vector4(0.4f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(0.3f, 0.75f, 0.75f, 1f),
+			FolderOffline = new Vector4(1f, 0.35f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.35f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.3f, 1f),
+			FolderAll = new Vector4(0.7f, 0.6f, 0.9f, 1f),
+			FolderCustom = new Vector4(0.9f, 0.5f, 0.8f, 1f)
 		},
 		["Anna 'The Intense Philosopher'"] = new ThemePalette
 		{
@@ -658,7 +991,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(1f, 0.4f, 0.4f, 1f),
 			BtnText = new Vector4(0.95f, 0.95f, 0.95f, 1f),
 			BtnTextHovered = new Vector4(0.95f, 0.95f, 0.95f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.6f, 1f),
+			FolderOnline = new Vector4(1f, 0.2f, 0.2f, 1f),
+			FolderOffline = new Vector4(1f, 0f, 0f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0f, 0f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.2f, 1f),
+			FolderAll = new Vector4(0.7f, 0.7f, 0.7f, 1f),
+			FolderCustom = new Vector4(1f, 0.4f, 0.4f, 1f)
 		},
 		["Yuku 'The Cheerful Sprite'"] = new ThemePalette
 		{
@@ -676,7 +1016,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0f, 0.7f, 0.45f, 1f),
 			BtnText = new Vector4(0f, 0.15f, 0.09f, 1f),
 			BtnTextHovered = new Vector4(0.9f, 0.98f, 0.95f, 1f),
-			BtnTextActive = new Vector4(1f, 1f, 1f, 1f)
+			BtnTextActive = new Vector4(1f, 1f, 1f, 1f),
+			FolderVisible = new Vector4(0f, 0.65f, 0.4f, 1f),
+			FolderOnline = new Vector4(0f, 0.65f, 0.4f, 1f),
+			FolderOffline = new Vector4(0.85f, 0.2f, 0.25f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.85f, 0.2f, 0.25f, 1f),
+			FolderUnpaired = new Vector4(0.95f, 0.5f, 0.1f, 1f),
+			FolderAll = new Vector4(0.5f, 0.4f, 0.7f, 1f),
+			FolderCustom = new Vector4(0.85f, 0.3f, 0.6f, 1f)
 		},
 		["Naro 'The Silent Vigil'"] = new ThemePalette
 		{
@@ -694,7 +1041,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.8f, 0.3f, 0.3f, 1f),
 			BtnText = new Vector4(0.9f, 0.85f, 0.85f, 1f),
 			BtnTextHovered = new Vector4(0.05f, 0f, 0f, 1f),
-			BtnTextActive = new Vector4(0.95f, 0.9f, 0.9f, 1f)
+			BtnTextActive = new Vector4(0.95f, 0.9f, 0.9f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.5f, 1f),
+			FolderOnline = new Vector4(0.7f, 0.2f, 0.2f, 1f),
+			FolderOffline = new Vector4(0.9f, 0f, 0f, 1f),
+			FolderOfflineSyncshell = new Vector4(0.9f, 0f, 0f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.6f, 0.2f, 1f),
+			FolderAll = new Vector4(0.6f, 0.6f, 0.6f, 1f),
+			FolderCustom = new Vector4(1f, 0.3f, 0.3f, 1f)
 		},
 		["Bong 'The Wholesome Mystic'"] = new ThemePalette
 		{
@@ -712,7 +1066,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.75f, 0.3f, 1f, 1f),
 			BtnText = new Vector4(0.92f, 0.88f, 0.98f, 1f),
 			BtnTextHovered = new Vector4(0.08f, 0.05f, 0.12f, 1f),
-			BtnTextActive = new Vector4(0.95f, 0.92f, 1f, 1f)
+			BtnTextActive = new Vector4(0.95f, 0.92f, 1f, 1f),
+			FolderVisible = new Vector4(0.5f, 1f, 0.7f, 1f),
+			FolderOnline = new Vector4(0.5f, 0f, 1f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.4f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.4f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.2f, 1f),
+			FolderAll = new Vector4(0.7f, 0.5f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.3f, 1f, 1f)
 		},
 		["Delvia 'The Perverted Paladin'"] = new ThemePalette
 		{
@@ -730,7 +1091,14 @@ public static class ThemePresets
 			LinkHover = new Vector4(0.3f, 1f, 0.6f, 1f),
 			BtnText = new Vector4(0.85f, 1f, 0.9f, 1f),
 			BtnTextHovered = new Vector4(0.02f, 0.05f, 0.03f, 1f),
-			BtnTextActive = new Vector4(0.9f, 1f, 0.95f, 1f)
+			BtnTextActive = new Vector4(0.9f, 1f, 0.95f, 1f),
+			FolderVisible = new Vector4(0.3f, 1f, 0.5f, 1f),
+			FolderOnline = new Vector4(0.15f, 1f, 0.45f, 1f),
+			FolderOffline = new Vector4(1f, 0.3f, 0.35f, 1f),
+			FolderOfflineSyncshell = new Vector4(1f, 0.3f, 0.35f, 1f),
+			FolderUnpaired = new Vector4(1f, 0.7f, 0.25f, 1f),
+			FolderAll = new Vector4(0.7f, 0.6f, 1f, 1f),
+			FolderCustom = new Vector4(1f, 0.5f, 0.85f, 1f)
 		}
 	};
 }

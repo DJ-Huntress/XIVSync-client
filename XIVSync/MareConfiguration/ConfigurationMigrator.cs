@@ -18,12 +18,11 @@ public class ConfigurationMigrator : IHostedService
 
 	private readonly ILogger<ConfigurationMigrator> _logger;
 
-	public ConfigurationMigrator(ILogger<ConfigurationMigrator> logger, TransientConfigService transientConfigService, ServerConfigService serverConfigService)
+	public ConfigurationMigrator(ILogger<ConfigurationMigrator> logger, TransientConfigService transientConfigService, ServerConfigService serverConfigService) : base()
 	{
 		_003CtransientConfigService_003EP = transientConfigService;
 		_003CserverConfigService_003EP = serverConfigService;
 		_logger = logger;
-		base._002Ector();
 	}
 
 	public void Migrate()

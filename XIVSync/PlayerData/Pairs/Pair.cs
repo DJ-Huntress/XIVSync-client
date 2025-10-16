@@ -78,7 +78,9 @@ public class Pair : IDisposable
 
 	public long LastAppliedDataTris { get; set; } = -1L;
 
+
 	public long LastAppliedApproximateVRAMBytes { get; set; } = -1L;
+
 
 	public string Ident => _onlineUserIdentDto?.Ident ?? string.Empty;
 
@@ -101,11 +103,11 @@ public class Pair : IDisposable
 	{
 		if (CachedPlayer != null && args.Target is MenuTargetDefault target && target.TargetObjectId == CachedPlayer.PlayerCharacterId && !IsPaused)
 		{
-			SeStringBuilder seStringBuilder = new SeStringBuilder();
+			SeStringBuilder seStringBuilder5 = new SeStringBuilder();
 			SeStringBuilder seStringBuilder2 = new SeStringBuilder();
 			SeStringBuilder seStringBuilder3 = new SeStringBuilder();
 			SeStringBuilder seStringBuilder4 = new SeStringBuilder();
-			SeString openProfileSeString = seStringBuilder.AddText("Open Profile").Build();
+			SeString openProfileSeString = seStringBuilder5.AddText("Open Profile").Build();
 			SeString reapplyDataSeString = seStringBuilder2.AddText("Reapply last data").Build();
 			SeString cyclePauseState = seStringBuilder3.AddText("Cycle pause state").Build();
 			SeString changePermissions = seStringBuilder4.AddText("Change Permissions").Build();
@@ -250,8 +252,8 @@ public class Pair : IDisposable
 				_creationSemaphore.Wait();
 			}
 			LastReceivedCharacterData = null;
-			PairHandler? cachedPlayer = CachedPlayer;
-			CachedPlayer = null;
+            PairHandler? cachedPlayer = CachedPlayer;
+            CachedPlayer = null;
 			cachedPlayer?.Dispose();
 			_onlineUserIdentDto = null;
 		}

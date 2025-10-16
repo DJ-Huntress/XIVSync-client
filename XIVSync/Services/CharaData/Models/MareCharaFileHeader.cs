@@ -8,6 +8,7 @@ public record MareCharaFileHeader(byte Version, MareCharaFileData CharaFileData)
 {
 	public string FilePath { get; private set; } = string.Empty;
 
+
 	public static readonly byte CurrentVersion = 1;
 
 	public void WriteToStream(BinaryWriter writer)

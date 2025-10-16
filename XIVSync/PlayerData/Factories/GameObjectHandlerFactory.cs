@@ -28,6 +28,6 @@ public class GameObjectHandlerFactory
 
 	public async Task<GameObjectHandler> Create(ObjectKind objectKind, Func<nint> getAddressFunc, bool isWatched = false)
 	{
-		return await _dalamudUtilService.RunOnFrameworkThread(() => new GameObjectHandler(_loggerFactory.CreateLogger<GameObjectHandler>(), _performanceCollectorService, _mareMediator, _dalamudUtilService, objectKind, getAddressFunc, isWatched), "Create", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\PlayerData\\Factories\\GameObjectHandlerFactory.cs", 27).ConfigureAwait(continueOnCapturedContext: false);
+		return await _dalamudUtilService.RunOnFrameworkThread(() => new GameObjectHandler(_loggerFactory.CreateLogger<GameObjectHandler>(), _performanceCollectorService, _mareMediator, _dalamudUtilService, objectKind, getAddressFunc, isWatched), "Create", "C:\\Users\\Owner\\sync_client2\\XIVSync\\PlayerData\\Factories\\GameObjectHandlerFactory.cs", 27).ConfigureAwait(continueOnCapturedContext: false);
 	}
 }

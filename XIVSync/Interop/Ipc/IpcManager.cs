@@ -57,9 +57,9 @@ public sealed class IpcManager : DisposableMediatorSubscriberBase
 		{
 			PeriodicApiStateCheck();
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			logger.LogWarning(exception, "Failed to check for some IPC, plugin not installed?");
+			logger.LogWarning(ex, "Failed to check for some IPC, plugin not installed?");
 		}
 	}
 

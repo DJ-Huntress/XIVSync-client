@@ -255,32 +255,30 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 			node["Bones"][bone.Key]["Rotation"] = $"{bone.Value.RotationX.ToString(CultureInfo.InvariantCulture)}, {bone.Value.RotationY.ToString(CultureInfo.InvariantCulture)}, {bone.Value.RotationZ.ToString(CultureInfo.InvariantCulture)}, {bone.Value.RotationW.ToString(CultureInfo.InvariantCulture)}";
 		}
 		node["MainHand"] = new JsonObject();
-		foreach (KeyValuePair<string, BoneData> bone2 in poseData.Value.MainHand)
+		foreach (KeyValuePair<string, BoneData> bone in poseData.Value.MainHand)
 		{
-			node["MainHand"][bone2.Key] = new JsonObject();
-			node["MainHand"][bone2.Key]["Position"] = $"{bone2.Value.PositionX.ToString(CultureInfo.InvariantCulture)}, {bone2.Value.PositionY.ToString(CultureInfo.InvariantCulture)}, {bone2.Value.PositionZ.ToString(CultureInfo.InvariantCulture)}";
-			node["MainHand"][bone2.Key]["Scale"] = $"{bone2.Value.ScaleX.ToString(CultureInfo.InvariantCulture)}, {bone2.Value.ScaleY.ToString(CultureInfo.InvariantCulture)}, {bone2.Value.ScaleZ.ToString(CultureInfo.InvariantCulture)}";
-			node["MainHand"][bone2.Key]["Rotation"] = $"{bone2.Value.RotationX.ToString(CultureInfo.InvariantCulture)}, {bone2.Value.RotationY.ToString(CultureInfo.InvariantCulture)}, {bone2.Value.RotationZ.ToString(CultureInfo.InvariantCulture)}, {bone2.Value.RotationW.ToString(CultureInfo.InvariantCulture)}";
+			node["MainHand"][bone.Key] = new JsonObject();
+			node["MainHand"][bone.Key]["Position"] = $"{bone.Value.PositionX.ToString(CultureInfo.InvariantCulture)}, {bone.Value.PositionY.ToString(CultureInfo.InvariantCulture)}, {bone.Value.PositionZ.ToString(CultureInfo.InvariantCulture)}";
+			node["MainHand"][bone.Key]["Scale"] = $"{bone.Value.ScaleX.ToString(CultureInfo.InvariantCulture)}, {bone.Value.ScaleY.ToString(CultureInfo.InvariantCulture)}, {bone.Value.ScaleZ.ToString(CultureInfo.InvariantCulture)}";
+			node["MainHand"][bone.Key]["Rotation"] = $"{bone.Value.RotationX.ToString(CultureInfo.InvariantCulture)}, {bone.Value.RotationY.ToString(CultureInfo.InvariantCulture)}, {bone.Value.RotationZ.ToString(CultureInfo.InvariantCulture)}, {bone.Value.RotationW.ToString(CultureInfo.InvariantCulture)}";
 		}
 		node["OffHand"] = new JsonObject();
-		foreach (KeyValuePair<string, BoneData> bone3 in poseData.Value.OffHand)
+		foreach (KeyValuePair<string, BoneData> bone in poseData.Value.OffHand)
 		{
-			node["OffHand"][bone3.Key] = new JsonObject();
-			node["OffHand"][bone3.Key]["Position"] = $"{bone3.Value.PositionX.ToString(CultureInfo.InvariantCulture)}, {bone3.Value.PositionY.ToString(CultureInfo.InvariantCulture)}, {bone3.Value.PositionZ.ToString(CultureInfo.InvariantCulture)}";
-			node["OffHand"][bone3.Key]["Scale"] = $"{bone3.Value.ScaleX.ToString(CultureInfo.InvariantCulture)}, {bone3.Value.ScaleY.ToString(CultureInfo.InvariantCulture)}, {bone3.Value.ScaleZ.ToString(CultureInfo.InvariantCulture)}";
-			node["OffHand"][bone3.Key]["Rotation"] = $"{bone3.Value.RotationX.ToString(CultureInfo.InvariantCulture)}, {bone3.Value.RotationY.ToString(CultureInfo.InvariantCulture)}, {bone3.Value.RotationZ.ToString(CultureInfo.InvariantCulture)}, {bone3.Value.RotationW.ToString(CultureInfo.InvariantCulture)}";
+			node["OffHand"][bone.Key] = new JsonObject();
+			node["OffHand"][bone.Key]["Position"] = $"{bone.Value.PositionX.ToString(CultureInfo.InvariantCulture)}, {bone.Value.PositionY.ToString(CultureInfo.InvariantCulture)}, {bone.Value.PositionZ.ToString(CultureInfo.InvariantCulture)}";
+			node["OffHand"][bone.Key]["Scale"] = $"{bone.Value.ScaleX.ToString(CultureInfo.InvariantCulture)}, {bone.Value.ScaleY.ToString(CultureInfo.InvariantCulture)}, {bone.Value.ScaleZ.ToString(CultureInfo.InvariantCulture)}";
+			node["OffHand"][bone.Key]["Rotation"] = $"{bone.Value.RotationX.ToString(CultureInfo.InvariantCulture)}, {bone.Value.RotationY.ToString(CultureInfo.InvariantCulture)}, {bone.Value.RotationZ.ToString(CultureInfo.InvariantCulture)}, {bone.Value.RotationW.ToString(CultureInfo.InvariantCulture)}";
 		}
 		return node.ToJsonString();
 	}
 
 	private PoseData CreatePoseDataFromJson(string json, PoseData? fullPoseData = null)
 	{
-		PoseData output = new PoseData
-		{
-			Bones = new Dictionary<string, BoneData>(StringComparer.Ordinal),
-			MainHand = new Dictionary<string, BoneData>(StringComparer.Ordinal),
-			OffHand = new Dictionary<string, BoneData>(StringComparer.Ordinal)
-		};
+		PoseData output = default(PoseData);
+		output.Bones = new Dictionary<string, BoneData>(StringComparer.Ordinal);
+		output.MainHand = new Dictionary<string, BoneData>(StringComparer.Ordinal);
+		output.OffHand = new Dictionary<string, BoneData>(StringComparer.Ordinal);
 		JsonNode node = JsonNode.Parse(json);
 		foreach (KeyValuePair<string, JsonNode> bone in node["Bones"].AsObject())
 		{
@@ -298,36 +296,36 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 				output.Bones[name] = outputBoneData;
 			}
 		}
-		foreach (KeyValuePair<string, JsonNode> bone2 in node["MainHand"].AsObject())
+		foreach (KeyValuePair<string, JsonNode> bone in node["MainHand"].AsObject())
 		{
-			string name2 = bone2.Key;
-			BoneData outputBoneData2 = createBoneData(bone2.Value.AsObject());
+			string name = bone.Key;
+			BoneData outputBoneData = createBoneData(bone.Value.AsObject());
 			if (fullPoseData.HasValue)
 			{
-				if (fullPoseData.Value.MainHand.TryGetValue(name2, out var prevBoneData2) && prevBoneData2 != outputBoneData2)
+				if (fullPoseData.Value.MainHand.TryGetValue(name, out var prevBoneData) && prevBoneData != outputBoneData)
 				{
-					output.MainHand[name2] = outputBoneData2;
+					output.MainHand[name] = outputBoneData;
 				}
 			}
 			else
 			{
-				output.MainHand[name2] = outputBoneData2;
+				output.MainHand[name] = outputBoneData;
 			}
 		}
-		foreach (KeyValuePair<string, JsonNode> bone3 in node["OffHand"].AsObject())
+		foreach (KeyValuePair<string, JsonNode> bone in node["OffHand"].AsObject())
 		{
-			string name3 = bone3.Key;
-			BoneData outputBoneData3 = createBoneData(bone3.Value.AsObject());
+			string name = bone.Key;
+			BoneData outputBoneData = createBoneData(bone.Value.AsObject());
 			if (fullPoseData.HasValue)
 			{
-				if (fullPoseData.Value.OffHand.TryGetValue(name3, out var prevBoneData3) && prevBoneData3 != outputBoneData3)
+				if (fullPoseData.Value.OffHand.TryGetValue(name, out var prevBoneData) && prevBoneData != outputBoneData)
 				{
-					output.OffHand[name3] = outputBoneData3;
+					output.OffHand[name] = outputBoneData;
 				}
 			}
 			else
 			{
-				output.OffHand[name3] = outputBoneData3;
+				output.OffHand[name] = outputBoneData;
 			}
 		}
 		if (fullPoseData.HasValue)
@@ -337,24 +335,22 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 		return output;
 		static BoneData createBoneData(JsonNode boneJson)
 		{
-			BoneData outputBoneData4 = new BoneData
-			{
-				Exists = true
-			};
+			BoneData outputBoneData = default(BoneData);
+			outputBoneData.Exists = true;
 			string[] pos = boneJson["Position"].ToString().Split(",", StringSplitOptions.TrimEntries);
-			outputBoneData4.PositionX = getRounded(pos[0]);
-			outputBoneData4.PositionY = getRounded(pos[1]);
-			outputBoneData4.PositionZ = getRounded(pos[2]);
+			outputBoneData.PositionX = getRounded(pos[0]);
+			outputBoneData.PositionY = getRounded(pos[1]);
+			outputBoneData.PositionZ = getRounded(pos[2]);
 			string[] sca = boneJson["Scale"].ToString().Split(",", StringSplitOptions.TrimEntries);
-			outputBoneData4.ScaleX = getRounded(sca[0]);
-			outputBoneData4.ScaleY = getRounded(sca[1]);
-			outputBoneData4.ScaleZ = getRounded(sca[2]);
+			outputBoneData.ScaleX = getRounded(sca[0]);
+			outputBoneData.ScaleY = getRounded(sca[1]);
+			outputBoneData.ScaleZ = getRounded(sca[2]);
 			string[] rot = boneJson["Rotation"].ToString().Split(",", StringSplitOptions.TrimEntries);
-			outputBoneData4.RotationX = getRounded(rot[0]);
-			outputBoneData4.RotationY = getRounded(rot[1]);
-			outputBoneData4.RotationZ = getRounded(rot[2]);
-			outputBoneData4.RotationW = getRounded(rot[3]);
-			return outputBoneData4;
+			outputBoneData.RotationX = getRounded(rot[0]);
+			outputBoneData.RotationY = getRounded(rot[1]);
+			outputBoneData.RotationZ = getRounded(rot[2]);
+			outputBoneData.RotationW = getRounded(rot[3]);
+			return outputBoneData;
 		}
 		static float getRounded(string number)
 		{
@@ -390,7 +386,7 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 				{
 					continue;
 				}
-				PoseData? lastFullData = ((_poseGenerationExecutions++ >= 12) ? ((PoseData?)null) : _lastFullPoseData);
+				PoseData? lastFullData = ((_poseGenerationExecutions++ >= 12) ? null : _lastFullPoseData);
 				lastFullData = (_forceResendFullPose ? _lastFullPoseData : lastFullData);
 				PoseData poseData = CreatePoseDataFromJson(poseJson, lastFullData);
 				if (!poseData.IsDelta)
@@ -399,7 +395,7 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 					_lastDeltaPoseData = null;
 					_poseGenerationExecutions = 0;
 				}
-				bool deltaIsSame = _lastDeltaPoseData.HasValue && poseData.Bones.Keys.All((string k) => _lastDeltaPoseData.Value.Bones.ContainsKey(k) && poseData.Bones.Values.All((BoneData value) => _lastDeltaPoseData.Value.Bones.ContainsValue(value)));
+				bool deltaIsSame = _lastDeltaPoseData.HasValue && poseData.Bones.Keys.All((string k) => _lastDeltaPoseData.Value.Bones.ContainsKey(k) && poseData.Bones.Values.All((BoneData k) => _lastDeltaPoseData.Value.Bones.ContainsValue(k)));
 				if (_forceResendFullPose || ((poseData.Bones.Any() || poseData.MainHand.Any() || poseData.OffHand.Any()) && (!poseData.IsDelta || (poseData.IsDelta && !deltaIsSame))))
 				{
 					_forceResendFullPose = false;
@@ -410,9 +406,9 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 					_lastDeltaPoseData = poseData;
 				}
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				base.Logger.LogWarning(exception, "Error during Pose Data Generation");
+				base.Logger.LogWarning(ex, "Error during Pose Data Generation");
 			}
 		}
 	}
@@ -472,7 +468,7 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 						{
 							entry.Value.LastWorldPosition = new Vector3(entryWorldData.PositionX, entryWorldData.PositionY, entryWorldData.PositionZ);
 							GposeLobbyUserData value = entry.Value;
-							value.SpawnedVfxId = await _dalamudUtil.RunOnFrameworkThread(() => _vfxSpawnManager.SpawnObject(entry.Value.LastWorldPosition.Value, Quaternion.Identity, Vector3.One, 0.5f, 0.1f, 0.5f, 0.9f), "GposeWorldPositionBackgroundTask", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataGposeTogetherManager.cs", 479).ConfigureAwait(continueOnCapturedContext: false);
+							value.SpawnedVfxId = await _dalamudUtil.RunOnFrameworkThread(() => _vfxSpawnManager.SpawnObject(entry.Value.LastWorldPosition.Value, Quaternion.Identity, Vector3.One, 0.5f, 0.1f, 0.5f, 0.9f), "GposeWorldPositionBackgroundTask", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataGposeTogetherManager.cs", 479).ConfigureAwait(continueOnCapturedContext: false);
 							continue;
 						}
 						Vector3 newPosition = new Vector3(entryWorldData.PositionX, entryWorldData.PositionY, entryWorldData.PositionZ);
@@ -489,7 +485,7 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 						await _dalamudUtil.RunOnFrameworkThread(delegate
 						{
 							_vfxSpawnManager.DespawnObject(entry.Value.SpawnedVfxId);
-						}, "GposeWorldPositionBackgroundTask", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataGposeTogetherManager.cs", 495).ConfigureAwait(continueOnCapturedContext: false);
+						}, "GposeWorldPositionBackgroundTask", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataGposeTogetherManager.cs", 495).ConfigureAwait(continueOnCapturedContext: false);
 						entry.Value.SpawnedVfxId = null;
 					}
 				}
@@ -512,9 +508,9 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 				goto IL_049d;
 				end_IL_00d5:;
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				base.Logger.LogWarning(exception, "Error during World Data Generation");
+				base.Logger.LogWarning(ex, "Error during World Data Generation");
 			}
 		}
 	}
@@ -562,7 +558,7 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 			_dalamudUtil.RunOnFrameworkThread(delegate
 			{
 				_vfxSpawnManager.DespawnObject(data.SpawnedVfxId);
-			}, "OnEnterGpose", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataGposeTogetherManager.cs", 548);
+			}, "OnEnterGpose", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataGposeTogetherManager.cs", 548);
 			data.Reset();
 		}
 	}
@@ -709,7 +705,7 @@ public class CharaDataGposeTogetherManager : DisposableMediatorSubscriberBase
 			_dalamudUtil.RunOnFrameworkThread(delegate
 			{
 				_vfxSpawnManager.DespawnObject(existingData.SpawnedVfxId);
-			}, "OnUserLeaveLobby", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataGposeTogetherManager.cs", 693);
+			}, "OnUserLeaveLobby", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataGposeTogetherManager.cs", 693);
 		}
 	}
 }

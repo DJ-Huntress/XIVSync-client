@@ -85,7 +85,7 @@ public sealed class IpcCallerHonorific : IIpcCaller, IDisposable
 				_logger.LogTrace("Honorific removing for {addr}", ((IntPtr)playerCharacter.Address).ToString("X"));
 				_honorificClearCharacterTitle.InvokeAction(playerCharacter.ObjectIndex);
 			}
-		}, "ClearTitleAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHonorific.cs", 69).ConfigureAwait(continueOnCapturedContext: false);
+		}, "ClearTitleAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHonorific.cs", 69).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task<string> GetTitle()
@@ -94,7 +94,7 @@ public sealed class IpcCallerHonorific : IIpcCaller, IDisposable
 		{
 			return string.Empty;
 		}
-		string title = await _dalamudUtil.RunOnFrameworkThread(() => _honorificGetLocalCharacterTitle.InvokeFunc(), "GetTitle", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHonorific.cs", 83).ConfigureAwait(continueOnCapturedContext: false);
+		string title = await _dalamudUtil.RunOnFrameworkThread(() => _honorificGetLocalCharacterTitle.InvokeFunc(), "GetTitle", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHonorific.cs", 83).ConfigureAwait(continueOnCapturedContext: false);
 		return string.IsNullOrEmpty(title) ? string.Empty : Convert.ToBase64String(Encoding.UTF8.GetBytes(title));
 	}
 
@@ -121,11 +121,11 @@ public sealed class IpcCallerHonorific : IIpcCaller, IDisposable
 						_honorificSetCharacterTitle.InvokeAction(playerCharacter.ObjectIndex, text);
 					}
 				}
-			}, "SetTitleAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHonorific.cs", 93).ConfigureAwait(continueOnCapturedContext: false);
+			}, "SetTitleAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHonorific.cs", 93).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Could not apply Honorific data");
+			_logger.LogWarning(e, "Could not apply Honorific data");
 		}
 	}
 

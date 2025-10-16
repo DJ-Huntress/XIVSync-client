@@ -4,8 +4,6 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
-using Dalamud.Interface.Colors;
-using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using XIVSync.API.Data;
 using XIVSync.API.Data.Enum;
@@ -101,6 +99,17 @@ public class DrawFolderGroup : DrawFolderBase
 	{
 		ImGui.TextUnformatted("Syncshell Menu (" + _groupFullInfoDto.GroupAliasOrGID + ")");
 		ImGui.Separator();
+		FontAwesomeIcon pauseIcon = (_groupFullInfoDto.GroupUserPermissions.IsPaused() ? FontAwesomeIcon.Play : FontAwesomeIcon.Pause);
+		string pauseText = (_groupFullInfoDto.GroupUserPermissions.IsPaused() ? "Resume Syncshell" : "Pause Syncshell");
+		if (_uiSharedService.IconTextButton(pauseIcon, pauseText, menuWidth, isInPopup: true))
+		{
+			GroupUserPreferredPermissions pausePerm = _groupFullInfoDto.GroupUserPermissions;
+			pausePerm.SetPaused(!pausePerm.IsPaused());
+			_apiController.GroupChangeIndividualPermissionState(new GroupPairUserPermissionDto(_groupFullInfoDto.Group, new UserData(_apiController.UID), pausePerm));
+			ImGui.CloseCurrentPopup();
+		}
+		UiSharedService.AttachToolTip(_groupFullInfoDto.GroupUserPermissions.IsPaused() ? "Resume pairing with all users in this syncshell" : "Pause pairing with all users in this syncshell");
+		ImGui.Separator();
 		ImGui.TextUnformatted("General Syncshell Actions");
 		if (_uiSharedService.IconTextButton(FontAwesomeIcon.Copy, "Copy ID", menuWidth, isInPopup: true))
 		{
@@ -167,62 +176,5 @@ public class DrawFolderGroup : DrawFolderBase
 	protected override void DrawName(float width)
 	{
 		_idDisplayHandler.DrawGroupText(_id, _groupFullInfoDto, ImGui.GetCursorPosX(), () => width);
-	}
-
-	protected override float DrawRightSide(float currentRightSideX)
-	{
-		float spacingX = ImGui.GetStyle().ItemSpacing.X;
-		FontAwesomeIcon pauseIcon = (_groupFullInfoDto.GroupUserPermissions.IsPaused() ? FontAwesomeIcon.Play : FontAwesomeIcon.Pause);
-		Vector2 pauseButtonSize = _uiSharedService.GetIconButtonSize(pauseIcon);
-		Vector2 userCogButtonSize = _uiSharedService.GetIconSize(FontAwesomeIcon.UsersCog);
-		bool individualSoundsDisabled = _groupFullInfoDto.GroupUserPermissions.IsDisableSounds();
-		bool individualAnimDisabled = _groupFullInfoDto.GroupUserPermissions.IsDisableAnimations();
-		bool individualVFXDisabled = _groupFullInfoDto.GroupUserPermissions.IsDisableVFX();
-		ImGui.SameLine(currentRightSideX - pauseButtonSize.X - spacingX - userCogButtonSize.X);
-		ImGui.AlignTextToFramePadding();
-		_uiSharedService.IconText(FontAwesomeIcon.UsersCog, (_groupFullInfoDto.GroupPermissions.IsPreferDisableAnimations() != individualAnimDisabled || _groupFullInfoDto.GroupPermissions.IsPreferDisableSounds() != individualSoundsDisabled || _groupFullInfoDto.GroupPermissions.IsPreferDisableVFX() != individualVFXDisabled) ? new Vector4?(ImGuiColors.DalamudYellow) : ((Vector4?)null));
-		if (ImGui.IsItemHovered())
-		{
-			ImGui.BeginTooltip();
-			ImGui.TextUnformatted("Syncshell Permissions");
-			ImGuiHelpers.ScaledDummy(2f);
-			_uiSharedService.BooleanToColoredIcon(!individualSoundsDisabled, inline: false);
-			ImGui.SameLine(40f * ImGuiHelpers.GlobalScale);
-			ImGui.AlignTextToFramePadding();
-			ImGui.TextUnformatted("Sound Sync");
-			_uiSharedService.BooleanToColoredIcon(!individualAnimDisabled, inline: false);
-			ImGui.SameLine(40f * ImGuiHelpers.GlobalScale);
-			ImGui.AlignTextToFramePadding();
-			ImGui.TextUnformatted("Animation Sync");
-			_uiSharedService.BooleanToColoredIcon(!individualVFXDisabled, inline: false);
-			ImGui.SameLine(40f * ImGuiHelpers.GlobalScale);
-			ImGui.AlignTextToFramePadding();
-			ImGui.TextUnformatted("VFX Sync");
-			ImGui.Separator();
-			ImGuiHelpers.ScaledDummy(2f);
-			ImGui.TextUnformatted("Suggested Permissions");
-			ImGuiHelpers.ScaledDummy(2f);
-			_uiSharedService.BooleanToColoredIcon(!_groupFullInfoDto.GroupPermissions.IsPreferDisableSounds(), inline: false);
-			ImGui.SameLine(40f * ImGuiHelpers.GlobalScale);
-			ImGui.AlignTextToFramePadding();
-			ImGui.TextUnformatted("Sound Sync");
-			_uiSharedService.BooleanToColoredIcon(!_groupFullInfoDto.GroupPermissions.IsPreferDisableAnimations(), inline: false);
-			ImGui.SameLine(40f * ImGuiHelpers.GlobalScale);
-			ImGui.AlignTextToFramePadding();
-			ImGui.TextUnformatted("Animation Sync");
-			_uiSharedService.BooleanToColoredIcon(!_groupFullInfoDto.GroupPermissions.IsPreferDisableVFX(), inline: false);
-			ImGui.SameLine(40f * ImGuiHelpers.GlobalScale);
-			ImGui.AlignTextToFramePadding();
-			ImGui.TextUnformatted("VFX Sync");
-			ImGui.EndTooltip();
-		}
-		ImGui.SameLine();
-		if (_uiSharedService.IconButton(pauseIcon))
-		{
-			GroupUserPreferredPermissions perm = _groupFullInfoDto.GroupUserPermissions;
-			perm.SetPaused(!perm.IsPaused());
-			_apiController.GroupChangeIndividualPermissionState(new GroupPairUserPermissionDto(_groupFullInfoDto.Group, new UserData(_apiController.UID), perm));
-		}
-		return currentRightSideX;
 	}
 }

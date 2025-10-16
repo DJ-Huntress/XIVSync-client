@@ -41,6 +41,7 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 
 	public List<FileTransfer> CurrentUploads { get; } = new List<FileTransfer>();
 
+
 	public bool IsUploading => CurrentUploads.Count > 0;
 
 	public FileUploadManager(ILogger<FileUploadManager> logger, MareMediator mediator, MareConfigService mareConfigService, FileTransferOrchestrator orchestrator, FileCacheManager fileDbManager, ServerConfigurationManager serverManager)
@@ -156,7 +157,10 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 		}
 		foreach (KeyValuePair<ObjectKind, List<FileReplacementData>> kvp in data.FileReplacements)
 		{
-			data.FileReplacements[kvp.Key].RemoveAll((FileReplacementData i) => _orchestrator.ForbiddenTransfers.Exists((FileTransfer f) => string.Equals(f.Hash, i.Hash, StringComparison.OrdinalIgnoreCase)));
+			data.FileReplacements[kvp.Key].RemoveAll(delegate(FileReplacementData i)
+			{
+				return _orchestrator.ForbiddenTransfers.Exists((FileTransfer f) => string.Equals(f.Hash, i.Hash, StringComparison.OrdinalIgnoreCase));
+			});
 		}
 		return data;
 	}
@@ -185,8 +189,9 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 	private HashSet<string> GetUnverifiedFiles(CharacterData data)
 	{
 		HashSet<string> unverifiedUploadHashes = new HashSet<string>(StringComparer.Ordinal);
-		foreach (string item in data.FileReplacements.SelectMany<KeyValuePair<ObjectKind, List<FileReplacementData>>, string>((KeyValuePair<ObjectKind, List<FileReplacementData>> c) => (from v in c.Value
-			where string.IsNullOrEmpty(v.FileSwapPath)
+		foreach (string item in data.FileReplacements.SelectMany<KeyValuePair<ObjectKind, List<FileReplacementData>>, string>((KeyValuePair<ObjectKind, List<FileReplacementData>> c) => (from f in c.Value
+			where string.IsNullOrEmpty(f.FileSwapPath)
+			select f into v
 			select v.Hash).Distinct<string>(StringComparer.Ordinal)).Distinct<string>(StringComparer.Ordinal).ToList())
 		{
 			if (!_verifiedUploadedHashes.TryGetValue(item, out var verifiedTime))
@@ -249,11 +254,11 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 			FileDownloadManager.MungeBuffer(compressedFile.AsSpan());
 		}
 		using MemoryStream ms = new MemoryStream(compressedFile);
-		Progress<UploadProgress> prog = ((!postProgress) ? null : new Progress<UploadProgress>(delegate(UploadProgress uploadProgress)
+		Progress<UploadProgress> prog = ((!postProgress) ? null : new Progress<UploadProgress>(delegate(UploadProgress prog)
 		{
 			try
 			{
-				CurrentUploads.Single((FileTransfer f) => string.Equals(f.Hash, fileHash, StringComparison.Ordinal)).Transferred = uploadProgress.Uploaded;
+				CurrentUploads.Single((FileTransfer f) => string.Equals(f.Hash, fileHash, StringComparison.Ordinal)).Transferred = prog.Uploaded;
 			}
 			catch (Exception exception)
 			{
@@ -280,21 +285,21 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 					Total = new FileInfo(_fileDbManager.GetFileCacheByHash(file.Hash).ResolvedFilepath).Length
 				});
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				base.Logger.LogWarning(exception, "Tried to request file {hash} but file was not present", file.Hash);
+				base.Logger.LogWarning(ex, "Tried to request file {hash} but file was not present", file.Hash);
 			}
 		}
-		foreach (UploadFileDto file2 in filesToUpload.Where((UploadFileDto c) => c.IsForbidden))
+		foreach (UploadFileDto file in filesToUpload.Where((UploadFileDto c) => c.IsForbidden))
 		{
-			if (_orchestrator.ForbiddenTransfers.TrueForAll((FileTransfer f) => !string.Equals(f.Hash, file2.Hash, StringComparison.Ordinal)))
+			if (_orchestrator.ForbiddenTransfers.TrueForAll((FileTransfer f) => !string.Equals(f.Hash, file.Hash, StringComparison.Ordinal)))
 			{
-				_orchestrator.ForbiddenTransfers.Add(new UploadFileTransfer(file2)
+				_orchestrator.ForbiddenTransfers.Add(new UploadFileTransfer(file)
 				{
-					LocalFile = (_fileDbManager.GetFileCacheByHash(file2.Hash)?.ResolvedFilepath ?? string.Empty)
+					LocalFile = (_fileDbManager.GetFileCacheByHash(file.Hash)?.ResolvedFilepath ?? string.Empty)
 				});
 			}
-			_verifiedUploadedHashes[file2.Hash] = DateTime.UtcNow;
+			_verifiedUploadedHashes[file.Hash] = DateTime.UtcNow;
 		}
 		long totalSize = CurrentUploads.Sum((FileTransfer c) => c.Total);
 		base.Logger.LogDebug("Compressing and uploading files in parallel");
@@ -305,31 +310,31 @@ public sealed class FileUploadManager : DisposableMediatorSubscriberBase
 			{
 				MaxDegreeOfParallelism = _mareConfigService.Current.ParallelUploads,
 				CancellationToken = uploadToken
-			}, async delegate(FileTransfer fileTransfer, CancellationToken token)
+			}, async delegate(FileTransfer file, CancellationToken token)
 			{
 				await _orchestrator.WaitForUploadSlotAsync(token).ConfigureAwait(continueOnCapturedContext: false);
 				try
 				{
-					_uploadingHashes.Add(fileTransfer.Hash);
-					base.Logger.LogDebug("[{hash}] Compressing", fileTransfer);
-					(string, byte[]) data = await _fileDbManager.GetCompressedFileData(fileTransfer.Hash, token).ConfigureAwait(continueOnCapturedContext: false);
+					_uploadingHashes.Add(file.Hash);
+					base.Logger.LogDebug("[{hash}] Compressing", file);
+					(string, byte[]) data = await _fileDbManager.GetCompressedFileData(file.Hash, token).ConfigureAwait(continueOnCapturedContext: false);
 					CurrentUploads.Single((FileTransfer e) => string.Equals(e.Hash, data.Item1, StringComparison.Ordinal)).Total = data.Item2.Length;
 					base.Logger.LogDebug("[{hash}] Starting upload for {filePath}", data.Item1, _fileDbManager.GetFileCacheByHash(data.Item1).ResolvedFilepath);
-					await UploadFile(data.Item2, fileTransfer.Hash, postProgress: true, token).ConfigureAwait(continueOnCapturedContext: false);
+					await UploadFile(data.Item2, file.Hash, postProgress: true, token).ConfigureAwait(continueOnCapturedContext: false);
 					token.ThrowIfCancellationRequested();
 				}
 				finally
 				{
-					_uploadingHashes.Remove(fileTransfer.Hash);
+					_uploadingHashes.Remove(file.Hash);
 					_orchestrator.ReleaseUploadSlot();
 				}
 			}).ConfigureAwait(continueOnCapturedContext: false);
 			long compressedSize = CurrentUploads.Sum((FileTransfer c) => c.Total);
 			base.Logger.LogDebug("Upload complete, compressed {size} to {compressed}", UiSharedService.ByteToString(totalSize), UiSharedService.ByteToString(compressedSize));
 		}
-		foreach (string file3 in unverifiedUploadHashes.Where((string c) => !CurrentUploads.Exists((FileTransfer u) => string.Equals(u.Hash, c, StringComparison.Ordinal))))
+		foreach (string file in unverifiedUploadHashes.Where((string c) => !CurrentUploads.Exists((FileTransfer u) => string.Equals(u.Hash, c, StringComparison.Ordinal))))
 		{
-			_verifiedUploadedHashes[file3] = DateTime.UtcNow;
+			_verifiedUploadedHashes[file] = DateTime.UtcNow;
 		}
 		CurrentUploads.Clear();
 	}

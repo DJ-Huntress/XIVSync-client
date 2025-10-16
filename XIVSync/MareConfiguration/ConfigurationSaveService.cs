@@ -51,9 +51,9 @@ public class ConfigurationSaveService : IHostedService
 			{
 				await SaveConfigs().ConfigureAwait(continueOnCapturedContext: false);
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				_logger.LogError(exception, "Error during SaveConfigs");
+				_logger.LogError(ex, "Error during SaveConfigs");
 			}
 			await Task.Delay(TimeSpan.FromSeconds(5L), ct).ConfigureAwait(continueOnCapturedContext: false);
 		}
@@ -104,9 +104,9 @@ public class ConfigurationSaveService : IHostedService
 			File.Copy(config.ConfigurationPath, backupPath, overwrite: true);
 			new FileInfo(backupPath).LastWriteTimeUtc = DateTime.UtcNow;
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Could not create backup for {config}", config.ConfigurationPath);
+			_logger.LogWarning(ex, "Could not create backup for {config}", config.ConfigurationPath);
 		}
 		string temp = config.ConfigurationPath + ".tmp";
 		try
@@ -118,9 +118,9 @@ public class ConfigurationSaveService : IHostedService
 			File.Move(temp, config.ConfigurationPath, overwrite: true);
 			config.UpdateLastWriteTime();
 		}
-		catch (Exception exception2)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception2, "Error during config save of {config}", config.ConfigurationName);
+			_logger.LogWarning(ex, "Error during config save of {config}", config.ConfigurationName);
 		}
 	}
 

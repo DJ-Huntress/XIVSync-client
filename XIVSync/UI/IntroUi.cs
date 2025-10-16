@@ -60,8 +60,7 @@ public class IntroUi : WindowMediatorSubscriberBase
 
 	private int _prevIdx = -1;
 
-	public IntroUi(ILogger<IntroUi> logger, UiSharedService uiShared, MareConfigService configService, CacheMonitor fileCacheManager, ServerConfigurationManager serverConfigurationManager, MareMediator mareMediator, PerformanceCollectorService performanceCollectorService, DalamudUtilService dalamudUtilService)
-		: base(logger, mareMediator, "XIVSync Setup", performanceCollectorService)
+	public IntroUi(ILogger<IntroUi> logger, UiSharedService uiShared, MareConfigService configService, CacheMonitor fileCacheManager, ServerConfigurationManager serverConfigurationManager, MareMediator mareMediator, PerformanceCollectorService performanceCollectorService, DalamudUtilService dalamudUtilService) : base(logger, mareMediator, "XIVSync Setup", performanceCollectorService)
 	{
 		IntroUi introUi = this;
 		_uiShared = uiShared;
@@ -255,14 +254,14 @@ public class IntroUi : WindowMediatorSubscriberBase
 			{
 				string buttonText = "Save";
 				float buttonWidth = ((_secretKey.Length != 64) ? 0f : (ImGuiHelpers.GetButtonSize(buttonText).X + ImGui.GetStyle().ItemSpacing.X));
-				Vector2 textSize2 = ImGui.CalcTextSize("Enter Secret Key");
+				Vector2 textSize = ImGui.CalcTextSize("Enter Secret Key");
 				ImGuiHelpers.ScaledDummy(5f);
 				UiSharedService.DrawGroupedCenteredColorText("Strongly consider to use OAuth2 to authenticate, if the server supports it (the current main server does). The authentication flow is simpler and you do not require to store or maintain Secret Keys. You already implicitly register using Discord, so the OAuth2 method will be cleaner and more straight-forward to use.", ImGuiColors.DalamudYellow, 500f);
 				ImGuiHelpers.ScaledDummy(5f);
 				ImGui.AlignTextToFramePadding();
 				ImGui.TextUnformatted("Enter Secret Key");
 				ImGui.SameLine();
-				ImGui.SetNextItemWidth(UiSharedService.GetWindowContentRegionWidth() - ImGui.GetWindowContentRegionMin().X - buttonWidth - textSize2.X);
+				ImGui.SetNextItemWidth(UiSharedService.GetWindowContentRegionWidth() - ImGui.GetWindowContentRegionMin().X - buttonWidth - textSize.X);
 				ImGui.InputText("", ref _secretKey, 64);
 				if (_secretKey.Length > 0 && _secretKey.Length != 64)
 				{
@@ -374,6 +373,6 @@ public class IntroUi : WindowMediatorSubscriberBase
 	[GeneratedCode("System.Text.RegularExpressions.Generator", "9.0.12.6610")]
 	private static Regex HexRegex()
 	{
-		return _003CRegexGenerator_g_003EF3957ABF6C996F283E6D5A99861D1FFD1A039295BD532E2416D998903D178A004__HexRegex_1.Instance;
+		return _003CRegexGenerator_g_003EF7C2A3A4E3E23D9AAD8AD182C53AF1445029BB959A191641E99FAF6FAA9B714AC__HexRegex_1.Instance;
 	}
 }

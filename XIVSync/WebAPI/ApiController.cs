@@ -73,11 +73,16 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 
 	private int _onlineUsers;
 
+	private int _unauthorizedRetryCount;
+
+	private const int MaxUnauthorizedRetries = 3;
+
 	private bool _naggedAboutLod;
 
 	public int OnlineUsers => Volatile.Read(ref _onlineUsers);
 
 	public string AuthFailureMessage { get; private set; } = string.Empty;
+
 
 	public Version CurrentClientVersion => _connectionDto?.CurrentClientVersion ?? new Version(0, 0, 0);
 
@@ -92,9 +97,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 	public bool ServerAlive
 	{
 		get
-		{
-			ServerState serverState = ServerState;
-			if ((uint)(serverState - 4) <= 2u || serverState == ServerState.RateLimited)
+        {
+            ServerState serverState = ServerState;
+            if ((uint)(serverState - 4) <= 2u || serverState == ServerState.RateLimited)
 			{
 				return true;
 			}
@@ -118,6 +123,7 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 	}
 
 	public SystemInfoDto SystemInfoDto { get; private set; } = new SystemInfoDto();
+
 
 	public string UID => _connectionDto?.User.UID ?? string.Empty;
 
@@ -229,9 +235,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 		}
 		else
 		{
-			bool multi2;
-			(string, string)? oauth2 = _serverManager.GetOAuth2(out multi2);
-			if (multi2)
+			bool multi;
+			(string OAuthToken, string UID)? oauth2 = _serverManager.GetOAuth2(out multi);
+			if (multi)
 			{
 				base.Logger.LogWarning("Multiple secret keys for current character");
 				_connectionDto = null;
@@ -309,6 +315,7 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 				Volatile.Write(ref _onlineUsers, SystemInfoDto?.OnlineUsers ?? 0);
 				this.OnlineUsersChanged?.Invoke(_onlineUsers);
 				ServerState = ServerState.Connected;
+				_unauthorizedRetryCount = 0;
 				Version currentClientVer = Assembly.GetExecutingAssembly().GetName().Version;
 				if (_connectionDto.ServerVersion != 33)
 				{
@@ -352,27 +359,39 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 				base.Logger.LogWarning("Connection attempt cancelled");
 				break;
 			}
-			catch (HttpRequestException ex3)
+			catch (HttpRequestException ex)
 			{
-				base.Logger.LogWarning(ex3, "HttpRequestException on Connection");
-				if (ex3.StatusCode == HttpStatusCode.Unauthorized)
+				base.Logger.LogWarning(ex, "HttpRequestException on Connection");
+				if (ex.StatusCode.GetValueOrDefault() == HttpStatusCode.Unauthorized)
 				{
-					await StopConnectionAsync(ServerState.Unauthorized).ConfigureAwait(continueOnCapturedContext: false);
-					break;
+					_unauthorizedRetryCount++;
+					if (_unauthorizedRetryCount > 3)
+					{
+						base.Logger.LogError("Authentication failed after {count} attempts, stopping connection", _unauthorizedRetryCount);
+						await StopConnectionAsync(ServerState.Unauthorized).ConfigureAwait(continueOnCapturedContext: false);
+						break;
+					}
+					base.Logger.LogWarning("Authentication failed (attempt {count}/{max}), clearing token cache and retrying with fresh token", _unauthorizedRetryCount, 3);
+					_tokenProvider.ClearTokenCache();
+					ServerState = ServerState.Reconnecting;
+					await Task.Delay(TimeSpan.FromSeconds(_unauthorizedRetryCount * 3), token).ConfigureAwait(continueOnCapturedContext: false);
 				}
-				ServerState = ServerState.Reconnecting;
-				base.Logger.LogInformation("Failed to establish connection, retrying");
-				await Task.Delay(TimeSpan.FromSeconds(new Random().Next(5, 20)), token).ConfigureAwait(continueOnCapturedContext: false);
+				else
+				{
+					ServerState = ServerState.Reconnecting;
+					base.Logger.LogInformation("Failed to establish connection, retrying");
+					await Task.Delay(TimeSpan.FromSeconds(new Random().Next(5, 20)), token).ConfigureAwait(continueOnCapturedContext: false);
+				}
 			}
-			catch (InvalidOperationException exception)
+			catch (InvalidOperationException ex)
 			{
-				base.Logger.LogWarning(exception, "InvalidOperationException on connection");
+				base.Logger.LogWarning(ex, "InvalidOperationException on connection");
 				await StopConnectionAsync(ServerState.Disconnected).ConfigureAwait(continueOnCapturedContext: false);
 				break;
 			}
-			catch (Exception exception2)
+			catch (Exception ex)
 			{
-				base.Logger.LogWarning(exception2, "Exception on Connection");
+				base.Logger.LogWarning(ex, "Exception on Connection");
 				base.Logger.LogInformation("Failed to establish connection, retrying");
 				await Task.Delay(TimeSpan.FromSeconds(new Random().Next(5, 20)), token).ConfigureAwait(continueOnCapturedContext: false);
 			}
@@ -693,9 +712,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			await LoadOnlinePairsAsync().ConfigureAwait(continueOnCapturedContext: false);
 			base.Mediator.Publish(new ConnectedMessage(_connectionDto));
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogCritical(exception, "Failure to obtain data after reconnection");
+			base.Logger.LogCritical(ex, "Failure to obtain data after reconnection");
 			await StopConnectionAsync(ServerState.Disconnected).ConfigureAwait(continueOnCapturedContext: false);
 		}
 	}
@@ -728,9 +747,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			await StopConnectionAsync(ServerState.Unauthorized).ConfigureAwait(continueOnCapturedContext: false);
 			requireReconnect = true;
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Could not refresh token, forcing reconnect");
+			base.Logger.LogWarning(ex, "Could not refresh token, forcing reconnect");
 			_doNotNotifyOnNextInfo = true;
 			await CreateConnectionsAsync().ConfigureAwait(continueOnCapturedContext: false);
 			requireReconnect = true;
@@ -1273,9 +1292,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 		{
 			act();
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogCritical(exception, "Error on executing safely");
+			base.Logger.LogCritical(ex, "Error on executing safely");
 		}
 	}
 
@@ -1290,9 +1309,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Creating new Character Data");
 			return await _mareHub.InvokeAsync<CharaDataFullDto>("CharaDataCreate").ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to create new character data");
+			base.Logger.LogWarning(ex, "Failed to create new character data");
 			return null;
 		}
 	}
@@ -1308,9 +1327,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Updating chara data for {id}", updateDto.Id);
 			return await _mareHub.InvokeAsync<CharaDataFullDto>("CharaDataUpdate", updateDto).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to update chara data for {id}", updateDto.Id);
+			base.Logger.LogWarning(ex, "Failed to update chara data for {id}", updateDto.Id);
 			return null;
 		}
 	}
@@ -1326,9 +1345,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Deleting chara data for {id}", id);
 			return await _mareHub.InvokeAsync<bool>("CharaDataDelete", id).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to delete chara data for {id}", id);
+			base.Logger.LogWarning(ex, "Failed to delete chara data for {id}", id);
 			return false;
 		}
 	}
@@ -1344,9 +1363,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Getting metainfo for chara data {id}", id);
 			return await _mareHub.InvokeAsync<CharaDataMetaInfoDto>("CharaDataGetMetainfo", id).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to get meta info for chara data {id}", id);
+			base.Logger.LogWarning(ex, "Failed to get meta info for chara data {id}", id);
 			return null;
 		}
 	}
@@ -1362,9 +1381,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Attempting to restore chara data {id}", id);
 			return await _mareHub.InvokeAsync<CharaDataFullDto>("CharaDataAttemptRestore", id).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to restore chara data for {id}", id);
+			base.Logger.LogWarning(ex, "Failed to restore chara data for {id}", id);
 			return null;
 		}
 	}
@@ -1380,9 +1399,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Getting all own chara data");
 			return await _mareHub.InvokeAsync<List<CharaDataFullDto>>("CharaDataGetOwn").ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to get own chara data");
+			base.Logger.LogWarning(ex, "Failed to get own chara data");
 			return new List<CharaDataFullDto>();
 		}
 	}
@@ -1398,9 +1417,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Getting all own chara data");
 			return await _mareHub.InvokeAsync<List<CharaDataMetaInfoDto>>("CharaDataGetShared").ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to get shared chara data");
+			base.Logger.LogWarning(ex, "Failed to get shared chara data");
 			return new List<CharaDataMetaInfoDto>();
 		}
 	}
@@ -1416,9 +1435,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Getting download chara data for {id}", id);
 			return await _mareHub.InvokeAsync<CharaDataDownloadDto>("CharaDataDownload", id).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to get download chara data for {id}", id);
+			base.Logger.LogWarning(ex, "Failed to get download chara data for {id}", id);
 			return null;
 		}
 	}
@@ -1434,9 +1453,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Creating GPose Lobby");
 			return await _mareHub.InvokeAsync<string>("GposeLobbyCreate").ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to create GPose lobby");
+			base.Logger.LogWarning(ex, "Failed to create GPose lobby");
 			return string.Empty;
 		}
 	}
@@ -1452,9 +1471,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Leaving current GPose Lobby");
 			return await _mareHub.InvokeAsync<bool>("GposeLobbyLeave").ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to leave GPose lobby");
+			base.Logger.LogWarning(ex, "Failed to leave GPose lobby");
 			return false;
 		}
 	}
@@ -1470,9 +1489,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Joining GPose Lobby {id}", lobbyId);
 			return await _mareHub.InvokeAsync<List<UserData>>("GposeLobbyJoin", lobbyId).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to join GPose lobby {id}", lobbyId);
+			base.Logger.LogWarning(ex, "Failed to join GPose lobby {id}", lobbyId);
 			return new List<UserData>();
 		}
 	}
@@ -1488,9 +1507,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Sending Chara Data to GPose Lobby");
 			await _mareHub.InvokeAsync("GposeLobbyPushCharacterData", charaDownloadDto).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to send Chara Data to GPose lobby");
+			base.Logger.LogWarning(ex, "Failed to send Chara Data to GPose lobby");
 		}
 	}
 
@@ -1505,9 +1524,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 			base.Logger.LogDebug("Sending Pose Data to GPose Lobby");
 			await _mareHub.InvokeAsync("GposeLobbyPushPoseData", poseData).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to send Pose Data to GPose lobby");
+			base.Logger.LogWarning(ex, "Failed to send Pose Data to GPose lobby");
 		}
 	}
 
@@ -1521,9 +1540,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 		{
 			await _mareHub.InvokeAsync("GposeLobbyPushWorldData", worldData).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to send World Data to GPose lobby");
+			base.Logger.LogWarning(ex, "Failed to send World Data to GPose lobby");
 		}
 	}
 
@@ -1640,9 +1659,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 	}
 
 	private void CheckConnection()
-	{
-		ServerState serverState = ServerState;
-		if (((uint)(serverState - 1) > 1u && serverState != ServerState.Connected) || 1 == 0)
+    {
+        ServerState serverState = ServerState;
+        if (((uint)(serverState - 1) > 1u && serverState != ServerState.Connected) || 1 == 0)
 		{
 			throw new InvalidDataException("Not connected");
 		}
@@ -1662,9 +1681,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 		{
 			base.Logger.LogDebug("Upload operation was cancelled");
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Error during upload of files");
+			base.Logger.LogWarning(ex, "Error during upload of files");
 		}
 	}
 
@@ -1708,9 +1727,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 		{
 			await _mareHub.InvokeAsync("UserPushData", dto).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to Push character data");
+			base.Logger.LogWarning(ex, "Failed to Push character data");
 		}
 	}
 
@@ -1721,9 +1740,9 @@ public sealed class ApiController : DisposableMediatorSubscriberBase, IMareHubCl
 		{
 			await _mareHub.InvokeAsync("SetBulkPermissions", dto).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Failed to set permissions");
+			base.Logger.LogWarning(ex, "Failed to set permissions");
 		}
 	}
 

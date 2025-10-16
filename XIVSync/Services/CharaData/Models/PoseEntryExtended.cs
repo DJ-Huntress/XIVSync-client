@@ -26,6 +26,7 @@ public sealed record PoseEntryExtended : PoseEntry
 
 	public string WorldDataDescriptor { get; private set; } = string.Empty;
 
+
 	private PoseEntryExtended(PoseEntry basePose, CharaDataMetaInfoExtendedDto parent)
 		: base(basePose)
 	{
@@ -46,7 +47,7 @@ public sealed record PoseEntryExtended : PoseEntry
 		{
 			WorldData worldData = newPose.WorldData.Value;
 			PoseEntryExtended poseEntryExtended = newPose;
-			poseEntryExtended.MapCoordinates = await dalamudUtilService.RunOnFrameworkThread(() => MapUtil.WorldToMap(new Vector2(worldData.PositionX, worldData.PositionY), dalamudUtilService.MapData.Value[worldData.LocationInfo.MapId].Map), "Create", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\Models\\PoseEntryExtended.cs", 40).ConfigureAwait(continueOnCapturedContext: false);
+			poseEntryExtended.MapCoordinates = await dalamudUtilService.RunOnFrameworkThread(() => MapUtil.WorldToMap(new Vector2(worldData.PositionX, worldData.PositionY), dalamudUtilService.MapData.Value[worldData.LocationInfo.MapId].Map), "Create", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\Models\\PoseEntryExtended.cs", 40).ConfigureAwait(continueOnCapturedContext: false);
 			newPose.Map = dalamudUtilService.MapData.Value[worldData.LocationInfo.MapId].Map;
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine("Server: " + dalamudUtilService.WorldData.Value[(ushort)worldData.LocationInfo.ServerId]);

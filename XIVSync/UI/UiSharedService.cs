@@ -34,6 +34,7 @@ using XIVSync.PlayerData.Pairs;
 using XIVSync.Services;
 using XIVSync.Services.Mediator;
 using XIVSync.Services.ServerConfiguration;
+using XIVSync.UI.Theming;
 using XIVSync.Utils;
 using XIVSync.WebAPI;
 using XIVSync.WebAPI.SignalR;
@@ -202,6 +203,7 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 		{
 			return;
 		}
+		ImGui.SetWindowFontScale(0.85f);
 		ImGui.BeginTooltip();
 		ImGui.PushTextWrapPos(ImGui.GetFontSize() * 35f);
 		if (text.Contains("--SEP--", StringComparison.Ordinal))
@@ -222,6 +224,7 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 		}
 		ImGui.PopTextWrapPos();
 		ImGui.EndTooltip();
+		ImGui.SetWindowFontScale(1f);
 	}
 
 	public static void AttachThemedToolTip(string text, ThemePalette theme)
@@ -234,6 +237,7 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 		{
 			using (ImRaii.PushColor(ImGuiCol.Text, theme.TooltipText))
 			{
+				ImGui.SetWindowFontScale(0.85f);
 				ImGui.BeginTooltip();
 				ImGui.PushTextWrapPos(ImGui.GetFontSize() * 35f);
 				if (text.Contains("--SEP--", StringComparison.Ordinal))
@@ -254,6 +258,7 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 				}
 				ImGui.PopTextWrapPos();
 				ImGui.EndTooltip();
+				ImGui.SetWindowFontScale(1f);
 			}
 		}
 	}
@@ -344,7 +349,7 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 		DrawGrouped(delegate
 		{
 			ColorTextWrapped(text, color, ImGui.GetCursorPosX() + textWidth);
-		}, 5f, (!maxWidth.HasValue) ? ((float?)null) : (maxWidth * ImGuiHelpers.GlobalScale));
+		}, 5f, (!maxWidth.HasValue) ? null : (maxWidth * ImGuiHelpers.GlobalScale));
 	}
 
 	public static void DrawOutlinedFont(string text, Vector4 fontColor, Vector4 outlineColor, int thickness)
@@ -722,8 +727,9 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 		if (_cacheMonitor.HaltScanLocks.Any<KeyValuePair<string, int>>((KeyValuePair<string, int> f) => f.Value > 0))
 		{
 			ImGui.AlignTextToFramePadding();
-			ImGui.TextUnformatted("Halted (" + string.Join(", ", from locker in _cacheMonitor.HaltScanLocks
-				where locker.Value > 0
+			ImGui.TextUnformatted("Halted (" + string.Join(", ", from f in _cacheMonitor.HaltScanLocks
+				where f.Value > 0
+				select f into locker
 				select locker.Key + ": " + locker.Value + " halt requests") + ")");
 			ImGui.SameLine();
 			if (ImGui.Button("Reset halt requests##clearlocks"))
@@ -820,9 +826,9 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 				DateTime dateTime = (_oauthTokenExpiry[oauthToken] = jwt.ValidTo);
 				tokenExpiry = dateTime;
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				base.Logger.LogWarning(exception, "Could not parse OAuth token, deleting");
+				base.Logger.LogWarning(ex, "Could not parse OAuth token, deleting");
 				selectedServer.OAuthToken = null;
 				_serverConfigurationManager.Save();
 			}
@@ -916,7 +922,8 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 		AttachToolTip("Brio is " + (_brioExists ? "available and up to date." : "unavailable or not up to date."));
 		if (!_penumbraExists || !_glamourerExists)
 		{
-			ImGui.TextColored(ImGuiColors.DalamudRed, "You need to install both Penumbra and Glamourer and keep them up to date to use XIVSync.");
+			Vector4 col = ImGuiColors.DalamudRed;
+			ImGui.TextColored(in col, "You need to install both Penumbra and Glamourer and keep them up to date to use XIVSync.");
 			return false;
 		}
 		return true;
@@ -942,15 +949,15 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 		}
 		if (ImGui.BeginCombo("Select Service", comboEntries[_serverSelectionIndex]))
 		{
-			for (int j = 0; j < comboEntries.Length; j++)
+			for (int i = 0; i < comboEntries.Length; i++)
 			{
-				bool isSelected = _serverSelectionIndex == j;
-				if (ImGui.Selectable(comboEntries[j], isSelected))
+				bool isSelected = _serverSelectionIndex == i;
+				if (ImGui.Selectable(comboEntries[i], isSelected))
 				{
-					_serverSelectionIndex = j;
+					_serverSelectionIndex = i;
 					if (selectOnChange)
 					{
-						_serverConfigurationManager.SelectServer(j);
+						_serverConfigurationManager.SelectServer(i);
 					}
 				}
 				if (isSelected)
@@ -1075,9 +1082,9 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 				DateTime dateTime = (_oauthTokenExpiry[selectedServer.OAuthToken] = jwt.ValidTo);
 				tokenExpiry = dateTime;
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				base.Logger.LogWarning(exception, "Could not parse OAuth token, deleting");
+				base.Logger.LogWarning(ex, "Could not parse OAuth token, deleting");
 				selectedServer.OAuthToken = null;
 				_serverConfigurationManager.Save();
 				tokenExpiry = DateTime.MinValue;
@@ -1171,7 +1178,7 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 	public bool IconTextButton(FontAwesomeIcon icon, string text, float? width = null, bool isInPopup = false)
 	{
 		ThemePalette theme = GetCurrentTheme();
-		return IconTextButtonInternal(icon, text, theme, isInPopup ? new Vector4?(ColorHelpers.RgbaUintToVector4(ImGui.GetColorU32(ImGuiCol.PopupBg))) : ((Vector4?)null), (width <= 0f) ? ((float?)null) : width);
+		return IconTextButtonInternal(icon, text, theme, isInPopup ? new Vector4?(ColorHelpers.RgbaUintToVector4(ImGui.GetColorU32(ImGuiCol.PopupBg))) : null, (width <= 0f) ? null : width);
 	}
 
 	public IDalamudTextureWrap LoadImage(byte[] imageData)
@@ -1225,7 +1232,7 @@ public class UiSharedService : DisposableMediatorSubscriberBase
 	[GeneratedCode("System.Text.RegularExpressions.Generator", "9.0.12.6610")]
 	private static Regex PathRegex()
 	{
-		return _003CRegexGenerator_g_003EF3957ABF6C996F283E6D5A99861D1FFD1A039295BD532E2416D998903D178A004__PathRegex_2.Instance;
+		return _003CRegexGenerator_g_003EF7C2A3A4E3E23D9AAD8AD182C53AF1445029BB959A191641E99FAF6FAA9B714AC__PathRegex_2.Instance;
 	}
 
 	private static void FontText(string text, IFontHandle font, Vector4? color = null)

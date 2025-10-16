@@ -10,10 +10,9 @@ public record GroupPairUserInfoDto : GroupPairDto
 {
 	public GroupPairUserInfo GroupUserInfo { get; init; }
 
-	public GroupPairUserInfoDto(GroupData Group, UserData User, GroupPairUserInfo GroupUserInfo)
+	public GroupPairUserInfoDto(GroupData Group, UserData User, GroupPairUserInfo GroupUserInfo) : base(Group, User)
 	{
 		this.GroupUserInfo = GroupUserInfo;
-		base._002Ector(Group, User);
 	}
 
 	[CompilerGenerated]

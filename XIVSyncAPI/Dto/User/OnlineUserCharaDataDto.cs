@@ -9,10 +9,9 @@ public record OnlineUserCharaDataDto : UserDto
 {
 	public CharacterData CharaData { get; init; }
 
-	public OnlineUserCharaDataDto(UserData User, CharacterData CharaData)
+	public OnlineUserCharaDataDto(UserData User, CharacterData CharaData) : base(User)
 	{
 		this.CharaData = CharaData;
-		base._002Ector(User);
 	}
 
 	[CompilerGenerated]

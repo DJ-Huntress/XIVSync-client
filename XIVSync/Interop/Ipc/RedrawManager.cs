@@ -23,6 +23,7 @@ public class RedrawManager : IDisposable
 
 	public SemaphoreSlim RedrawSemaphore { get; init; } = new SemaphoreSlim(2, 2);
 
+
 	public RedrawManager(MareMediator mareMediator, DalamudUtilService dalamudUtil)
 	{
 		_mareMediator = mareMediator;
@@ -36,9 +37,8 @@ public class RedrawManager : IDisposable
 		try
 		{
 			using CancellationTokenSource cancelToken = new CancellationTokenSource();
-			[cancelToken.Token, token, _disposalCts.Token]
-			using CancellationTokenSource combinedCts = CancellationTokenSource.CreateLinkedTokenSource([cancelToken.Token, token, _disposalCts.Token]);
-			CancellationToken combinedToken = combinedCts.Token;
+            using CancellationTokenSource combinedCts = CancellationTokenSource.CreateLinkedTokenSource([cancelToken.Token, token, _disposalCts.Token]);
+            CancellationToken combinedToken = combinedCts.Token;
 			cancelToken.CancelAfter(TimeSpan.FromSeconds(15L));
 			await handler.ActOnFrameworkAfterEnsureNoDrawAsync(action, combinedToken).ConfigureAwait(continueOnCapturedContext: false);
 			if (!_disposalCts.Token.IsCancellationRequested)

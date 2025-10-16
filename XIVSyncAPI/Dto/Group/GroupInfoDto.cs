@@ -18,11 +18,10 @@ public record GroupInfoDto : GroupDto
 
 	public string OwnerAliasOrUID => Owner.AliasOrUID;
 
-	public GroupInfoDto(GroupData Group, UserData Owner, GroupPermissions GroupPermissions)
+	public GroupInfoDto(GroupData Group, UserData Owner, GroupPermissions GroupPermissions) : base(Group)
 	{
 		this.GroupPermissions = GroupPermissions;
 		this.Owner = Owner;
-		base._002Ector(Group);
 	}
 
 	[CompilerGenerated]

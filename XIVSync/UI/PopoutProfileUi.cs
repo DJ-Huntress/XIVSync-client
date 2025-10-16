@@ -42,8 +42,7 @@ public class PopoutProfileUi : WindowMediatorSubscriberBase
 
 	private IDalamudTextureWrap? _textureWrap;
 
-	public PopoutProfileUi(ILogger<PopoutProfileUi> logger, MareMediator mediator, UiSharedService uiBuilder, ServerConfigurationManager serverManager, MareConfigService mareConfigService, MareProfileManager mareProfileManager, PairManager pairManager, PerformanceCollectorService performanceCollectorService)
-		: base(logger, mediator, "###XIVSyncProfileUI", performanceCollectorService)
+	public PopoutProfileUi(ILogger<PopoutProfileUi> logger, MareMediator mediator, UiSharedService uiBuilder, ServerConfigurationManager serverManager, MareConfigService mareConfigService, MareProfileManager mareProfileManager, PairManager pairManager, PerformanceCollectorService performanceCollectorService) : base(logger, mediator, "###XIVSyncProfileUI", performanceCollectorService)
 	{
 		PopoutProfileUi popoutProfileUi = this;
 		_uiSharedService = uiBuilder;
@@ -191,9 +190,9 @@ public class PopoutProfileUi : WindowMediatorSubscriberBase
 				drawList.AddImage(_supporterTextureWrap.Handle, new Vector2(rectMax.X - 38f - spacing.X, rectMin.Y + textPos / 2f - 19f), new Vector2(rectMax.X - spacing.X, rectMin.Y + 38f + textPos / 2f - 19f));
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Error during draw tooltip");
+			_logger.LogWarning(ex, "Error during draw tooltip");
 		}
 	}
 }

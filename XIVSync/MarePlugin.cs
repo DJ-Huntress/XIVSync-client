@@ -114,9 +114,9 @@ public class MarePlugin : MediatorSubscriberBase, IHostedService
 				base.Mediator.Publish(new NotificationMessage("Abnormal Log Level", $"Your log level is set to '{_mareConfigService.Current.LogLevel}' which is not recommended for normal usage. Set it to '{2}' in \"Mare Settings -> Debug\" unless instructed otherwise.", NotificationType.Error, TimeSpan.FromSeconds(15000L)));
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger?.LogCritical(exception, "Error during launch of managers");
+			base.Logger?.LogCritical(ex, "Error during launch of managers");
 		}
 	}
 }

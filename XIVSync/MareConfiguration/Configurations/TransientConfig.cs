@@ -11,9 +11,12 @@ public class TransientConfig : IMareConfiguration
 	{
 		public List<string> GlobalPersistentCache { get; set; } = new List<string>();
 
+
 		public Dictionary<uint, List<string>> JobSpecificCache { get; set; } = new Dictionary<uint, List<string>>();
 
+
 		public Dictionary<uint, List<string>> JobSpecificPetCache { get; set; } = new Dictionary<uint, List<string>>();
+
 
 		private bool ElevateIfNeeded(uint jobId, string gamePath)
 		{
@@ -77,5 +80,7 @@ public class TransientConfig : IMareConfiguration
 
 	public Dictionary<string, TransientPlayerConfig> TransientConfigs { get; set; } = new Dictionary<string, TransientPlayerConfig>();
 
+
 	public int Version { get; set; } = 1;
+
 }

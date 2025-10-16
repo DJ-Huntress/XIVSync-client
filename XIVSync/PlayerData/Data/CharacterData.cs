@@ -10,19 +10,27 @@ public class CharacterData
 {
 	public Dictionary<ObjectKind, string> CustomizePlusScale { get; set; } = new Dictionary<ObjectKind, string>();
 
+
 	public Dictionary<ObjectKind, HashSet<FileReplacement>> FileReplacements { get; set; } = new Dictionary<ObjectKind, HashSet<FileReplacement>>();
+
 
 	public Dictionary<ObjectKind, string> GlamourerString { get; set; } = new Dictionary<ObjectKind, string>();
 
+
 	public string HeelsData { get; set; } = string.Empty;
+
 
 	public string HonorificData { get; set; } = string.Empty;
 
+
 	public string ManipulationString { get; set; } = string.Empty;
+
 
 	public string MoodlesData { get; set; } = string.Empty;
 
+
 	public string PetNamesData { get; set; } = string.Empty;
+
 
 	public void SetFragment(ObjectKind kind, CharacterDataFragment? fragment)
 	{

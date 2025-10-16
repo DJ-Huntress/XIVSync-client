@@ -48,6 +48,7 @@ public sealed class FileCompactor
 
 	public string Progress { get; private set; } = string.Empty;
 
+
 	public FileCompactor(ILogger<FileCompactor> logger, MareConfigService mareConfigService, DalamudUtilService dalamudUtilService)
 	{
 		_clusterSizes = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -159,9 +160,9 @@ public sealed class FileCompactor
 			using FileStream fs = new FileStream(path, FileMode.Open);
 			DeviceIoControl(fs.SafeFileHandle.DangerousGetHandle(), 590612u, IntPtr.Zero, 0u, IntPtr.Zero, 0u, out var _, out var _);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Error decompressing file {path}", path);
+			_logger.LogWarning(ex, "Error decompressing file {path}", path);
 		}
 	}
 
@@ -221,9 +222,9 @@ public sealed class FileCompactor
 				_logger.LogWarning("Failed to compact {file}: {ret}", path, ret.ToString("X"));
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Error compacting file {path}", path);
+			_logger.LogWarning(ex, "Error compacting file {path}", path);
 		}
 		finally
 		{

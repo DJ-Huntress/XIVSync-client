@@ -72,9 +72,9 @@ public class PlayerDataFactory
 				_logger.LogDebug("NullRef for {object}", playerRelatedObject);
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Could not create data for {object}", playerRelatedObject);
+			_logger.LogWarning(ex, "Could not create data for {object}", playerRelatedObject);
 		}
 		if (pointerIsZero)
 		{
@@ -95,16 +95,16 @@ public class PlayerDataFactory
 			_logger.LogDebug("Cancelled creating Character data for {object}", playerRelatedObject);
 			throw;
 		}
-		catch (Exception exception2)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception2, "Failed to create {object} data", playerRelatedObject);
+			_logger.LogWarning(e, "Failed to create {object} data", playerRelatedObject);
 		}
 		return null;
 	}
 
 	private async Task<bool> CheckForNullDrawObject(nint playerPointer)
 	{
-		return await _dalamudUtil.RunOnFrameworkThread(() => CheckForNullDrawObjectUnsafe(playerPointer), "CheckForNullDrawObject", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\PlayerData\\Factories\\PlayerDataFactory.cs", 97).ConfigureAwait(continueOnCapturedContext: false);
+		return await _dalamudUtil.RunOnFrameworkThread(() => CheckForNullDrawObjectUnsafe(playerPointer), "CheckForNullDrawObject", "C:\\Users\\Owner\\sync_client2\\XIVSync\\PlayerData\\Factories\\PlayerDataFactory.cs", 97).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	private unsafe bool CheckForNullDrawObjectUnsafe(nint playerPointer)
@@ -131,7 +131,7 @@ public class PlayerDataFactory
 			totalWaitTime -= 50;
 		}
 		ct.ThrowIfCancellationRequested();
-		Dictionary<string, List<ushort>> dictionary = ((objectKind == ObjectKind.Player) ? (await _dalamudUtil.RunOnFrameworkThread(() => _modelAnalyzer.GetSkeletonBoneIndices(playerRelatedObject), "CreateCharacterData", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\PlayerData\\Factories\\PlayerDataFactory.cs", 127).ConfigureAwait(continueOnCapturedContext: false)) : null);
+		Dictionary<string, List<ushort>> dictionary = ((objectKind == ObjectKind.Player) ? (await _dalamudUtil.RunOnFrameworkThread(() => _modelAnalyzer.GetSkeletonBoneIndices(playerRelatedObject), "CreateCharacterData", "C:\\Users\\Owner\\sync_client2\\XIVSync\\PlayerData\\Factories\\PlayerDataFactory.cs", 127).ConfigureAwait(continueOnCapturedContext: false)) : null);
 		Dictionary<string, List<ushort>> boneIndices = dictionary;
 		DateTime start = DateTime.UtcNow;
 		Dictionary<string, HashSet<string>> resolvedPaths = await _ipcManager.Penumbra.GetCharacterData(_logger, playerRelatedObject).ConfigureAwait(continueOnCapturedContext: false);
@@ -168,10 +168,10 @@ public class PlayerDataFactory
 		HashSet<string> transientPaths = ManageSemiTransientData(objectKind);
 		IReadOnlyDictionary<string, string[]> source = await GetFileReplacementsFromPaths(transientPaths, new HashSet<string>(StringComparer.Ordinal)).ConfigureAwait(continueOnCapturedContext: false);
 		_logger.LogDebug("== Transient Replacements ==");
-		foreach (FileReplacement replacement2 in source.Select((KeyValuePair<string, string[]> c) => new FileReplacement(c.Value.ToArray(), c.Key)).OrderBy<FileReplacement, string>((FileReplacement f) => f.ResolvedPath, StringComparer.Ordinal))
+		foreach (FileReplacement replacement in source.Select((KeyValuePair<string, string[]> c) => new FileReplacement(c.Value.ToArray(), c.Key)).OrderBy<FileReplacement, string>((FileReplacement f) => f.ResolvedPath, StringComparer.Ordinal))
 		{
-			_logger.LogDebug("=> {repl}", replacement2);
-			fragment.FileReplacements.Add(replacement2);
+			_logger.LogDebug("=> {repl}", replacement);
+			fragment.FileReplacements.Add(replacement);
 		}
 		_transientResourceManager.CleanUpSemiTransientResources(objectKind, fragment.FileReplacements.ToList());
 		ct.ThrowIfCancellationRequested();
@@ -223,14 +223,14 @@ public class PlayerDataFactory
 			{
 				await VerifyPlayerAnimationBones(boneIndices, fragment as CharacterDataFragmentPlayer, ct).ConfigureAwait(continueOnCapturedContext: false);
 			}
-			catch (OperationCanceledException exception)
+			catch (OperationCanceledException e)
 			{
-				_logger.LogDebug(exception, "Cancelled during player animation verification");
+				_logger.LogDebug(e, "Cancelled during player animation verification");
 				throw;
 			}
-			catch (Exception exception2)
+			catch (Exception e)
 			{
-				_logger.LogWarning(exception2, "Failed to verify player animations, continuing without further verification");
+				_logger.LogWarning(e, "Failed to verify player animations, continuing without further verification");
 			}
 		}
 		_logger.LogInformation("Building character data for {obj} took {time}ms", objectKind, TimeSpan.FromTicks(DateTime.UtcNow.Ticks - start.Ticks).TotalMilliseconds);
@@ -255,7 +255,7 @@ public class PlayerDataFactory
 		foreach (FileReplacement file in fragment.FileReplacements.Where((FileReplacement f) => !f.IsFileSwap && f.GamePaths.First().EndsWith("pap", StringComparison.OrdinalIgnoreCase)).ToList())
 		{
 			ct.ThrowIfCancellationRequested();
-			Dictionary<string, List<ushort>> skeletonIndices = await _dalamudUtil.RunOnFrameworkThread(() => _modelAnalyzer.GetBoneIndicesFromPap(file.Hash), "VerifyPlayerAnimationBones", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\PlayerData\\Factories\\PlayerDataFactory.cs", 282).ConfigureAwait(continueOnCapturedContext: false);
+			Dictionary<string, List<ushort>> skeletonIndices = await _dalamudUtil.RunOnFrameworkThread(() => _modelAnalyzer.GetBoneIndicesFromPap(file.Hash), "VerifyPlayerAnimationBones", "C:\\Users\\Owner\\sync_client2\\XIVSync\\PlayerData\\Factories\\PlayerDataFactory.cs", 282).ConfigureAwait(continueOnCapturedContext: false);
 			bool validationFailed = false;
 			if (skeletonIndices != null)
 			{
@@ -311,16 +311,16 @@ public class PlayerDataFactory
 			}
 			resolvedPaths[filePath] = new List<string>(1) { forwardPaths[i].ToLowerInvariant() };
 		}
-		for (int j = 0; j < reversePaths.Length; j++)
+		for (int i = 0; i < reversePaths.Length; i++)
 		{
-			string filePath2 = reversePaths[j].ToLowerInvariant();
-			if (resolvedPaths.TryGetValue(filePath2, out List<string> list2))
+			string filePath = reversePaths[i].ToLowerInvariant();
+			if (resolvedPaths.TryGetValue(filePath, out List<string> list))
 			{
-				list2.AddRange(reverse[j].Select((string c) => c.ToLowerInvariant()));
+				list.AddRange(reverse[i].Select((string c) => c.ToLowerInvariant()));
 			}
 			else
 			{
-				resolvedPaths[filePath2] = new List<string>(reverse[j].Select((string c) => c.ToLowerInvariant()).ToList());
+				resolvedPaths[filePath] = new List<string>(reverse[i].Select((string c) => c.ToLowerInvariant()).ToList());
 			}
 		}
 		return resolvedPaths.ToDictionary<KeyValuePair<string, List<string>>, string, string[]>((KeyValuePair<string, List<string>> k) => k.Key, (KeyValuePair<string, List<string>> k) => k.Value.ToArray(), StringComparer.OrdinalIgnoreCase).AsReadOnly();
@@ -330,9 +330,9 @@ public class PlayerDataFactory
 	{
 		_transientResourceManager.PersistTransientResources(objectKind);
 		HashSet<string> pathsToResolve = new HashSet<string>(StringComparer.Ordinal);
-		foreach (string path in from value in _transientResourceManager.GetSemiTransientResources(objectKind)
-			where !string.IsNullOrEmpty(value)
-			select value)
+		foreach (string path in from path in _transientResourceManager.GetSemiTransientResources(objectKind)
+			where !string.IsNullOrEmpty(path)
+			select path)
 		{
 			pathsToResolve.Add(path);
 		}

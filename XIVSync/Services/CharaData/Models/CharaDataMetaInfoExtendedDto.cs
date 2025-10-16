@@ -8,6 +8,7 @@ public sealed record CharaDataMetaInfoExtendedDto : CharaDataMetaInfoDto
 {
 	public List<PoseEntryExtended> PoseExtended { get; private set; } = new List<PoseEntryExtended>();
 
+
 	public bool HasPoses => PoseExtended.Count != 0;
 
 	public bool HasWorldData => PoseExtended.Exists((PoseEntryExtended p) => p.HasWorldData);

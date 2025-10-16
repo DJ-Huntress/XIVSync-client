@@ -86,9 +86,9 @@ public sealed class XivDataAnalyzer
 				}
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Could not process skeleton data");
+			_logger.LogWarning(ex, "Could not process skeleton data");
 		}
 		if (outputIndices.Count == 0 || !outputIndices.Values.All((List<ushort> u) => u.Count > 0))
 		{
@@ -168,9 +168,9 @@ public sealed class XivDataAnalyzer
 				}
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Could not load havok file in {path}", tempHavokDataPath);
+			_logger.LogWarning(ex, "Could not load havok file in {path}", tempHavokDataPath);
 		}
 		finally
 		{
@@ -218,9 +218,9 @@ public sealed class XivDataAnalyzer
 					ushort meshCnt = file.Lods[i].MeshCount;
 					tris = file.Meshes.Skip(meshIdx).Take(meshCnt).Sum((MdlStructs.MeshStruct p) => p.IndexCount) / 3;
 				}
-				catch (Exception exception)
+				catch (Exception ex)
 				{
-					_logger.LogDebug(exception, "Could not load lod mesh {mesh} from path {path}", i, filePath);
+					_logger.LogDebug(ex, "Could not load lod mesh {mesh} from path {path}", i, filePath);
 					continue;
 				}
 				if (tris > 0)
@@ -233,12 +233,12 @@ public sealed class XivDataAnalyzer
 			}
 			return tris;
 		}
-		catch (Exception exception2)
+		catch (Exception e)
 		{
 			_failedCalculatedTris.Add(hash);
 			_configService.Current.TriangleDictionary[hash] = 0L;
 			_configService.Save();
-			_logger.LogWarning(exception2, "Could not parse file {file}", filePath);
+			_logger.LogWarning(e, "Could not parse file {file}", filePath);
 			return 0L;
 		}
 	}

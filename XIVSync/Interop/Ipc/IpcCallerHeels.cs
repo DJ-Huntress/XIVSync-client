@@ -54,7 +54,7 @@ public sealed class IpcCallerHeels : IIpcCaller, IDisposable
 		{
 			return string.Empty;
 		}
-		return await _dalamudUtil.RunOnFrameworkThread((Func<string>)_heelsGetOffset.InvokeFunc, "GetOffsetAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHeels.cs", 46).ConfigureAwait(continueOnCapturedContext: false);
+		return await _dalamudUtil.RunOnFrameworkThread((Func<string>)_heelsGetOffset.InvokeFunc, "GetOffsetAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHeels.cs", 46).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task RestoreOffsetForPlayerAsync(nint character)
@@ -71,7 +71,7 @@ public sealed class IpcCallerHeels : IIpcCaller, IDisposable
 				_logger.LogTrace("Restoring Heels data to {chara}", ((IntPtr)character).ToString("X"));
 				_heelsUnregisterPlayer.InvokeAction(gameObject.ObjectIndex);
 			}
-		}, "RestoreOffsetForPlayerAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHeels.cs", 52).ConfigureAwait(continueOnCapturedContext: false);
+		}, "RestoreOffsetForPlayerAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHeels.cs", 52).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task SetOffsetForPlayerAsync(nint character, string data)
@@ -88,7 +88,7 @@ public sealed class IpcCallerHeels : IIpcCaller, IDisposable
 				_logger.LogTrace("Applying Heels data to {chara}", ((IntPtr)character).ToString("X"));
 				_heelsRegisterPlayer.InvokeAction(gameObject.ObjectIndex, data);
 			}
-		}, "SetOffsetForPlayerAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHeels.cs", 66).ConfigureAwait(continueOnCapturedContext: false);
+		}, "SetOffsetForPlayerAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerHeels.cs", 66).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public void CheckAPI()

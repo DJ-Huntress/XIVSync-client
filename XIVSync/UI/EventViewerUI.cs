@@ -120,23 +120,23 @@ internal class EventViewerUI : WindowMediatorSubscriberBase
 		{
 			return "Plugin";
 		}
-		string source2 = source;
-		if (source2.Contains("auth") || source2.Contains("login") || source2.Contains("token"))
+		source = source;
+		if (source.Contains("auth") || source.Contains("login") || source.Contains("token"))
 		{
 			return "Auth";
 		}
-		string source3 = source;
-		if (source3.Contains("service") || source3.Contains("manager") || source3.Contains("controller"))
+		source = source;
+		if (source.Contains("service") || source.Contains("manager") || source.Contains("controller"))
 		{
 			return "Services";
 		}
-		string source4 = source;
-		if (source4.Contains("network") || source4.Contains("connection") || source4.Contains("signalr") || source4.Contains("api"))
+		source = source;
+		if (source.Contains("network") || source.Contains("connection") || source.Contains("signalr") || source.Contains("api"))
 		{
 			return "Network";
 		}
-		string source5 = source;
-		if (source5.Contains("file") || source5.Contains("cache") || source5.Contains("download") || source5.Contains("upload"))
+		source = source;
+		if (source.Contains("file") || source.Contains("cache") || source.Contains("download") || source.Contains("upload"))
 		{
 			return "File";
 		}
@@ -222,8 +222,8 @@ internal class EventViewerUI : WindowMediatorSubscriberBase
 			});
 		}
 		_uiSharedService.BigText("Last Events");
-		ImRaii.IEndObject endObject = ImRaii.TreeNode("Filter");
-		if (endObject)
+		ImRaii.IEndObject endObject2 = ImRaii.TreeNode("Filter");
+		if (endObject2)
 		{
 			if (_uiSharedService.IconTextButton(FontAwesomeIcon.Ban, "Clear Filters"))
 			{
@@ -243,21 +243,21 @@ internal class EventViewerUI : WindowMediatorSubscriberBase
 			ImGui.Separator();
 			ImGui.Text("Categories:");
 			ImGui.Columns(3, "CategoryColumns", border: false);
-			int num6 = (int)((uint)num5 | (ImGui.Checkbox("Plugin", ref _filterPlugin) ? 1u : 0u) | (ImGui.Checkbox("Auth", ref _filterAuth) ? 1u : 0u)) | (ImGui.Checkbox("Services", ref _filterServices) ? 1 : 0);
+			int num6 = num5 | (ImGui.Checkbox("Plugin", ref _filterPlugin) ? 1 : 0) | (ImGui.Checkbox("Auth", ref _filterAuth) ? 1 : 0) | (ImGui.Checkbox("Services", ref _filterServices) ? 1 : 0);
 			ImGui.NextColumn();
-			int num7 = (int)((uint)num6 | (ImGui.Checkbox("Network", ref _filterNetwork) ? 1u : 0u) | (ImGui.Checkbox("File", ref _filterFile) ? 1u : 0u)) | (ImGui.Checkbox("Other", ref _filterOther) ? 1 : 0);
+			int num7 = num6 | (ImGui.Checkbox("Network", ref _filterNetwork) ? 1 : 0) | (ImGui.Checkbox("File", ref _filterFile) ? 1 : 0) | (ImGui.Checkbox("Other", ref _filterOther) ? 1 : 0);
 			ImGui.Columns();
 			ImGui.Separator();
 			ImGui.Text("Severity:");
 			ImGui.Columns(3, "SeverityColumns", border: false);
-			int num8 = (int)((uint)num7 | (ImGui.Checkbox("Info", ref _filterInfo) ? 1u : 0u) | (ImGui.Checkbox("Warning", ref _filterWarning) ? 1u : 0u)) | (ImGui.Checkbox("Error", ref _filterError) ? 1 : 0);
+			int num8 = num7 | (ImGui.Checkbox("Info", ref _filterInfo) ? 1 : 0) | (ImGui.Checkbox("Warning", ref _filterWarning) ? 1 : 0) | (ImGui.Checkbox("Error", ref _filterError) ? 1 : 0);
 			ImGui.Columns();
 			if (num8 != 0)
 			{
 				_filteredEvents = RecreateFilter();
 			}
 		}
-		endObject.Dispose();
+		endObject2.Dispose();
 		float cursorPos = ImGui.GetCursorPosY();
 		Vector2 windowContentRegionMax = ImGui.GetWindowContentRegionMax();
 		Vector2 min = ImGui.GetWindowContentRegionMin();
@@ -293,7 +293,7 @@ internal class EventViewerUI : WindowMediatorSubscriberBase
 				_ => default(Vector4), 
 			};
 			ImGui.TableNextColumn();
-			_uiSharedService.IconText(icon, (iconColor == default(Vector4)) ? ((Vector4?)null) : new Vector4?(iconColor));
+			_uiSharedService.IconText(icon, (iconColor == default(Vector4)) ? null : new Vector4?(iconColor));
 			UiSharedService.AttachToolTip(ev.EventSeverity.ToString());
 			ImGui.TableNextColumn();
 			ImGui.AlignTextToFramePadding();

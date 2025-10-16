@@ -88,8 +88,8 @@ public sealed class IpcCallerGlamourer : DisposableMediatorSubscriberBase, IIpcC
 			bool versionValid = (_pi.InstalledPlugins.FirstOrDefault((IExposedPlugin p) => string.Equals(p.InternalName, "Glamourer", StringComparison.OrdinalIgnoreCase))?.Version ?? new Version(0, 0, 0, 0)) >= new Version(1, 3, 0, 10);
 			try
 			{
-				(int, int) version = _glamourerApiVersions.Invoke();
-				if (version.Item1 == 1 && version.Item2 >= 1 && versionValid)
+				(int Major, int Minor) version = _glamourerApiVersions.Invoke();
+				if (version.Major == 1 && version.Minor >= 1 && versionValid)
 				{
 					apiAvailable = true;
 				}
@@ -150,7 +150,7 @@ public sealed class IpcCallerGlamourer : DisposableMediatorSubscriberBase, IIpcC
 		}
 		try
 		{
-			return await _dalamudUtil.RunOnFrameworkThread(() => (_dalamudUtil.CreateGameObject(character) is ICharacter character2) ? (_glamourerGetAllCustomization.Invoke(character2.ObjectIndex).Item2 ?? string.Empty) : string.Empty, "GetCharacterCustomizationAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerGlamourer.cs", 139).ConfigureAwait(continueOnCapturedContext: false);
+			return await _dalamudUtil.RunOnFrameworkThread(() => (_dalamudUtil.CreateGameObject(character) is ICharacter character2) ? (_glamourerGetAllCustomization.Invoke(character2.ObjectIndex).Item2 ?? string.Empty) : string.Empty, "GetCharacterCustomizationAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerGlamourer.cs", 139).ConfigureAwait(continueOnCapturedContext: false);
 		}
 		catch
 		{
@@ -197,7 +197,7 @@ public sealed class IpcCallerGlamourer : DisposableMediatorSubscriberBase, IIpcC
 			await _dalamudUtil.RunOnFrameworkThread(delegate
 			{
 				RevertByName(logger, name, applicationId);
-			}, "RevertByNameAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerGlamourer.cs", 189).ConfigureAwait(continueOnCapturedContext: false);
+			}, "RevertByNameAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerGlamourer.cs", 189).ConfigureAwait(continueOnCapturedContext: false);
 		}
 	}
 
@@ -214,9 +214,9 @@ public sealed class IpcCallerGlamourer : DisposableMediatorSubscriberBase, IIpcC
 			logger.LogDebug("[{appid}] Calling On IPC: GlamourerUnlockName", applicationId);
 			_glamourerUnlockByName.Invoke(name, LockCode);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Error during Glamourer RevertByName");
+			_logger.LogWarning(ex, "Error during Glamourer RevertByName");
 		}
 	}
 

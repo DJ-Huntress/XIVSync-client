@@ -192,7 +192,7 @@ public sealed class IpcCallerPenumbra : DisposableMediatorSubscriberBase, IIpcCa
 				PenumbraApiEc penumbraApiEc = _penumbraAssignTemporaryCollection.Invoke(collName, idx);
 				logger.LogTrace("Assigning Temp Collection {collName} to index {idx}, Success: {ret}", collName, idx, penumbraApiEc);
 				return collName;
-			}, "AssignTemporaryCollectionAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 164).ConfigureAwait(continueOnCapturedContext: false);
+			}, "AssignTemporaryCollectionAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 164).ConfigureAwait(continueOnCapturedContext: false);
 		}
 	}
 
@@ -229,9 +229,9 @@ public sealed class IpcCallerPenumbra : DisposableMediatorSubscriberBase, IIpcCa
 				{
 					File.Copy(texture.Key, duplicatedTexture, overwrite: true);
 				}
-				catch (Exception exception)
+				catch (Exception ex)
 				{
-					logger.LogError(exception, "Failed to copy duplicate {dup}", duplicatedTexture);
+					logger.LogError(ex, "Failed to copy duplicate {dup}", duplicatedTexture);
 				}
 			}
 		}
@@ -241,7 +241,7 @@ public sealed class IpcCallerPenumbra : DisposableMediatorSubscriberBase, IIpcCa
 			DalamudUtilService dalamudUtil = _dalamudUtil;
 			IGameObject gameObject = await dalamudUtil.CreateGameObjectAsync(await _dalamudUtil.GetPlayerPointerAsync().ConfigureAwait(continueOnCapturedContext: false)).ConfigureAwait(continueOnCapturedContext: false);
 			_penumbraRedraw.Invoke(gameObject.ObjectIndex);
-		}, "ConvertTextureFiles", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 205).ConfigureAwait(continueOnCapturedContext: false);
+		}, "ConvertTextureFiles", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 205).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task<Guid> CreateTemporaryCollectionAsync(ILogger logger, string uid)
@@ -256,7 +256,7 @@ public sealed class IpcCallerPenumbra : DisposableMediatorSubscriberBase, IIpcCa
 			_penumbraCreateNamedTemporaryCollection.Invoke(uid, text, out var collection);
 			logger.LogTrace("Creating Temp Collection {collName}, GUID: {collId}", text, collection);
 			return collection;
-		}, "CreateTemporaryCollectionAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 216).ConfigureAwait(continueOnCapturedContext: false);
+		}, "CreateTemporaryCollectionAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 216).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task<Dictionary<string, HashSet<string>>?> GetCharacterData(ILogger logger, GameObjectHandler handler)
@@ -270,7 +270,7 @@ public sealed class IpcCallerPenumbra : DisposableMediatorSubscriberBase, IIpcCa
 			logger.LogTrace("Calling On IPC: Penumbra.GetGameObjectResourcePaths");
 			ushort? num = handler.GetGameObject()?.ObjectIndex;
 			return (!num.HasValue) ? null : _penumbraResourcePaths.Invoke(num.Value)[0];
-		}, "GetCharacterData", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 231).ConfigureAwait(continueOnCapturedContext: false);
+		}, "GetCharacterData", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 231).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public string GetMetaManipulations()
@@ -312,7 +312,7 @@ public sealed class IpcCallerPenumbra : DisposableMediatorSubscriberBase, IIpcCa
 				logger.LogTrace("[{applicationId}] Removing temp collection for {collId}", applicationId, collId);
 				PenumbraApiEc penumbraApiEc = _penumbraRemoveTemporaryCollection.Invoke(collId);
 				logger.LogTrace("[{applicationId}] RemoveTemporaryCollection: {ret2}", applicationId, penumbraApiEc);
-			}, "RemoveTemporaryCollectionAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 268).ConfigureAwait(continueOnCapturedContext: false);
+			}, "RemoveTemporaryCollectionAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 268).ConfigureAwait(continueOnCapturedContext: false);
 		}
 	}
 
@@ -330,7 +330,7 @@ public sealed class IpcCallerPenumbra : DisposableMediatorSubscriberBase, IIpcCa
 				logger.LogTrace("[{applicationId}] Manip: {data}", applicationId, manipulationData);
 				PenumbraApiEc penumbraApiEc = _penumbraAddTemporaryMod.Invoke("MareChara_Meta", collId, new Dictionary<string, string>(), manipulationData, 0);
 				logger.LogTrace("[{applicationId}] Setting temp meta mod for {collId}, Success: {ret}", applicationId, collId, penumbraApiEc);
-			}, "SetManipulationDataAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 285).ConfigureAwait(continueOnCapturedContext: false);
+			}, "SetManipulationDataAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 285).ConfigureAwait(continueOnCapturedContext: false);
 		}
 	}
 
@@ -350,7 +350,7 @@ public sealed class IpcCallerPenumbra : DisposableMediatorSubscriberBase, IIpcCa
 			logger.LogTrace("[{applicationId}] Removing temp files mod for {collId}, Success: {ret}", applicationId, collId, penumbraApiEc);
 			PenumbraApiEc penumbraApiEc2 = _penumbraAddTemporaryMod.Invoke("MareChara_Files", collId, modPaths, string.Empty, 0);
 			logger.LogTrace("[{applicationId}] Setting temp files mod for {collId}, Success: {ret}", applicationId, collId, penumbraApiEc2);
-		}, "SetTemporaryModsAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 297).ConfigureAwait(continueOnCapturedContext: false);
+		}, "SetTemporaryModsAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerPenumbra.cs", 297).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	private void RedrawEvent(nint objectAddress, int objectTableIndex)

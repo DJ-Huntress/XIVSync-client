@@ -148,7 +148,7 @@ public class SyncshellAdminUI : WindowMediatorSubscriberBase
 							ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.None, 2f);
 							ImGui.TableHeadersRow();
 							GroupPairUserInfo value;
-							foreach (KeyValuePair<Pair, GroupPairUserInfo?> pair in new Dictionary<Pair, GroupPairUserInfo?>(pairs.Select((Pair p) => new KeyValuePair<Pair, GroupPairUserInfo?>(p, GroupFullInfo.GroupPairUserInfos.TryGetValue(p.UserData.UID, out value) ? new GroupPairUserInfo?(value) : ((GroupPairUserInfo?)null)))).OrderBy(delegate(KeyValuePair<Pair, GroupPairUserInfo?> p)
+							foreach (KeyValuePair<Pair, GroupPairUserInfo?> pair in new Dictionary<Pair, GroupPairUserInfo?>(pairs.Select((Pair p) => new KeyValuePair<Pair, GroupPairUserInfo?>(p, GroupFullInfo.GroupPairUserInfos.TryGetValue(p.UserData.UID, out value) ? new GroupPairUserInfo?(value) : null))).OrderBy(delegate(KeyValuePair<Pair, GroupPairUserInfo?> p)
 							{
 								if (!p.Value.HasValue)
 								{
@@ -213,9 +213,9 @@ public class SyncshellAdminUI : WindowMediatorSubscriberBase
 									}
 									if (_uiSharedService.IconButton(FontAwesomeIcon.Thumbtack))
 									{
-										GroupPairUserInfo userInfo2 = pair.Value.GetValueOrDefault();
-										userInfo2.SetPinned(!userInfo2.IsPinned());
-										_apiController.GroupSetUserInfo(new GroupPairUserInfoDto(GroupFullInfo.Group, pair.Key.UserData, userInfo2));
+										GroupPairUserInfo userInfo = pair.Value.GetValueOrDefault();
+										userInfo.SetPinned(!userInfo.IsPinned());
+										_apiController.GroupSetUserInfo(new GroupPairUserInfoDto(GroupFullInfo.Group, pair.Key.UserData, userInfo));
 									}
 									UiSharedService.AttachToolTip((pair.Value.HasValue && pair.Value.Value.IsPinned()) ? "Unpin user" : "Pin user");
 									ImGui.SameLine();
@@ -264,10 +264,10 @@ public class SyncshellAdminUI : WindowMediatorSubscriberBase
 					UiSharedService.AttachToolTip($"This will start the prune process for this Syncshell of inactive Mare users that have not logged in in the past {_pruneDays} days." + Environment.NewLine + "You will be able to review the amount of inactive users before executing the prune.--SEP--Note: this check excludes pinned users and moderators of this Syncshell.");
 					ImGui.SameLine();
 					ImGui.SetNextItemWidth(150f);
-					_uiSharedService.DrawCombo("Days of inactivity", [7, 14, 30, 90], (count) =>
-					{
-						return count + " days";
-					});
+                    _uiSharedService.DrawCombo("Days of inactivity", [7, 14, 30, 90], (count) =>
+                    {
+                        return count + " days";
+                    });
                     if (_pruneTestTask != null)
 					{
 						if (!_pruneTestTask.IsCompleted)
@@ -349,8 +349,8 @@ public class SyncshellAdminUI : WindowMediatorSubscriberBase
 				banNode.Dispose();
 			}
 			mgmtTab.Dispose();
-			ImRaii.IEndObject endObject = ImRaii.TabItem("Permissions");
-			if (endObject)
+			ImRaii.IEndObject endObject2 = ImRaii.TabItem("Permissions");
+			if (endObject2)
 			{
 				bool isDisableAnimations = perm.IsPreferDisableAnimations();
 				bool isDisableSounds = perm.IsPreferDisableSounds();
@@ -384,7 +384,7 @@ public class SyncshellAdminUI : WindowMediatorSubscriberBase
 				}
 				UiSharedService.TextWrapped("Note: those suggested permissions will be shown to users on joining the Syncshell.");
 			}
-			endObject.Dispose();
+			endObject2.Dispose();
 			if (!_isOwner)
 			{
 				return;

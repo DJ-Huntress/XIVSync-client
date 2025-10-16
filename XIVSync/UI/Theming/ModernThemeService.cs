@@ -110,9 +110,9 @@ public class ModernThemeService
 			}
 			_logger.LogInformation("Loaded theme settings: {ThemeName}, opacity: {Opacity}", _currentTheme.DisplayName, _currentTheme.BackgroundOpacity);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogError(exception, "Failed to load theme settings, using defaults");
+			_logger.LogError(ex, "Failed to load theme settings, using defaults");
 		}
 	}
 
@@ -125,9 +125,9 @@ public class ModernThemeService
 			current.ModernThemeOpacity = _currentTheme.BackgroundOpacity;
 			_configService.Save();
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogError(exception, "Failed to save theme settings");
+			_logger.LogError(ex, "Failed to save theme settings");
 		}
 	}
 }

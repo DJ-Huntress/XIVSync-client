@@ -89,9 +89,9 @@ public sealed class IpcCallerBrio : IIpcCaller, IDisposable
 				return ex;
 			}
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogDebug(exception, "Brio.Actor.SpawnExAsync failed");
+			_logger.LogDebug(e, "Brio.Actor.SpawnExAsync failed");
 		}
 		try
 		{
@@ -101,17 +101,17 @@ public sealed class IpcCallerBrio : IIpcCaller, IDisposable
 				return a;
 			}
 		}
-		catch (Exception exception2)
+		catch (Exception e)
 		{
-			_logger.LogDebug(exception2, "Brio.Actor.SpawnAsync failed");
+			_logger.LogDebug(e, "Brio.Actor.SpawnAsync failed");
 		}
 		try
 		{
 			return _brioSpawn.InvokeFunc();
 		}
-		catch (Exception exception3)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception3, "Brio.Actor.Spawn failed");
+			_logger.LogWarning(e, "Brio.Actor.Spawn failed");
 			return null;
 		}
 	}
@@ -129,11 +129,11 @@ public sealed class IpcCallerBrio : IIpcCaller, IDisposable
 		}
 		try
 		{
-			return await _dalamudUtilService.RunOnFrameworkThread(() => _brioDespawnActor.InvokeFunc(gameObject), "DespawnActorAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 110).ConfigureAwait(continueOnCapturedContext: false);
+			return await _dalamudUtilService.RunOnFrameworkThread(() => _brioDespawnActor.InvokeFunc(gameObject), "DespawnActorAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 110).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Brio.Actor.Despawn failed");
+			_logger.LogWarning(e, "Brio.Actor.Despawn failed");
 			return false;
 		}
 	}
@@ -151,11 +151,11 @@ public sealed class IpcCallerBrio : IIpcCaller, IDisposable
 		}
 		try
 		{
-			return await _dalamudUtilService.RunOnFrameworkThread(() => _brioSetModelTransform.InvokeFunc(gameObject, new Vector3(data.PositionX, data.PositionY, data.PositionZ), new Quaternion(data.RotationX, data.RotationY, data.RotationZ, data.RotationW), new Vector3(data.ScaleX, data.ScaleY, data.ScaleZ), arg5: false), "ApplyTransformAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 126).ConfigureAwait(continueOnCapturedContext: false);
+			return await _dalamudUtilService.RunOnFrameworkThread(() => _brioSetModelTransform.InvokeFunc(gameObject, new Vector3(data.PositionX, data.PositionY, data.PositionZ), new Quaternion(data.RotationX, data.RotationY, data.RotationZ, data.RotationW), new Vector3(data.ScaleX, data.ScaleY, data.ScaleZ), arg5: false), "ApplyTransformAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 126).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Brio.Actor.SetModelTransform failed");
+			_logger.LogWarning(e, "Brio.Actor.SetModelTransform failed");
 			return false;
 		}
 	}
@@ -173,28 +173,27 @@ public sealed class IpcCallerBrio : IIpcCaller, IDisposable
 		}
 		try
 		{
-			(Vector3?, Quaternion?, Vector3?) data = await _dalamudUtilService.RunOnFrameworkThread(() => _brioGetModelTransform.InvokeFunc(gameObject), "GetTransformAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 148).ConfigureAwait(continueOnCapturedContext: false);
+			(Vector3?, Quaternion?, Vector3?) data = await _dalamudUtilService.RunOnFrameworkThread(() => _brioGetModelTransform.InvokeFunc(gameObject), "GetTransformAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 148).ConfigureAwait(continueOnCapturedContext: false);
 			if (!data.Item1.HasValue || !data.Item2.HasValue || !data.Item3.HasValue)
 			{
 				return default(WorldData);
 			}
-			return new WorldData
-			{
-				PositionX = data.Item1.Value.X,
-				PositionY = data.Item1.Value.Y,
-				PositionZ = data.Item1.Value.Z,
-				RotationX = data.Item2.Value.X,
-				RotationY = data.Item2.Value.Y,
-				RotationZ = data.Item2.Value.Z,
-				RotationW = data.Item2.Value.W,
-				ScaleX = data.Item3.Value.X,
-				ScaleY = data.Item3.Value.Y,
-				ScaleZ = data.Item3.Value.Z
-			};
+			WorldData result = default(WorldData);
+			result.PositionX = data.Item1.Value.X;
+			result.PositionY = data.Item1.Value.Y;
+			result.PositionZ = data.Item1.Value.Z;
+			result.RotationX = data.Item2.Value.X;
+			result.RotationY = data.Item2.Value.Y;
+			result.RotationZ = data.Item2.Value.Z;
+			result.RotationW = data.Item2.Value.W;
+			result.ScaleX = data.Item3.Value.X;
+			result.ScaleY = data.Item3.Value.Y;
+			result.ScaleZ = data.Item3.Value.Z;
+			return result;
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Brio.Actor.GetModelTransform failed");
+			_logger.LogWarning(e, "Brio.Actor.GetModelTransform failed");
 			return default(WorldData);
 		}
 	}
@@ -212,11 +211,11 @@ public sealed class IpcCallerBrio : IIpcCaller, IDisposable
 		}
 		try
 		{
-			return await _dalamudUtilService.RunOnFrameworkThread(() => _brioGetPoseAsJson.InvokeFunc(gameObject), "GetPoseAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 178).ConfigureAwait(continueOnCapturedContext: false);
+			return await _dalamudUtilService.RunOnFrameworkThread(() => _brioGetPoseAsJson.InvokeFunc(gameObject), "GetPoseAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 178).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Brio.Actor.Pose.GetPoseAsJson failed");
+			_logger.LogWarning(e, "Brio.Actor.Pose.GetPoseAsJson failed");
 			return null;
 		}
 	}
@@ -235,7 +234,7 @@ public sealed class IpcCallerBrio : IIpcCaller, IDisposable
 		try
 		{
 			JsonNode applicablePose = JsonNode.Parse(pose);
-			string currentPose = await _dalamudUtilService.RunOnFrameworkThread(() => _brioGetPoseAsJson.InvokeFunc(gameObject), "SetPoseAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 196).ConfigureAwait(continueOnCapturedContext: false);
+			string currentPose = await _dalamudUtilService.RunOnFrameworkThread(() => _brioGetPoseAsJson.InvokeFunc(gameObject), "SetPoseAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 196).ConfigureAwait(continueOnCapturedContext: false);
 			if (currentPose == null)
 			{
 				return false;
@@ -249,12 +248,12 @@ public sealed class IpcCallerBrio : IIpcCaller, IDisposable
 			{
 				_brioFreezeActor.InvokeFunc(gameObject);
 				_brioFreezePhysics.InvokeFunc();
-			}, "SetPoseAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 203).ConfigureAwait(continueOnCapturedContext: false);
-			return await _dalamudUtilService.RunOnFrameworkThread(() => _brioSetPoseFromJson.InvokeFunc(gameObject, applicablePose.ToJsonString(), arg3: false), "SetPoseAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 209).ConfigureAwait(continueOnCapturedContext: false);
+			}, "SetPoseAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 203).ConfigureAwait(continueOnCapturedContext: false);
+			return await _dalamudUtilService.RunOnFrameworkThread(() => _brioSetPoseFromJson.InvokeFunc(gameObject, applicablePose.ToJsonString(), arg3: false), "SetPoseAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerBrio.cs", 209).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Brio.Actor.Pose.LoadFromJson failed");
+			_logger.LogWarning(e, "Brio.Actor.Pose.LoadFromJson failed");
 			return false;
 		}
 	}

@@ -51,9 +51,9 @@ public class ChangelogService : IHostedService
 				}, TaskScheduler.Default);
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogError(exception, "Error checking for version change");
+			_logger.LogError(ex, "Error checking for version change");
 		}
 	}
 

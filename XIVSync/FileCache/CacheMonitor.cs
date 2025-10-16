@@ -55,6 +55,7 @@ public sealed class CacheMonitor : DisposableMediatorSubscriberBase
 
 	public ConcurrentDictionary<string, int> HaltScanLocks { get; set; } = new ConcurrentDictionary<string, int>(StringComparer.Ordinal);
 
+
 	public bool IsScanRunning
 	{
 		get
@@ -77,8 +78,7 @@ public sealed class CacheMonitor : DisposableMediatorSubscriberBase
 
 	public FileSystemWatcher? MareWatcher { get; private set; }
 
-	public CacheMonitor(ILogger<CacheMonitor> logger, IpcManager ipcManager, MareConfigService configService, FileCacheManager fileDbManager, MareMediator mediator, PerformanceCollectorService performanceCollector, DalamudUtilService dalamudUtil, FileCompactor fileCompactor)
-		: base(logger, mediator)
+	public CacheMonitor(ILogger<CacheMonitor> logger, IpcManager ipcManager, MareConfigService configService, FileCacheManager fileDbManager, MareMediator mediator, PerformanceCollectorService performanceCollector, DalamudUtilService dalamudUtil, FileCompactor fileCompactor) : base(logger, mediator)
 	{
 		CacheMonitor cacheMonitor = this;
 		_ipcManager = ipcManager;
@@ -125,21 +125,21 @@ public sealed class CacheMonitor : DisposableMediatorSubscriberBase
 		Task.Run(async delegate
 		{
 			cacheMonitor.Logger.LogInformation("Starting Periodic Storage Directory Calculation Task");
-			CancellationToken token2 = cacheMonitor._periodicCalculationTokenSource.Token;
-			while (!token2.IsCancellationRequested)
+			token = cacheMonitor._periodicCalculationTokenSource.Token;
+			while (!token.IsCancellationRequested)
 			{
 				try
 				{
-					while (cacheMonitor._dalamudUtil.IsOnFrameworkThread && !token2.IsCancellationRequested)
+					while (cacheMonitor._dalamudUtil.IsOnFrameworkThread && !token.IsCancellationRequested)
 					{
 						await Task.Delay(1).ConfigureAwait(continueOnCapturedContext: false);
 					}
-					cacheMonitor.RecalculateFileCacheSize(token2);
+					cacheMonitor.RecalculateFileCacheSize(token);
 				}
 				catch
 				{
 				}
-				await Task.Delay(TimeSpan.FromMinutes(1L), token2).ConfigureAwait(continueOnCapturedContext: false);
+				await Task.Delay(TimeSpan.FromMinutes(1L), token).ConfigureAwait(continueOnCapturedContext: false);
 			}
 		}, token);
 	}
@@ -327,13 +327,13 @@ public sealed class CacheMonitor : DisposableMediatorSubscriberBase
 			{
 				base.Logger.LogDebug("FSW Change: Deletion - {val}", entry);
 			}
-			foreach (KeyValuePair<string, WatcherChange> entry2 in renamedEntries)
+			foreach (KeyValuePair<string, WatcherChange> entry in renamedEntries)
 			{
-				base.Logger.LogDebug("FSW Change: Renamed - {oldVal} => {val}", entry2.Value.OldPath, entry2.Key);
+				base.Logger.LogDebug("FSW Change: Renamed - {oldVal} => {val}", entry.Value.OldPath, entry.Key);
 			}
-			foreach (string entry3 in remainingEntries)
+			foreach (string entry in remainingEntries)
 			{
-				base.Logger.LogDebug("FSW Change: Creation or Change - {val}", entry3);
+				base.Logger.LogDebug("FSW Change: Creation or Change - {val}", entry);
 			}
 			string[] allChanges = deletedEntries.Concat<string>(renamedEntries.Select((KeyValuePair<string, WatcherChange> c) => c.Value.OldPath)).Concat(renamedEntries.Select((KeyValuePair<string, WatcherChange> c) => c.Key)).Concat(remainingEntries)
 				.ToArray();
@@ -435,9 +435,9 @@ public sealed class CacheMonitor : DisposableMediatorSubscriberBase
 		{
 			FileCacheDriveFree = di.AvailableFreeSpace;
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Could not determine drive size for Storage Folder {folder}", _configService.Current.CacheFolder);
+			base.Logger.LogWarning(ex, "Could not determine drive size for Storage Folder {folder}", _configService.Current.CacheFolder);
 		}
 		List<FileInfo> files = (from f in Directory.EnumerateFiles(_configService.Current.CacheFolder)
 			select new FileInfo(f) into f
@@ -530,9 +530,9 @@ public sealed class CacheMonitor : DisposableMediatorSubscriberBase
 					where AllowedFileExtensions.Any((string e) => f.EndsWith(e, StringComparison.OrdinalIgnoreCase)) && !f.Contains("\\bg\\", StringComparison.OrdinalIgnoreCase) && !f.Contains("\\bgcommon\\", StringComparison.OrdinalIgnoreCase) && !f.Contains("\\ui\\", StringComparison.OrdinalIgnoreCase)
 					select f);
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				base.Logger.LogWarning(exception, "Could not enumerate path {path}", folder);
+				base.Logger.LogWarning(ex, "Could not enumerate path {path}", folder);
 			}
 			Thread.Sleep(50);
 			if (ct.IsCancellationRequested)
@@ -586,28 +586,28 @@ public sealed class CacheMonitor : DisposableMediatorSubscriberBase
 							base.Logger.LogWarning("Penumbra not available");
 							return;
 						}
-						(FileState, FileCacheEntity) tuple = _fileDbManager.ValidateFileCacheEntity(result);
-						if (tuple.Item1 != FileState.RequireDeletion)
+						(FileState State, FileCacheEntity FileCache) tuple = _fileDbManager.ValidateFileCacheEntity(result);
+						if (tuple.State != FileState.RequireDeletion)
 						{
 							lock (sync)
 							{
-								allScannedFiles[tuple.Item2.ResolvedFilepath] = true;
+								allScannedFiles[tuple.FileCache.ResolvedFilepath] = true;
 							}
 						}
-						if (tuple.Item1 == FileState.RequireUpdate)
+						if (tuple.State == FileState.RequireUpdate)
 						{
-							base.Logger.LogTrace("To update: {path}", tuple.Item2.ResolvedFilepath);
+							base.Logger.LogTrace("To update: {path}", tuple.FileCache.ResolvedFilepath);
 							lock (sync)
 							{
-								entitiesToUpdate.Add(tuple.Item2);
+								entitiesToUpdate.Add(tuple.FileCache);
 							}
 						}
-						else if (tuple.Item1 == FileState.RequireDeletion)
+						else if (tuple.State == FileState.RequireDeletion)
 						{
-							base.Logger.LogTrace("To delete: {path}", tuple.Item2.ResolvedFilepath);
+							base.Logger.LogTrace("To delete: {path}", tuple.FileCache.ResolvedFilepath);
 							lock (sync)
 							{
-								entitiesToRemove.Add(tuple.Item2);
+								entitiesToRemove.Add(tuple.FileCache);
 							}
 						}
 					}
@@ -645,9 +645,9 @@ public sealed class CacheMonitor : DisposableMediatorSubscriberBase
 			{
 				_fileDbManager.UpdateHashedFile(entity);
 			}
-			foreach (FileCacheEntity entity2 in entitiesToRemove)
+			foreach (FileCacheEntity entity in entitiesToRemove)
 			{
-				_fileDbManager.RemoveHashedFile(entity2.Hash, entity2.PrefixedFilePath);
+				_fileDbManager.RemoveHashedFile(entity.Hash, entity.PrefixedFilePath);
 			}
 			_fileDbManager.WriteOutFullCsv();
 		}
@@ -687,9 +687,9 @@ public sealed class CacheMonitor : DisposableMediatorSubscriberBase
 									_fileDbManager.CreateCacheEntry(cachePath);
 								}
 							}
-							catch (Exception exception2)
+							catch (Exception exception)
 							{
-								base.Logger.LogWarning(exception2, "Failed adding {file}", cachePath);
+								base.Logger.LogWarning(exception, "Failed adding {file}", cachePath);
 							}
 							Interlocked.Increment(ref _currentFileProgress);
 						}
@@ -714,7 +714,6 @@ public sealed class CacheMonitor : DisposableMediatorSubscriberBase
 
 	static CacheMonitor()
 	{
-		
-		AllowedFileExtensions = ImmutableList.Create([".mdl", ".tex", ".mtrl", ".tmb", ".pap", ".avfx", ".atex", ".sklb", ".eid", ".phyb", ".pbd", ".scd", ".skp", ".shpk"]);
-	}
+        AllowedFileExtensions = ImmutableList.Create([".mdl", ".tex", ".mtrl", ".tmb", ".pap", ".avfx", ".atex", ".sklb", ".eid", ".phyb", ".pbd", ".scd", ".skp", ".shpk"]);
+    }
 }

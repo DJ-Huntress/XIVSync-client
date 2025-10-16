@@ -77,12 +77,11 @@ public class MdlFile
 
 		public static ShapeStruct Read(LuminaBinaryReader br)
 		{
-			return new ShapeStruct
-			{
-				StringOffset = br.ReadUInt32(),
-				ShapeMeshStartIndex = br.ReadUInt16Array(3),
-				ShapeMeshCount = br.ReadUInt16Array(3)
-			};
+			ShapeStruct ret = default(ShapeStruct);
+			ret.StringOffset = br.ReadUInt32();
+			ret.ShapeMeshStartIndex = br.ReadUInt16Array(3);
+			ret.ShapeMeshCount = br.ReadUInt16Array(3);
+			return ret;
 		}
 	}
 
@@ -211,33 +210,33 @@ public class MdlFile
 			IndexOffset[i] -= dataOffset;
 		}
 		VertexDeclarations = new VertexDeclarationStruct[header.VertexDeclarationCount];
-		for (int j = 0; j < header.VertexDeclarationCount; j++)
+		for (int i = 0; i < header.VertexDeclarationCount; i++)
 		{
-			VertexDeclarations[j] = VertexDeclarationStruct.Read(r);
+			VertexDeclarations[i] = VertexDeclarationStruct.Read(r);
 		}
 		LoadStrings(r);
 		ModelHeader modelHeader = LoadModelHeader(r);
 		ElementIds = new MdlStructs.ElementIdStruct[modelHeader.ElementIdCount];
-		for (int k = 0; k < modelHeader.ElementIdCount; k++)
+		for (int i = 0; i < modelHeader.ElementIdCount; i++)
 		{
-			ElementIds[k] = MdlStructs.ElementIdStruct.Read(r);
+			ElementIds[i] = MdlStructs.ElementIdStruct.Read(r);
 		}
 		Lods = new MdlStructs.LodStruct[3];
-		for (int l = 0; l < 3; l++)
+		for (int i = 0; i < 3; i++)
 		{
 			MdlStructs.LodStruct lod = r.ReadStructure<MdlStructs.LodStruct>();
-			if (l < LodCount)
+			if (i < LodCount)
 			{
 				lod.VertexDataOffset -= dataOffset;
 				lod.IndexDataOffset -= dataOffset;
 			}
-			Lods[l] = lod;
+			Lods[i] = lod;
 		}
 		ExtraLods = (((modelHeader.Flags2 & ModelFlags2.ExtraLodEnabled) != 0) ? r.ReadStructuresAsArray<MdlStructs.ExtraLodStruct>(3) : Array.Empty<MdlStructs.ExtraLodStruct>());
 		Meshes = new MdlStructs.MeshStruct[modelHeader.MeshCount];
-		for (int m = 0; m < modelHeader.MeshCount; m++)
+		for (int i = 0; i < modelHeader.MeshCount; i++)
 		{
-			Meshes[m] = MdlStructs.MeshStruct.Read(r);
+			Meshes[i] = MdlStructs.MeshStruct.Read(r);
 		}
 	}
 

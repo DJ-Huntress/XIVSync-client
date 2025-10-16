@@ -9,10 +9,9 @@ public record OnlineUserIdentDto : UserDto
 {
 	public string Ident { get; init; }
 
-	public OnlineUserIdentDto(UserData User, string Ident)
+	public OnlineUserIdentDto(UserData User, string Ident) : base(User)
 	{
 		this.Ident = Ident;
-		base._002Ector(User);
 	}
 
 	[CompilerGenerated]

@@ -64,7 +64,7 @@ public sealed class IpcCallerCustomize : IIpcCaller, IDisposable
 				_logger.LogTrace("CustomizePlus reverting for {chara}", ((IntPtr)character2.Address).ToString("X"));
 				_customizePlusRevertCharacter.InvokeFunc(character2.ObjectIndex);
 			}
-		}, "RevertAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerCustomize.cs", 49).ConfigureAwait(continueOnCapturedContext: false);
+		}, "RevertAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerCustomize.cs", 49).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task<Guid?> SetBodyScaleAsync(nint character, string scale)
@@ -77,17 +77,17 @@ public sealed class IpcCallerCustomize : IIpcCaller, IDisposable
 		{
 			if (_dalamudUtil.CreateGameObject(character) is ICharacter character2)
 			{
-				string arg = Encoding.UTF8.GetString(Convert.FromBase64String(scale));
+				string @string = Encoding.UTF8.GetString(Convert.FromBase64String(scale));
 				_logger.LogTrace("CustomizePlus applying for {chara}", ((IntPtr)character2.Address).ToString("X"));
 				if (scale.IsNullOrEmpty())
 				{
 					_customizePlusRevertCharacter.InvokeFunc(character2.ObjectIndex);
 					return (Guid?)null;
 				}
-				return _customizePlusSetBodyScaleToCharacter.InvokeFunc(character2.ObjectIndex, arg).Item2;
+				return _customizePlusSetBodyScaleToCharacter.InvokeFunc(character2.ObjectIndex, @string).Item2;
 			}
 			return (Guid?)null;
-		}, "SetBodyScaleAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerCustomize.cs", 63).ConfigureAwait(continueOnCapturedContext: false);
+		}, "SetBodyScaleAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerCustomize.cs", 63).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public async Task RevertByIdAsync(Guid? profileId)
@@ -97,7 +97,7 @@ public sealed class IpcCallerCustomize : IIpcCaller, IDisposable
 			await _dalamudUtil.RunOnFrameworkThread(delegate
 			{
 				_customizePlusDeleteByUniqueId.InvokeFunc(profileId.Value);
-			}, "RevertByIdAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerCustomize.cs", 90).ConfigureAwait(continueOnCapturedContext: false);
+			}, "RevertByIdAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerCustomize.cs", 90).ConfigureAwait(continueOnCapturedContext: false);
 		}
 	}
 
@@ -120,7 +120,7 @@ public sealed class IpcCallerCustomize : IIpcCaller, IDisposable
 				return _customizePlusGetProfileById.InvokeFunc(tuple.Item2.Value).Item2;
 			}
 			return string.Empty;
-		}, "GetScaleAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerCustomize.cs", 99).ConfigureAwait(continueOnCapturedContext: false);
+		}, "GetScaleAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerCustomize.cs", 99).ConfigureAwait(continueOnCapturedContext: false);
 		if (string.IsNullOrEmpty(scale))
 		{
 			return string.Empty;

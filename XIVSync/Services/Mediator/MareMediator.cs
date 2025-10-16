@@ -63,9 +63,9 @@ public sealed class MareMediator : IHostedService
 			_logger.LogInformation("Subscriber {type}: {sub}", subscriber.GetType().Name, subscriber.ToString());
 			StringBuilder sb = new StringBuilder();
 			sb.Append("=> ");
-			foreach (KeyValuePair<Type, HashSet<SubscriberAction>> item2 in _subscriberDict.Where<KeyValuePair<Type, HashSet<SubscriberAction>>>((KeyValuePair<Type, HashSet<SubscriberAction>> item) => item.Value.Any((SubscriberAction v) => v.Subscriber == subscriber)).ToList())
+			foreach (KeyValuePair<Type, HashSet<SubscriberAction>> item in _subscriberDict.Where<KeyValuePair<Type, HashSet<SubscriberAction>>>((KeyValuePair<Type, HashSet<SubscriberAction>> item) => item.Value.Any((SubscriberAction v) => v.Subscriber == subscriber)).ToList())
 			{
-				sb.Append(item2.Key.Name).Append(", ");
+				sb.Append(item.Key.Name).Append(", ");
 			}
 			if (!string.Equals(sb.ToString(), "=> ", StringComparison.Ordinal))
 			{

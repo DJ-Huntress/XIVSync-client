@@ -44,6 +44,7 @@ public class FileTransferOrchestrator : DisposableMediatorSubscriberBase
 
 	public List<FileTransfer> ForbiddenTransfers { get; } = new List<FileTransfer>();
 
+
 	public bool IsInitialized => FilesCdnUri != null;
 
 	public FileTransferOrchestrator(ILogger<FileTransferOrchestrator> logger, MareConfigService mareConfig, MareMediator mediator, TokenProvider tokenProvider, HttpClient httpClient)
@@ -214,9 +215,9 @@ public class FileTransferOrchestrator : DisposableMediatorSubscriberBase
 		{
 			throw;
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Error during SendRequestInternal for {uri}", requestMessage.RequestUri);
+			base.Logger.LogWarning(ex, "Error during SendRequestInternal for {uri}", requestMessage.RequestUri);
 			throw;
 		}
 	}

@@ -146,7 +146,7 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 	}
 
 	public CharaDataHubUi(ILogger<CharaDataHubUi> logger, MareMediator mediator, PerformanceCollectorService performanceCollectorService, CharaDataManager charaDataManager, CharaDataNearbyManager charaDataNearbyManager, CharaDataConfigService configService, UiSharedService uiSharedService, ServerConfigurationManager serverConfigurationManager, DalamudUtilService dalamudUtilService, FileDialogManager fileDialogManager, PairManager pairManager, CharaDataGposeTogetherManager charaDataGposeTogetherManager)
-		: base(logger, mediator, "XIVSync Character Data Hub###MareSynchronosCharaDataUI", performanceCollectorService)
+		: base(logger, mediator, "XIVSync Character Data Hub###XIVSyncCharaDataUI", performanceCollectorService)
 	{
 		SetWindowSizeConstraints();
 		_charaDataManager = charaDataManager;
@@ -176,7 +176,13 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 		if (_abbreviateCharaName)
 		{
 			string[] split = name.Split(" ");
-			return split[0].First() + ". " + split[1].First() + '.';
+			char reference = split[0].First();
+			ReadOnlySpan<char> readOnlySpan = new ReadOnlySpan<char>(ref reference);
+			ReadOnlySpan<char> readOnlySpan2 = ". ";
+			char reference2 = split[1].First();
+			ReadOnlySpan<char> readOnlySpan3 = new ReadOnlySpan<char>(ref reference2);
+			char reference3 = '.';
+			return string.Concat(readOnlySpan, readOnlySpan2, readOnlySpan3, new ReadOnlySpan<char>(ref reference3));
 		}
 		return name;
 	}
@@ -284,8 +290,8 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 						{
 							using (ImRaii.Disabled(!_uiSharedService.IsInGpose))
 							{
-								using ImRaii.IEndObject gposeTabItem = ImRaii.TabItem("GPose Actors");
-								if (gposeTabItem)
+								using ImRaii.IEndObject endObject = ImRaii.TabItem("GPose Actors");
+								if (endObject)
 								{
 									using (ImRaii.PushId("gposeControls"))
 									{
@@ -312,10 +318,10 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 									_charaDataNearbyManager.ComputeNearbyData = false;
 								}
 							}
-							using ImRaii.IEndObject gposeTabItem2 = ImRaii.TabItem("Apply Data", _openDataApplicationShared ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None);
-							if (gposeTabItem2)
+							using ImRaii.IEndObject gposeTabItem = ImRaii.TabItem("Apply Data", _openDataApplicationShared ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None);
+							if (gposeTabItem)
 							{
-								smallUi = (byte)((smallUi ? 1u : 0u) | 1u) != 0;
+								smallUi = smallUi || true;
 								using (ImRaii.PushId("applyData"))
 								{
 									DrawDataApplication();
@@ -554,11 +560,11 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 												float cursorPosX = ImGui.GetCursorPosX();
 												float num = max.X - cursorPos.X;
 												bool item = favorite.Value.Item3;
-												CharaDataMetaInfoExtendedDto metaInfo3 = favorite.Value.Item2;
+												CharaDataMetaInfoExtendedDto metaInfo = favorite.Value.Item2;
 												ImGui.AlignTextToFramePadding();
 												using (ImRaii.PushColor(ImGuiCol.Text, ImGuiColors.DalamudGrey, !item))
 												{
-													using (ImRaii.PushColor(ImGuiCol.Text, UiSharedService.GetBoolColor(metaInfo3 != null), item))
+													using (ImRaii.PushColor(ImGuiCol.Text, UiSharedService.GetBoolColor(metaInfo != null), item))
 													{
 														ImGui.TextUnformatted(favorite.Key);
 													}
@@ -572,10 +578,10 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 												ImGui.SetCursorPosX(cursorPosX2);
 												if (item)
 												{
-													_uiSharedService.BooleanToColoredIcon(metaInfo3 != null, inline: false);
-													if (metaInfo3 != null)
+													_uiSharedService.BooleanToColoredIcon(metaInfo != null, inline: false);
+													if (metaInfo != null)
 													{
-														UiSharedService.AttachToolTip("Metainfo present--SEP--" + $"Last Updated: {metaInfo3.UpdatedDate}" + Environment.NewLine + "Description: " + metaInfo3.Description + Environment.NewLine + $"Poses: {metaInfo3.PoseData.Count}");
+														UiSharedService.AttachToolTip("Metainfo present--SEP--" + $"Last Updated: {metaInfo.UpdatedDate}" + Environment.NewLine + "Description: " + metaInfo.Description + Environment.NewLine + $"Poses: {metaInfo.PoseData.Count}");
 													}
 													else
 													{
@@ -603,9 +609,9 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 												{
 													if (_uiSharedService.IconButton(FontAwesomeIcon.ArrowRight))
 													{
-														_charaDataManager.ApplyCharaDataToGposeTarget(metaInfo3);
+														_charaDataManager.ApplyCharaDataToGposeTarget(metaInfo);
 													}
-												}, "Apply Character Data to GPose Target", metaInfo3, _hasValidGposeTarget, isSpawning: false);
+												}, "Apply Character Data to GPose Target", metaInfo, _hasValidGposeTarget, isSpawning: false);
 												ImGui.SameLine();
 												GposeMetaInfoAction(delegate(CharaDataMetaInfoExtendedDto? meta)
 												{
@@ -613,14 +619,14 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 													{
 														_charaDataManager.SpawnAndApplyData(meta);
 													}
-												}, "Spawn Actor with Brio and apply Character Data", metaInfo3, _hasValidGposeTarget, isSpawning: true);
+												}, "Spawn Actor with Brio and apply Character Data", metaInfo, _hasValidGposeTarget, isSpawning: true);
 												string empty = string.Empty;
-												string text = favorite.Key.Split(":")[0];
-												empty = ((!(metaInfo3 != null)) ? text : metaInfo3.Uploader.AliasOrUID);
-												string noteForUid = _serverConfigurationManager.GetNoteForUid(text);
-												if (noteForUid != null)
+												string text2 = favorite.Key.Split(":")[0];
+												empty = ((!(metaInfo != null)) ? text2 : metaInfo.Uploader.AliasOrUID);
+												string noteForUid2 = _serverConfigurationManager.GetNoteForUid(text2);
+												if (noteForUid2 != null)
 												{
-													empty = noteForUid + " (" + empty + ")";
+													empty = noteForUid2 + " (" + empty + ")";
 												}
 												ImGui.TextUnformatted(empty);
 												ImGui.TextUnformatted("Last Use: ");
@@ -633,7 +639,7 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 													favorite.Value.Item1.CustomDescription = buf;
 													_configService.Save();
 												}
-												DrawPoseData(metaInfo3, _gposeTarget, _hasValidGposeTarget);
+												DrawPoseData(metaInfo, _gposeTarget, _hasValidGposeTarget);
 											}
 										}
 									});
@@ -750,9 +756,9 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 							{
 								foreach (CharaDataFullExtendedDto data in _charaDataManager.OwnCharaData.Values)
 								{
-									if (_charaDataManager.TryGetMetaInfo(data.FullId, out CharaDataMetaInfoExtendedDto metaInfo2))
+									if (_charaDataManager.TryGetMetaInfo(data.FullId, out CharaDataMetaInfoExtendedDto metaInfo))
 									{
-										DrawMetaInfoData(_gposeTarget, _hasValidGposeTarget, metaInfo2, canOpen: true);
+										DrawMetaInfoData(_gposeTarget, _hasValidGposeTarget, metaInfo, canOpen: true);
 									}
 								}
 								ImGuiHelpers.ScaledDummy(5f);
@@ -1170,12 +1176,6 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 			return "Specified";
 		case AccessTypeDto.Public:
 			return "Everyone";
-		default:
-		{
-			global::_003CPrivateImplementationDetails_003E.ThrowSwitchExpressionException(dto);
-			string result = default(string);
-			return result;
-		}
 		}
 	}
 
@@ -1266,10 +1266,10 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 		{
 			UiSharedService.AttachToolTip(sb.ToString());
 		}
-		static void AddErrorStart(StringBuilder stringBuilder)
+		static void AddErrorStart(StringBuilder sb)
 		{
-			stringBuilder.Append("--SEP--");
-			stringBuilder.AppendLine("Cannot execute:");
+			sb.Append("--SEP--");
+			sb.AppendLine("Cannot execute:");
 		}
 	}
 
@@ -1316,10 +1316,10 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 		{
 			UiSharedService.AttachToolTip(sb.ToString());
 		}
-		static void AddErrorStart(StringBuilder stringBuilder)
+		static void AddErrorStart(StringBuilder sb)
 		{
-			stringBuilder.Append("--SEP--");
-			stringBuilder.AppendLine("Cannot execute:");
+			sb.Append("--SEP--");
+			sb.AppendLine("Cannot execute:");
 		}
 	}
 
@@ -1327,8 +1327,8 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 	{
 		base.SizeConstraints = new WindowSizeConstraints
 		{
-			MinimumSize = new Vector2((inGposeTab == true) ? 400 : 1000, 500f),
-			MaximumSize = new Vector2((inGposeTab == true) ? 400 : 1000, 2000f)
+			MinimumSize = new Vector2(inGposeTab.GetValueOrDefault() ? 400 : 1000, 500f),
+			MaximumSize = new Vector2(inGposeTab.GetValueOrDefault() ? 400 : 1000, 2000f)
 		};
 	}
 
@@ -1525,9 +1525,9 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 					using (ImRaii.Disabled(!_uiSharedService.IsInGpose))
 					{
 						UiSharedService.ScaledNextItemWidth(200f);
-						using (ImRaii.IEndObject endObject = ImRaii.Combo("##character", string.IsNullOrEmpty(user.AssociatedCharaName) ? "No character assigned" : CharaName(user.AssociatedCharaName)))
+						using (ImRaii.IEndObject endObject2 = ImRaii.Combo("##character", string.IsNullOrEmpty(user.AssociatedCharaName) ? "No character assigned" : CharaName(user.AssociatedCharaName)))
 						{
-							if (endObject)
+							if (endObject2)
 							{
 								foreach (ICharacter current in gposeCharas)
 								{
@@ -2316,7 +2316,7 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 					{
 						SelectedDtoId = entry.Id;
 					}
-					if (eIcon != FontAwesomeIcon.None)
+					if (eIcon != 0)
 					{
 						UiSharedService.AttachToolTip($"This entry will expire on {entry.ExpiryDate.ToLocalTime()}");
 					}
@@ -2526,9 +2526,9 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 		_comboHybridUsedLastFrame = true;
 		float width = 200f - 2f * ImGui.GetStyle().FramePadding.X - ((_openComboHybridEntries.Length > 8) ? ImGui.GetStyle().ScrollbarSize : 0f);
 		(string, string, string, string)[] openComboHybridEntries = _openComboHybridEntries;
-		for (int num = 0; num < openComboHybridEntries.Length; num++)
+		for (int i = 0; i < openComboHybridEntries.Length; i++)
 		{
-			(string, string, string, string) tuple = openComboHybridEntries[num];
+			(string, string, string, string) tuple = openComboHybridEntries[i];
 			string id = tuple.Item1;
 			string alias = tuple.Item2;
 			string aliasOrId = tuple.Item3;
@@ -2555,46 +2555,46 @@ internal sealed class CharaDataHubUi : WindowMediatorSubscriberBase
 			{
 				_charaDataNearbyManager.UserNoteFilter = buf;
 			}
-			bool v = _configService.Current.NearbyOwnServerOnly;
-			if (ImGui.Checkbox("Only show Poses on current server", ref v))
+			bool v2 = _configService.Current.NearbyOwnServerOnly;
+			if (ImGui.Checkbox("Only show Poses on current server", ref v2))
 			{
-				_configService.Current.NearbyOwnServerOnly = v;
+				_configService.Current.NearbyOwnServerOnly = v2;
 				_configService.Save();
 			}
 			_uiSharedService.DrawHelpText("Toggling this off will show you the location of all shared Poses with World Data from all Servers");
-			bool v2 = _configService.Current.NearbyShowOwnData;
-			if (ImGui.Checkbox("Also show your own data", ref v2))
+			bool v3 = _configService.Current.NearbyShowOwnData;
+			if (ImGui.Checkbox("Also show your own data", ref v3))
 			{
-				_configService.Current.NearbyShowOwnData = v2;
+				_configService.Current.NearbyShowOwnData = v3;
 				_configService.Save();
 			}
 			_uiSharedService.DrawHelpText("Toggling this on will also show you the location of your own Poses");
-			bool v3 = _configService.Current.NearbyIgnoreHousingLimitations;
-			if (ImGui.Checkbox("Ignore Housing Limitations", ref v3))
+			bool v4 = _configService.Current.NearbyIgnoreHousingLimitations;
+			if (ImGui.Checkbox("Ignore Housing Limitations", ref v4))
 			{
-				_configService.Current.NearbyIgnoreHousingLimitations = v3;
+				_configService.Current.NearbyIgnoreHousingLimitations = v4;
 				_configService.Save();
 			}
 			_uiSharedService.DrawHelpText("This will display all poses in their location regardless of housing limitations. (Ignoring Ward, Plot, Room)--SEP--Note: Poses that utilize housing props, furniture, etc. will not be displayed correctly if not spawned in the right location.");
-			bool v4 = _configService.Current.NearbyDrawWisps;
-			if (ImGui.Checkbox("Show Pose Wisps in the overworld", ref v4))
+			bool v5 = _configService.Current.NearbyDrawWisps;
+			if (ImGui.Checkbox("Show Pose Wisps in the overworld", ref v5))
 			{
-				_configService.Current.NearbyDrawWisps = v4;
+				_configService.Current.NearbyDrawWisps = v5;
 				_configService.Save();
 			}
 			_uiSharedService.DrawHelpText("When enabled, Mare will draw floating wisps where other's poses are in the world.");
-			int v5 = _configService.Current.NearbyDistanceFilter;
+			int v6 = _configService.Current.NearbyDistanceFilter;
 			UiSharedService.ScaledNextItemWidth(100f);
-			if (ImGui.SliderInt("Detection Distance", ref v5, 5, 1000))
+			if (ImGui.SliderInt("Detection Distance", ref v6, 5, 1000))
 			{
-				_configService.Current.NearbyDistanceFilter = v5;
+				_configService.Current.NearbyDistanceFilter = v6;
 				_configService.Save();
 			}
 			_uiSharedService.DrawHelpText("This setting allows you to change the maximum distance in which poses will be shown. Set it to the maximum if you want to see all poses on the current map.");
-			bool v6 = _configService.Current.NearbyShowAlways;
-			if (ImGui.Checkbox("Keep active outside Poses Nearby tab", ref v6))
+			bool v7 = _configService.Current.NearbyShowAlways;
+			if (ImGui.Checkbox("Keep active outside Poses Nearby tab", ref v7))
 			{
-				_configService.Current.NearbyShowAlways = v6;
+				_configService.Current.NearbyShowAlways = v7;
 				_configService.Save();
 			}
 			_uiSharedService.DrawHelpText("This will allow Mare to continue the calculation of position of wisps etc. active outside of the 'Poses Nearby' tab.--SEP--Note: The wisps etc. will disappear during combat and performing.");

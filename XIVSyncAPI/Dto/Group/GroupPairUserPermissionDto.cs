@@ -10,10 +10,9 @@ public record GroupPairUserPermissionDto : GroupPairDto
 {
 	public GroupUserPreferredPermissions GroupPairPermissions { get; init; }
 
-	public GroupPairUserPermissionDto(GroupData Group, UserData User, GroupUserPreferredPermissions GroupPairPermissions)
+	public GroupPairUserPermissionDto(GroupData Group, UserData User, GroupUserPreferredPermissions GroupPairPermissions) : base(Group, User)
 	{
 		this.GroupPairPermissions = GroupPairPermissions;
-		base._002Ector(Group, User);
 	}
 
 	[CompilerGenerated]

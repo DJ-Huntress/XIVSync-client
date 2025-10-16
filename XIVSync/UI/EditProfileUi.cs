@@ -246,8 +246,8 @@ public class EditProfileUi : WindowMediatorSubscriberBase
 		ImGui.SameLine();
 		if (_uiSharedService.IconTextButton(FontAwesomeIcon.Trash, "Clear Description"))
 		{
-			string fullDescription2 = BuildDescriptionWithStatus("");
-			_apiController.UserSetProfile(new UserProfileDto(new UserData(_apiController.UID), Disabled: false, null, null, fullDescription2));
+			string fullDescription = BuildDescriptionWithStatus("");
+			_apiController.UserSetProfile(new UserProfileDto(new UserData(_apiController.UID), Disabled: false, null, null, fullDescription));
 		}
 		UiSharedService.AttachToolTip("Clears your profile description text");
 	}

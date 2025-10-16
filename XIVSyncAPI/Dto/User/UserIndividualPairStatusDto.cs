@@ -10,10 +10,9 @@ public record UserIndividualPairStatusDto : UserDto
 {
 	public IndividualPairStatus IndividualPairStatus { get; init; }
 
-	public UserIndividualPairStatusDto(UserData User, IndividualPairStatus IndividualPairStatus)
+	public UserIndividualPairStatusDto(UserData User, IndividualPairStatus IndividualPairStatus) : base(User)
 	{
 		this.IndividualPairStatus = IndividualPairStatus;
-		base._002Ector(User);
 	}
 
 	[CompilerGenerated]

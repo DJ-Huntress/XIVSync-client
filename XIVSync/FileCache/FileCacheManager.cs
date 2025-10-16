@@ -148,9 +148,9 @@ public sealed class FileCacheManager : IHostedService
 					brokenEntities.Add(fileCache);
 				}
 			}
-			catch (Exception exception)
+			catch (Exception e)
 			{
-				_logger.LogWarning(exception, "Error during validation of {file}", fileCache.ResolvedFilepath);
+				_logger.LogWarning(e, "Error during validation of {file}", fileCache.ResolvedFilepath);
 				brokenEntities.Add(fileCache);
 			}
 		}
@@ -161,9 +161,9 @@ public sealed class FileCacheManager : IHostedService
 			{
 				File.Delete(brokenEntity.ResolvedFilepath);
 			}
-			catch (Exception exception2)
+			catch (Exception ex)
 			{
-				_logger.LogWarning(exception2, "Could not delete {file}", brokenEntity.ResolvedFilepath);
+				_logger.LogWarning(ex, "Could not delete {file}", brokenEntity.ResolvedFilepath);
 			}
 		}
 		_mareMediator.Publish(new ResumeScanMessage("ValidateLocalIntegrity"));
@@ -322,10 +322,10 @@ public sealed class FileCacheManager : IHostedService
 			_logger.LogTrace("Migrated from {oldPath} to {newPath}", fileCache.ResolvedFilepath, newHashedEntity.ResolvedFilepath);
 			return newHashedEntity;
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
 			AddHashedFile(fileCache);
-			_logger.LogWarning(exception, "Failed to migrate entity {entity}", fileCache.PrefixedFilePath);
+			_logger.LogWarning(ex, "Failed to migrate entity {entity}", fileCache.PrefixedFilePath);
 			return fileCache;
 		}
 	}
@@ -408,9 +408,9 @@ public sealed class FileCacheManager : IHostedService
 					File.Move(CsvBakPath, _csvPath, overwrite: true);
 				}
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				_logger.LogWarning(exception, "Failed to move BAK to ORG, deleting BAK");
+				_logger.LogWarning(ex, "Failed to move BAK to ORG, deleting BAK");
 				try
 				{
 					if (File.Exists(CsvBakPath))
@@ -418,9 +418,9 @@ public sealed class FileCacheManager : IHostedService
 						File.Delete(CsvBakPath);
 					}
 				}
-				catch (Exception exception2)
+				catch (Exception ex1)
 				{
-					_logger.LogWarning(exception2, "Could not delete bak file");
+					_logger.LogWarning(ex1, "Could not delete bak file");
 				}
 			}
 		}
@@ -442,10 +442,10 @@ public sealed class FileCacheManager : IHostedService
 					entries = File.ReadAllLines(_csvPath);
 					success = true;
 				}
-				catch (Exception exception3)
+				catch (Exception ex)
 				{
 					attempts++;
-					_logger.LogWarning(exception3, "Could not open {file}, trying again", _csvPath);
+					_logger.LogWarning(ex, "Could not open {file}, trying again", _csvPath);
 					Thread.Sleep(100);
 				}
 			}
@@ -489,9 +489,9 @@ public sealed class FileCacheManager : IHostedService
 					}
 					AddHashedFile(ReplacePathPrefixes(new FileCacheEntity(hash, path, time, size, compressed)));
 				}
-				catch (Exception exception4)
+				catch (Exception ex)
 				{
-					_logger.LogWarning(exception4, "Failed to initialize entry {entry}, ignoring", entry);
+					_logger.LogWarning(ex, "Failed to initialize entry {entry}, ignoring", entry);
 				}
 			}
 			if (processedFiles.Count != entries.Length)

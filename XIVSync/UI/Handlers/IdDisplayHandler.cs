@@ -99,16 +99,16 @@ public class IdDisplayHandler
 	public void DrawPairText(string id, Pair pair, float textPosX, Func<float> editBoxWidth)
 	{
 		ImGui.SameLine(textPosX);
-		(bool isUid, string text) playerText = GetPlayerText(pair);
-		bool textIsUid = playerText.isUid;
-		string playerText2 = playerText.text;
+		(bool isUid, string text) playerText2 = GetPlayerText(pair);
+		bool textIsUid = playerText2.isUid;
+		string playerText = playerText2.text;
 		string statusMessage = GetStatusMessage(pair);
 		if (!string.Equals(_editEntry, pair.UserData.UID, StringComparison.Ordinal))
 		{
 			ImGui.AlignTextToFramePadding();
 			using (ImRaii.PushFont(UiBuilder.MonoFont, textIsUid))
 			{
-				ImGui.TextUnformatted(playerText2);
+				ImGui.TextUnformatted(playerText);
 			}
 			if (!string.IsNullOrEmpty(statusMessage) && _mareConfigService.Current.ShowProfileStatusInPairList)
 			{

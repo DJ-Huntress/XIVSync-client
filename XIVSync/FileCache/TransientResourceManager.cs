@@ -87,9 +87,11 @@ public sealed class TransientResourceManager : DisposableMediatorSubscriberBase
 
 	private ConcurrentDictionary<ObjectKind, HashSet<string>> TransientResources { get; } = new ConcurrentDictionary<ObjectKind, HashSet<string>>();
 
+
 	public IReadOnlySet<TransientRecord> RecordedTransients => _recordedTransients;
 
 	public ValueProgress<TimeSpan> RecordTimeRemaining { get; } = new ValueProgress<TimeSpan>();
+
 
 	public TransientResourceManager(ILogger<TransientResourceManager> logger, TransientConfigService configurationService, DalamudUtilService dalamudUtil, MareMediator mediator)
 		: base(logger, mediator)
@@ -184,9 +186,9 @@ public sealed class TransientResourceManager : DisposableMediatorSubscriberBase
 			{
 				petPerma = (PlayerConfig.JobSpecificPetCache[_dalamudUtil.ClassJobId] = new List<string>());
 			}
-			foreach (string item2 in newlyAddedGamePaths.Where((string f) => !string.IsNullOrEmpty(f)))
+			foreach (string item in newlyAddedGamePaths.Where((string f) => !string.IsNullOrEmpty(f)))
 			{
-				petPerma.Add(item2);
+				petPerma.Add(item);
 			}
 		}
 		if (saveConfig)
@@ -227,7 +229,10 @@ public sealed class TransientResourceManager : DisposableMediatorSubscriberBase
 
 	internal void ClearTransientPaths(ObjectKind objectKind, List<string> list)
 	{
-		int recordingOnlyRemoved = list.RemoveAll((string entry) => _handledRecordingFileTypes.Any((string ext) => entry.EndsWith(ext, StringComparison.OrdinalIgnoreCase)));
+		int recordingOnlyRemoved = list.RemoveAll(delegate(string entry)
+		{
+			return _handledRecordingFileTypes.Any((string ext) => entry.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
+		});
 		if (recordingOnlyRemoved > 0)
 		{
 			base.Logger.LogTrace("Ignored {0} game paths when clearing transients", recordingOnlyRemoved);
@@ -244,14 +249,14 @@ public sealed class TransientResourceManager : DisposableMediatorSubscriberBase
 		bool reloadSemiTransient = false;
 		if (objectKind == ObjectKind.Player && SemiTransientResources.TryGetValue(objectKind, out HashSet<string> semiset))
 		{
-			foreach (string file2 in semiset.Where((string p) => list.Contains<string>(p, StringComparer.OrdinalIgnoreCase)))
+			foreach (string file in semiset.Where((string p) => list.Contains<string>(p, StringComparer.OrdinalIgnoreCase)))
 			{
-				base.Logger.LogTrace("Removing From SemiTransient: {file}", file2);
-				PlayerConfig.RemovePath(file2, objectKind);
+				base.Logger.LogTrace("Removing From SemiTransient: {file}", file);
+				PlayerConfig.RemovePath(file, objectKind);
 			}
-			int removed2 = semiset.RemoveWhere((string p) => list.Contains<string>(p, StringComparer.OrdinalIgnoreCase));
-			base.Logger.LogDebug("Removed {removed} previously existing semi transient paths", removed2);
-			if (removed2 > 0)
+			int removed = semiset.RemoveWhere((string p) => list.Contains<string>(p, StringComparer.OrdinalIgnoreCase));
+			base.Logger.LogDebug("Removed {removed} previously existing semi transient paths", removed);
+			if (removed > 0)
 			{
 				reloadSemiTransient = true;
 				base.Logger.LogTrace("Saving transient.json from {method}", "ClearTransientPaths");
@@ -288,8 +293,8 @@ public sealed class TransientResourceManager : DisposableMediatorSubscriberBase
 			}
 			PlayerConfig.JobSpecificCache.TryGetValue(_dalamudUtil.ClassJobId, out List<string> jobSpecificData);
 			SemiTransientResources[ObjectKind.Player] = PlayerConfig.GlobalPersistentCache.Concat(jobSpecificData ?? new List<string>()).ToHashSet<string>(StringComparer.OrdinalIgnoreCase);
-			PlayerConfig.JobSpecificPetCache.TryGetValue(_dalamudUtil.ClassJobId, out List<string> petSpecificData);
-			ConcurrentDictionary<ObjectKind, HashSet<string>> semiTransientResources = SemiTransientResources;
+            ConcurrentDictionary<ObjectKind, HashSet<string>> semiTransientResources = SemiTransientResources;
+            PlayerConfig.JobSpecificPetCache.TryGetValue(_dalamudUtil.ClassJobId, out List<string> petSpecificData);
 			value2 = new HashSet<string>();
 			foreach (string item in petSpecificData ?? new List<string>())
 			{
@@ -475,9 +480,9 @@ public sealed class TransientResourceManager : DisposableMediatorSubscriberBase
 			}
 		}
 		_recordedTransients.Clear();
-		foreach (nint item2 in addedTransients)
+		foreach (nint item in addedTransients)
 		{
-			base.Mediator.Publish(new TransientResourceChangedMessage(item2));
+			base.Mediator.Publish(new TransientResourceChangedMessage(item));
 		}
 	}
 }

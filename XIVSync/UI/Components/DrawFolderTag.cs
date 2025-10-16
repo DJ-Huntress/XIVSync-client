@@ -115,6 +115,26 @@ public class DrawFolderTag : DrawFolderBase
 	protected override void DrawMenu(float menuWidth)
 	{
 		ImGui.TextUnformatted("Group Menu");
+		if (RenderPause && _allPairs.Any())
+		{
+			bool allArePaused = _allPairs.All((Pair pair) => pair.UserPair.OwnPermissions.IsPaused());
+			FontAwesomeIcon pauseButton = (allArePaused ? FontAwesomeIcon.Play : FontAwesomeIcon.Pause);
+			string pauseText = (allArePaused ? "Resume All" : "Pause All");
+			if (_uiSharedService.IconTextButton(pauseButton, pauseText, menuWidth, isInPopup: true))
+			{
+				if (allArePaused)
+				{
+					ResumeAllPairs(_allPairs);
+				}
+				else
+				{
+					PauseRemainingPairs(_allPairs);
+				}
+				ImGui.CloseCurrentPopup();
+			}
+			UiSharedService.AttachToolTip(allArePaused ? ("Resume pairing with all pairs in " + _id) : ("Pause pairing with all pairs in " + _id));
+			ImGui.Separator();
+		}
 		if (_uiSharedService.IconTextButton(FontAwesomeIcon.Users, "Select Pairs", menuWidth, isInPopup: true))
 		{
 			_selectPairForTagUi.Open(_id);
@@ -140,38 +160,6 @@ public class DrawFolderTag : DrawFolderBase
 			"Mare_All" => "Users", 
 			_ => _id, 
 		});
-	}
-
-	protected override float DrawRightSide(float currentRightSideX)
-	{
-		if (!RenderPause)
-		{
-			return currentRightSideX;
-		}
-		bool allArePaused = _allPairs.All((Pair pair) => pair.UserPair.OwnPermissions.IsPaused());
-		FontAwesomeIcon pauseButton = (allArePaused ? FontAwesomeIcon.Play : FontAwesomeIcon.Pause);
-		float pauseButtonX = _uiSharedService.GetIconButtonSize(pauseButton).X;
-		ImGui.SameLine(currentRightSideX - pauseButtonX);
-		if (_uiSharedService.IconButton(pauseButton))
-		{
-			if (allArePaused)
-			{
-				ResumeAllPairs(_allPairs);
-			}
-			else
-			{
-				PauseRemainingPairs(_allPairs);
-			}
-		}
-		if (allArePaused)
-		{
-			UiSharedService.AttachToolTip("Resume pairing with all pairs in " + _id);
-		}
-		else
-		{
-			UiSharedService.AttachToolTip("Pause pairing with all pairs in " + _id);
-		}
-		return currentRightSideX;
 	}
 
 	private void PauseRemainingPairs(IEnumerable<Pair> availablePairs)

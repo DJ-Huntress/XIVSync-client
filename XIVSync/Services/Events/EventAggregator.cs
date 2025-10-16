@@ -92,9 +92,9 @@ public class EventAggregator : MediatorSubscriberBase, IHostedService
 					File.Delete(filesInDirectory.OrderBy((string f) => new FileInfo(f).LastWriteTimeUtc).First());
 				}
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				_logger.LogWarning(exception, "Could not delete last events");
+				_logger.LogWarning(ex, "Could not delete last events");
 			}
 		}
 		string eventLogFile = Path.Combine(EventLogFolder, CurrentLogName);
@@ -104,11 +104,11 @@ public class EventAggregator : MediatorSubscriberBase, IHostedService
 			{
 				Directory.CreateDirectory(EventLogFolder);
 			}
-			File.AppendAllLines(eventLogFile, [receivedEvent.ToString()]);
-		}
-		catch (Exception exception2)
+            File.AppendAllLines(eventLogFile, [receivedEvent.ToString()]);
+        }
+        catch (Exception ex)
 		{
-			_logger.LogWarning(exception2, "Could not write to event file " + eventLogFile);
+			_logger.LogWarning(ex, "Could not write to event file " + eventLogFile);
 		}
 	}
 

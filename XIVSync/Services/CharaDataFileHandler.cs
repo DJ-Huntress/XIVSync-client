@@ -74,9 +74,9 @@ public sealed class CharaDataFileHandler : IDisposable
 				}
 				else
 				{
-					existingFile.GamePaths = existingFile.GamePaths.Concat([file.GamePath]).ToArray();
-				}
-			}
+                    existingFile.GamePaths = existingFile.GamePaths.Concat([file.GamePath]).ToArray();
+                }
+            }
 			else
 			{
 				modPaths[file.GamePath] = localCacheFile.ResolvedFilepath;
@@ -156,13 +156,13 @@ public sealed class CharaDataFileHandler : IDisposable
 					}
 				}
 				int itemNr = 0;
-				foreach (MareCharaFileData.FileData item2 in loadedCharaFile.CharaFileData.Files)
+				foreach (MareCharaFileData.FileData item in loadedCharaFile.CharaFileData.Files)
 				{
 					itemNr++;
-					expectedLength += item2.Length;
-					foreach (string gamePath2 in item2.GamePaths)
+					expectedLength += item.Length;
+					foreach (string gamePath in item.GamePaths)
 					{
-						_logger.LogTrace("File {itemNr}: {gamePath} = {len}", itemNr, gamePath2, item2.Length.ToByteString());
+						_logger.LogTrace("File {itemNr}: {gamePath} = {len}", itemNr, gamePath, item.Length.ToByteString());
 					}
 				}
 				_logger.LogInformation("Expected length: {expected}", expectedLength.ToByteString());
@@ -170,9 +170,9 @@ public sealed class CharaDataFileHandler : IDisposable
 			}
 			throw new InvalidOperationException("MCDF Header was null");
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Could not parse MCDF header of file {file}", filePath);
+			_logger.LogWarning(ex, "Could not parse MCDF header of file {file}", filePath);
 			throw;
 		}
 	}
@@ -276,34 +276,23 @@ public sealed class CharaDataFileHandler : IDisposable
 					_logger.LogDebug("\t{path}", path);
 				}
 				FileStream fsRead = File.OpenRead(file.ResolvedFilepath);
-				{
-					ConfiguredAsyncDisposable V_12 = fsRead.ConfigureAwait(continueOnCapturedContext: false);
-					try
-					{
-						using BinaryReader br = new BinaryReader(fsRead);
-						byte[] buffer = new byte[item.Length];
-						br.Read(buffer, 0, item.Length);
-						writer.Write(buffer);
-					}
-					finally
-					{
-						IAsyncDisposable asyncDisposable = V_12 as IAsyncDisposable;
-						if (asyncDisposable != null)
-						{
-							await asyncDisposable.DisposeAsync();
-						}
-					}
-				}
-			}
+                await using (fsRead.ConfigureAwait(false))
+                {
+                    using var br = new BinaryReader(fsRead);
+                    byte[] buffer = new byte[item.Length];
+                    br.Read(buffer, 0, item.Length);
+                    writer.Write(buffer);
+                }
+            }
 			writer.Flush();
 			await lz4.FlushAsync().ConfigureAwait(continueOnCapturedContext: false);
 			await fs.FlushAsync().ConfigureAwait(continueOnCapturedContext: false);
 			fs.Close();
 			File.Move(tempFilePath, filePath, overwrite: true);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogError(exception, "Failure Saving Mare Chara File, deleting output");
+			_logger.LogError(ex, "Failure Saving Mare Chara File, deleting output");
 			File.Delete(tempFilePath);
 		}
 	}

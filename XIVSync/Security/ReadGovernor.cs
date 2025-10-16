@@ -70,12 +70,12 @@ internal sealed class ReadGovernor
 
 	private void Trim(DateTime now)
 	{
-		(DateTime, string, long) e;
-		while (_events.TryPeek(out e) && now - e.Item1 > _window)
+		(DateTime ts, string path, long bytes) e;
+		while (_events.TryPeek(out e) && now - e.ts > _window)
 		{
-			if (_events.TryDequeue(out (DateTime, string, long) d))
+			if (_events.TryDequeue(out (DateTime ts, string path, long bytes) d))
 			{
-				Interlocked.Add(ref _bytes, -d.Item3);
+				Interlocked.Add(ref _bytes, -d.bytes);
 			}
 		}
 	}

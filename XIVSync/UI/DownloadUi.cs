@@ -145,9 +145,9 @@ public class DownloadUi : WindowMediatorSubscriberBase
 			Vector2 screenPos = _dalamudUtilService.WorldToScreen(transfer.Key.GetGameObject());
 			if (!(screenPos == Vector2.Zero))
 			{
-				long totalBytes2 = transfer.Value.Sum((KeyValuePair<string, FileDownloadStatus> c) => c.Value.TotalBytes);
-				long transferredBytes2 = transfer.Value.Sum((KeyValuePair<string, FileDownloadStatus> c) => c.Value.TransferredBytes);
-				string maxDlText = UiSharedService.ByteToString(totalBytes2, addSuffix: false) + "/" + UiSharedService.ByteToString(totalBytes2);
+				long totalBytes = transfer.Value.Sum((KeyValuePair<string, FileDownloadStatus> c) => c.Value.TotalBytes);
+				long transferredBytes = transfer.Value.Sum((KeyValuePair<string, FileDownloadStatus> c) => c.Value.TransferredBytes);
+				string maxDlText = UiSharedService.ByteToString(totalBytes, addSuffix: false) + "/" + UiSharedService.ByteToString(totalBytes);
 				Vector2 textSize = (_configService.Current.TransferBarsShowText ? ImGui.CalcTextSize(maxDlText) : new Vector2(10f, 10f));
 				int dlBarHeight = ((_configService.Current.TransferBarsHeight > (int)textSize.Y + 5) ? _configService.Current.TransferBarsHeight : ((int)textSize.Y + 5));
 				int dlBarWidth = ((_configService.Current.TransferBarsWidth > (int)textSize.X + 10) ? _configService.Current.TransferBarsWidth : ((int)textSize.X + 10));
@@ -171,14 +171,14 @@ public class DownloadUi : WindowMediatorSubscriberBase
 				vector.Y = dlBarEnd.Y + 3f;
 				drawList.AddRectFilled(pMin2, vector, UiSharedService.Color(220, 220, 220, 100), 1f);
 				drawList.AddRectFilled(dlBarStart, dlBarEnd, UiSharedService.Color(0, 0, 0, 100), 1f);
-				double dlProgressPercent = (double)transferredBytes2 / (double)totalBytes2;
+				double dlProgressPercent = (double)transferredBytes / (double)totalBytes;
 				Vector2 pMin3 = dlBarStart;
 				vector = dlBarEnd;
 				vector.X = dlBarStart.X + (float)(dlProgressPercent * (double)dlBarWidth);
 				drawList.AddRectFilled(pMin3, vector, UiSharedService.Color(50, 205, 50, 100), 1f);
 				if (_configService.Current.TransferBarsShowText)
 				{
-					string downloadText = UiSharedService.ByteToString(transferredBytes2, addSuffix: false) + "/" + UiSharedService.ByteToString(totalBytes2);
+					string downloadText = UiSharedService.ByteToString(transferredBytes, addSuffix: false) + "/" + UiSharedService.ByteToString(totalBytes);
 					ImDrawListPtr drawList2 = drawList;
 					vector = screenPos;
 					vector.X = screenPos.X - textSize.X / 2f - 1f;
@@ -193,8 +193,8 @@ public class DownloadUi : WindowMediatorSubscriberBase
 		}
 		foreach (GameObjectHandler player in _uploadingPlayers.Select<KeyValuePair<GameObjectHandler, bool>, GameObjectHandler>((KeyValuePair<GameObjectHandler, bool> p) => p.Key).ToList())
 		{
-			Vector2 screenPos2 = _dalamudUtilService.WorldToScreen(player.GetGameObject());
-			if (screenPos2 == Vector2.Zero)
+			Vector2 screenPos = _dalamudUtilService.WorldToScreen(player.GetGameObject());
+			if (screenPos == Vector2.Zero)
 			{
 				continue;
 			}
@@ -203,11 +203,11 @@ public class DownloadUi : WindowMediatorSubscriberBase
 				using (_uiShared.UidFont.Push())
 				{
 					string uploadText = "Uploading";
-					Vector2 textSize2 = ImGui.CalcTextSize(uploadText);
+					Vector2 textSize = ImGui.CalcTextSize(uploadText);
 					ImDrawListPtr backgroundDrawList = ImGui.GetBackgroundDrawList();
-					Vector2 vector = screenPos2;
-					vector.X = screenPos2.X - textSize2.X / 2f - 1f;
-					vector.Y = screenPos2.Y - textSize2.Y / 2f - 1f;
+					Vector2 vector = screenPos;
+					vector.X = screenPos.X - textSize.X / 2f - 1f;
+					vector.Y = screenPos.Y - textSize.Y / 2f - 1f;
 					UiSharedService.DrawOutlinedFont(backgroundDrawList, uploadText, vector, UiSharedService.Color(byte.MaxValue, byte.MaxValue, 0, 100), UiSharedService.Color(0, 0, 0, 100), 2);
 				}
 			}

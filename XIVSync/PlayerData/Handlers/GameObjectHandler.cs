@@ -58,17 +58,21 @@ public sealed class GameObjectHandler : DisposableMediatorSubscriberBase, IHighP
 
 	private byte[] CustomizeData { get; set; } = new byte[26];
 
+
 	private nint DrawObjectAddress { get; set; }
 
 	private byte[] EquipSlotData { get; set; } = new byte[40];
 
+
 	private ushort[] MainHandData { get; set; } = new ushort[3];
+
 
 	private ushort[] OffHandData { get; set; } = new ushort[3];
 
-	public GameObjectHandler(ILogger<GameObjectHandler> logger, PerformanceCollectorService performanceCollector, MareMediator mediator, DalamudUtilService dalamudUtil, XIVSync.API.Data.Enum.ObjectKind objectKind, Func<nint> getAddress, bool ownedObject = true)
-		: base(logger, mediator)
+
+	public GameObjectHandler(ILogger<GameObjectHandler> logger, PerformanceCollectorService performanceCollector, MareMediator mediator, DalamudUtilService dalamudUtil, XIVSync.API.Data.Enum.ObjectKind objectKind, Func<nint> getAddress, bool ownedObject = true) : base(logger, mediator)
 	{
+
 		GameObjectHandler gameObjectHandler = this;
 		_performanceCollector = performanceCollector;
 		ObjectKind = objectKind;
@@ -127,7 +131,7 @@ public sealed class GameObjectHandler : DisposableMediatorSubscriberBase, IHighP
 			}
 		});
 		base.Mediator.Publish(new GameObjectHandlerCreatedMessage(this, _isOwnedObject));
-		_dalamudUtil.RunOnFrameworkThread(CheckAndUpdateObject, ".ctor", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\PlayerData\\Handlers\\GameObjectHandler.cs", 80).GetAwaiter().GetResult();
+		_dalamudUtil.RunOnFrameworkThread(CheckAndUpdateObject, ".ctor", "C:\\Users\\Owner\\sync_client2\\XIVSync\\PlayerData\\Handlers\\GameObjectHandler.cs", 80).GetAwaiter().GetResult();
 	}
 
 	public async Task ActOnFrameworkAfterEnsureNoDrawAsync(Action<ICharacter> act, CancellationToken token)
@@ -138,7 +142,7 @@ public sealed class GameObjectHandler : DisposableMediatorSubscriberBase, IHighP
 			{
 				CheckAndUpdateObject();
 			}
-			if (CurrentDrawCondition != DrawCondition.None)
+			if (CurrentDrawCondition != 0)
 			{
 				return true;
 			}
@@ -147,7 +151,7 @@ public sealed class GameObjectHandler : DisposableMediatorSubscriberBase, IHighP
 				act(obj);
 			}
 			return false;
-		}, "ActOnFrameworkAfterEnsureNoDrawAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\PlayerData\\Handlers\\GameObjectHandler.cs", 108).ConfigureAwait(continueOnCapturedContext: false))
+		}, "ActOnFrameworkAfterEnsureNoDrawAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\PlayerData\\Handlers\\GameObjectHandler.cs", 108).ConfigureAwait(continueOnCapturedContext: false))
 		{
 			await Task.Delay(250, token).ConfigureAwait(continueOnCapturedContext: false);
 		}
@@ -179,7 +183,7 @@ public sealed class GameObjectHandler : DisposableMediatorSubscriberBase, IHighP
 
 	public async Task<bool> IsBeingDrawnRunOnFrameworkAsync()
 	{
-		return await _dalamudUtil.RunOnFrameworkThread((Func<bool>)IsBeingDrawn, "IsBeingDrawnRunOnFrameworkAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\PlayerData\\Handlers\\GameObjectHandler.cs", 150).ConfigureAwait(continueOnCapturedContext: false);
+		return await _dalamudUtil.RunOnFrameworkThread((Func<bool>)IsBeingDrawn, "IsBeingDrawnRunOnFrameworkAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\PlayerData\\Handlers\\GameObjectHandler.cs", 150).ConfigureAwait(continueOnCapturedContext: false);
 	}
 
 	public override string ToString()
@@ -296,7 +300,7 @@ public sealed class GameObjectHandler : DisposableMediatorSubscriberBase, IHighP
 		{
 			CurrentDrawCondition = DrawCondition.DrawObjectZero;
 			base.Logger.LogTrace("[{this}] Changed", this);
-			if (_isOwnedObject && ObjectKind != XIVSync.API.Data.Enum.ObjectKind.Player)
+			if (_isOwnedObject && ObjectKind != 0)
 			{
 				base.Mediator.Publish(new ClearCacheForObjectMessage(this));
 			}
@@ -384,9 +388,9 @@ public sealed class GameObjectHandler : DisposableMediatorSubscriberBase, IHighP
 			counterName.AppendFormatted(((IntPtr)Address).ToString("X"));
 			performanceCollector.LogPerformance(this, counterName, CheckAndUpdateObject);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Error during FrameworkUpdate of {this}", this);
+			base.Logger.LogWarning(ex, "Error during FrameworkUpdate of {this}", this);
 		}
 	}
 
@@ -446,9 +450,9 @@ public sealed class GameObjectHandler : DisposableMediatorSubscriberBase, IHighP
 		catch (ObjectDisposedException)
 		{
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Zoning CTS cancel issue");
+			base.Logger.LogWarning(ex, "Zoning CTS cancel issue");
 		}
 	}
 

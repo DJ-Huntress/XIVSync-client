@@ -77,11 +77,11 @@ public sealed class IpcCallerMoodles : IIpcCaller, IDisposable
 		}
 		try
 		{
-			return await _dalamudUtil.RunOnFrameworkThread(() => _moodlesGetStatus.InvokeFunc(address), "GetStatusAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerMoodles.cs", 74).ConfigureAwait(continueOnCapturedContext: false);
+			return await _dalamudUtil.RunOnFrameworkThread(() => _moodlesGetStatus.InvokeFunc(address), "GetStatusAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerMoodles.cs", 74).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Could not Get Moodles Status");
+			_logger.LogWarning(e, "Could not Get Moodles Status");
 			return null;
 		}
 	}
@@ -97,11 +97,11 @@ public sealed class IpcCallerMoodles : IIpcCaller, IDisposable
 			await _dalamudUtil.RunOnFrameworkThread(delegate
 			{
 				_moodlesSetStatus.InvokeAction(pointer, status);
-			}, "SetStatusAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerMoodles.cs", 90).ConfigureAwait(continueOnCapturedContext: false);
+			}, "SetStatusAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerMoodles.cs", 90).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Could not Set Moodles Status");
+			_logger.LogWarning(e, "Could not Set Moodles Status");
 		}
 	}
 
@@ -116,11 +116,11 @@ public sealed class IpcCallerMoodles : IIpcCaller, IDisposable
 			await _dalamudUtil.RunOnFrameworkThread(delegate
 			{
 				_moodlesRevertStatus.InvokeAction(pointer);
-			}, "RevertStatusAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerMoodles.cs", 104).ConfigureAwait(continueOnCapturedContext: false);
+			}, "RevertStatusAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Interop\\Ipc\\IpcCallerMoodles.cs", 104).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception e)
 		{
-			_logger.LogWarning(exception, "Could not Revert Moodles Status");
+			_logger.LogWarning(e, "Could not Revert Moodles Status");
 		}
 	}
 }

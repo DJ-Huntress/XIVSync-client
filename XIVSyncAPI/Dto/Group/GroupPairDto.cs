@@ -15,10 +15,9 @@ public record GroupPairDto : GroupDto
 
 	public string UserAliasOrUID => User.AliasOrUID;
 
-	public GroupPairDto(GroupData Group, UserData User)
+	public GroupPairDto(GroupData Group, UserData User) : base(Group)
 	{
 		this.User = User;
-		base._002Ector(Group);
 	}
 
 	[CompilerGenerated]

@@ -18,15 +18,21 @@ public record MareCharaFileData
 
 	public string Description { get; set; } = string.Empty;
 
+
 	public string GlamourerData { get; set; } = string.Empty;
+
 
 	public string CustomizePlusData { get; set; } = string.Empty;
 
+
 	public string ManipulationData { get; set; } = string.Empty;
+
 
 	public List<FileData> Files { get; set; } = new List<FileData>();
 
+
 	public List<FileSwap> FileSwaps { get; set; } = new List<FileSwap>();
+
 
 	public MareCharaFileData()
 	{

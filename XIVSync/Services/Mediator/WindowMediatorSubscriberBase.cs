@@ -46,9 +46,9 @@ public abstract class WindowMediatorSubscriberBase : Window, IMediatorSubscriber
 			counterName.AppendLiteral("Draw");
 			performanceCollectorService.LogPerformance(this, counterName, DrawInternal);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogError(exception, "Error in {ClassName}.Draw() - {WindowName}", GetType().Name, base.WindowName);
+			_logger.LogError(ex, "Error in {ClassName}.Draw() - {WindowName}", GetType().Name, base.WindowName);
 			throw;
 		}
 	}

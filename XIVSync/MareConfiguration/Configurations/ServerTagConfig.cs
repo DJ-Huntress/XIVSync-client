@@ -8,5 +8,6 @@ public class ServerTagConfig : IMareConfiguration
 {
 	public Dictionary<string, ServerTagStorage> ServerTagStorage { get; set; } = new Dictionary<string, ServerTagStorage>(StringComparer.OrdinalIgnoreCase);
 
+
 	public int Version { get; set; }
 }

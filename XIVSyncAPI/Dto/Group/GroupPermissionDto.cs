@@ -10,10 +10,9 @@ public record GroupPermissionDto : GroupDto
 {
 	public GroupPermissions Permissions { get; init; }
 
-	public GroupPermissionDto(GroupData Group, GroupPermissions Permissions)
+	public GroupPermissionDto(GroupData Group, GroupPermissions Permissions) : base(Group)
 	{
 		this.Permissions = Permissions;
-		base._002Ector(Group);
 	}
 
 	[CompilerGenerated]

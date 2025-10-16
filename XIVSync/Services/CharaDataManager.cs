@@ -77,6 +77,7 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 
 	public string DataApplicationProgress { get; private set; } = string.Empty;
 
+
 	public Task? DataApplicationTask { get; private set; }
 
 	public Task<(string Output, bool Success)>? DataCreationTask { get; private set; }
@@ -158,7 +159,7 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 
 	public Task ApplyCharaData(CharaDataDownloadDto dataDownloadDto, string charaName)
 	{
-		Task task = (DataApplicationTask = Task.Run(async delegate
+		Task task2 = (DataApplicationTask = Task.Run(async delegate
 		{
 			if (!string.IsNullOrEmpty(charaName))
 			{
@@ -171,12 +172,12 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 				await DownloadAndAplyDataAsync(charaName, dataDownloadDto, metaInfo, autoRevert: false).ConfigureAwait(continueOnCapturedContext: false);
 			}
 		}));
-		return UiBlockingComputation = task;
+		return UiBlockingComputation = task2;
 	}
 
 	public Task ApplyCharaData(CharaDataMetaInfoDto dataMetaInfoDto, string charaName)
 	{
-		Task task = (DataApplicationTask = Task.Run(async delegate
+		Task task2 = (DataApplicationTask = Task.Run(async delegate
 		{
 			if (!string.IsNullOrEmpty(charaName))
 			{
@@ -191,12 +192,12 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 				}
 			}
 		}));
-		return UiBlockingComputation = task;
+		return UiBlockingComputation = task2;
 	}
 
 	public Task ApplyCharaDataToGposeTarget(CharaDataMetaInfoDto dataMetaInfoDto)
 	{
-		Task task = (DataApplicationTask = Task.Run(async delegate
+		Task task2 = (DataApplicationTask = Task.Run(async delegate
 		{
 			string charaName = (await _dalamudUtilService.GetGposeTargetGameObjectAsync().ConfigureAwait(continueOnCapturedContext: false))?.Name.TextValue ?? string.Empty;
 			if (!string.IsNullOrEmpty(charaName))
@@ -204,7 +205,7 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 				await ApplyCharaData(dataMetaInfoDto, charaName).ConfigureAwait(continueOnCapturedContext: false);
 			}
 		}));
-		return UiBlockingComputation = task;
+		return UiBlockingComputation = task2;
 	}
 
 	public async Task ApplyOwnDataToGposeTarget(CharaDataFullExtendedDto dataDto)
@@ -260,10 +261,10 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 	{
 		return UiBlockingComputation = Task.Run(async delegate
 		{
-			(bool, string) apply = await CanApplyInGpose().ConfigureAwait(continueOnCapturedContext: false);
-			if (apply.Item1)
+			(bool CanApply, string TargetName) apply = await CanApplyInGpose().ConfigureAwait(continueOnCapturedContext: false);
+			if (apply.CanApply)
 			{
-				await ApplyPoseData(pose, apply.Item2).ConfigureAwait(continueOnCapturedContext: false);
+				await ApplyPoseData(pose, apply.TargetName).ConfigureAwait(continueOnCapturedContext: false);
 			}
 		});
 	}
@@ -294,10 +295,10 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 	{
 		return UiBlockingComputation = Task.Run(async delegate
 		{
-			(bool, string) apply = await CanApplyInGpose().ConfigureAwait(continueOnCapturedContext: false);
-			if (apply.Item1)
+			(bool CanApply, string TargetName) apply = await CanApplyInGpose().ConfigureAwait(continueOnCapturedContext: false);
+			if (apply.CanApply)
 			{
-				await ApplyPoseData(pose, apply.Item2).ConfigureAwait(continueOnCapturedContext: false);
+				await ApplyPoseData(pose, apply.TargetName).ConfigureAwait(continueOnCapturedContext: false);
 			}
 		});
 	}
@@ -437,8 +438,9 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 					await Task.Delay(TimeSpan.FromMinutes(1L), ct.Token).ConfigureAwait(continueOnCapturedContext: false);
 				});
 			}
-			return (from k in source
-				orderby k.CreatedDate
+			return (from u in source
+				orderby u.CreatedDate
+				select u into k
 				select new CharaDataFullExtendedDto(k)).ToList();
 		}));
 		charaDataManager.UiBlockingComputation = uiBlockingComputation;
@@ -550,9 +552,9 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 				CharaDataMetaInfoExtendedDto extended = await CharaDataMetaInfoExtendedDto.Create(new CharaDataMetaInfoDto(charaFile.FilePath, new UserData(string.Empty)), _dalamudUtilService).ConfigureAwait(continueOnCapturedContext: false);
 				await ApplyDataAsync(applicationId, tempHandler, isSelf, autoRevert: false, extended, extractedFiles, charaFile.CharaFileData.ManipulationData, charaFile.CharaFileData.GlamourerData, charaFile.CharaFileData.CustomizePlusData, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				base.Logger.LogWarning(exception, "Failed to extract MCDF");
+				base.Logger.LogWarning(ex, "Failed to extract MCDF");
 				throw;
 			}
 			finally
@@ -568,10 +570,10 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 
 	public async Task McdfApplyToGposeTarget()
 	{
-		(bool, string) apply = await CanApplyInGpose().ConfigureAwait(continueOnCapturedContext: false);
-		if (apply.Item1)
+		(bool CanApply, string TargetName) apply = await CanApplyInGpose().ConfigureAwait(continueOnCapturedContext: false);
+		if (apply.CanApply)
 		{
-			McdfApplyToTarget(apply.Item2);
+			McdfApplyToTarget(apply.TargetName);
 		}
 	}
 
@@ -881,7 +883,7 @@ public sealed class CharaDataManager : DisposableMediatorSubscriberBase
 			base.Logger.LogTrace("[{appId}] Applying data in Penumbra", applicationId);
 			DataApplicationProgress = "Applying Penumbra information";
 			Guid penumbraCollection = await _ipcManager.Penumbra.CreateTemporaryCollectionAsync(base.Logger, metaInfo.Uploader.UID + metaInfo.Id).ConfigureAwait(continueOnCapturedContext: false);
-			ushort idx = (await _dalamudUtilService.RunOnFrameworkThread(() => tempHandler.GetGameObject()?.ObjectIndex, "ApplyDataAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataManager.cs", 838).ConfigureAwait(continueOnCapturedContext: false)).GetValueOrDefault();
+			ushort idx = (await _dalamudUtilService.RunOnFrameworkThread(() => tempHandler.GetGameObject()?.ObjectIndex, "ApplyDataAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataManager.cs", 838).ConfigureAwait(continueOnCapturedContext: false)).GetValueOrDefault();
 			await _ipcManager.Penumbra.AssignTemporaryCollectionAsync(base.Logger, penumbraCollection, idx).ConfigureAwait(continueOnCapturedContext: false);
 			await _ipcManager.Penumbra.SetTemporaryModsAsync(base.Logger, applicationId, penumbraCollection, modPaths).ConfigureAwait(continueOnCapturedContext: false);
 			await _ipcManager.Penumbra.SetManipulationDataAsync(base.Logger, applicationId, penumbraCollection, manipData ?? string.Empty).ConfigureAwait(continueOnCapturedContext: false);

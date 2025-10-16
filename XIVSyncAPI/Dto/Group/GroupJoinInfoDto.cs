@@ -8,10 +8,9 @@ public record GroupJoinInfoDto : GroupInfoDto
 {
 	public bool Success { get; init; }
 
-	public GroupJoinInfoDto(GroupData Group, UserData Owner, GroupPermissions GroupPermissions, bool Success)
+	public GroupJoinInfoDto(GroupData Group, UserData Owner, GroupPermissions GroupPermissions, bool Success) : base(Group, Owner, GroupPermissions)
 	{
 		this.Success = Success;
-		base._002Ector(Group, Owner, GroupPermissions);
 	}
 
 	[CompilerGenerated]

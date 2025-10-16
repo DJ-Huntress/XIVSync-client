@@ -17,13 +17,12 @@ public record UserFullPairDto : UserDto
 
 	public IndividualPairStatus IndividualPairStatus { get; set; }
 
-	public UserFullPairDto(UserData User, IndividualPairStatus IndividualPairStatus, List<string> Groups, UserPermissions OwnPermissions, UserPermissions OtherPermissions)
+	public UserFullPairDto(UserData User, IndividualPairStatus IndividualPairStatus, List<string> Groups, UserPermissions OwnPermissions, UserPermissions OtherPermissions) : base(User)
 	{
 		this.Groups = Groups;
 		this.OwnPermissions = OwnPermissions;
 		this.OtherPermissions = OtherPermissions;
 		this.IndividualPairStatus = IndividualPairStatus;
-		base._002Ector(User);
 	}
 
 	[CompilerGenerated]

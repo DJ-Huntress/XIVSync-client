@@ -30,4 +30,5 @@ public static class Strings
 	}
 
 	public static ToSStrings ToS { get; set; } = new ToSStrings();
+
 }

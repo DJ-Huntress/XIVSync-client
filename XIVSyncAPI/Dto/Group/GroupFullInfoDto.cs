@@ -15,12 +15,11 @@ public record GroupFullInfoDto : GroupInfoDto
 
 	public GroupPairUserInfo GroupUserInfo { get; set; }
 
-	public GroupFullInfoDto(GroupData Group, UserData Owner, GroupPermissions GroupPermissions, GroupUserPreferredPermissions GroupUserPermissions, GroupPairUserInfo GroupUserInfo, Dictionary<string, GroupPairUserInfo> GroupPairUserInfos)
-	{
+	public GroupFullInfoDto(GroupData Group, UserData Owner, GroupPermissions GroupPermissions, GroupUserPreferredPermissions GroupUserPermissions, GroupPairUserInfo GroupUserInfo, Dictionary<string, GroupPairUserInfo> GroupPairUserInfos) : base(Group, Owner, GroupPermissions)
+    {
 		this.GroupPairUserInfos = GroupPairUserInfos;
 		this.GroupUserPermissions = GroupUserPermissions;
 		this.GroupUserInfo = GroupUserInfo;
-		base._002Ector(Group, Owner, GroupPermissions);
 	}
 
 	[CompilerGenerated]

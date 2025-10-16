@@ -56,7 +56,14 @@ public class VfxSpawnManager : DisposableMediatorSubscriberBase
 		public float Alpha;
 	}
 
-	private static readonly byte[] _pool = "Client.System.Scheduler.Instance.VfxObject\0"u8.ToArray();
+	private static readonly byte[] _pool = ((ReadOnlySpan<byte>)new byte[43]
+	{
+		67, 108, 105, 101, 110, 116, 46, 83, 121, 115,
+		116, 101, 109, 46, 83, 99, 104, 101, 100, 117,
+		108, 101, 114, 46, 73, 110, 115, 116, 97, 110,
+		99, 101, 46, 86, 102, 120, 79, 98, 106, 101,
+		99, 116, 0
+	}).ToArray();
 
 	[Signature("E8 ?? ?? ?? ?? F3 0F 10 35 ?? ?? ?? ?? 48 89 43 08")]
 	private unsafe readonly delegate* unmanaged<byte*, byte*, VfxStruct*> _staticVfxCreate;
@@ -124,9 +131,9 @@ public class VfxSpawnManager : DisposableMediatorSubscriberBase
 		vfx->Position = new Vector3(pos.X, pos.Y + 1f, pos.Z);
 		vfx->Rotation = new Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W);
 		byte* someFlags = &vfx->SomeFlags;
-		*someFlags &= 0xF7;
+		*someFlags = (byte)(*someFlags & 0xF7u);
 		byte* flags = &vfx->Flags;
-		*flags |= 2;
+		*flags = (byte)(*flags | 2u);
 		vfx->Red = r;
 		vfx->Green = g;
 		vfx->Blue = b;
@@ -153,23 +160,23 @@ public class VfxSpawnManager : DisposableMediatorSubscriberBase
 
 	public unsafe void MoveObject(Guid id, Vector3 newPosition)
 	{
-		if (_spawnedObjects.TryGetValue(id, out (nint, float) vfxValue) && vfxValue.Item1 != IntPtr.Zero)
+		if (_spawnedObjects.TryGetValue(id, out var vfxValue) && vfxValue.Address != IntPtr.Zero)
 		{
-			VfxStruct* vfx = (VfxStruct*)vfxValue.Item1;
+			VfxStruct* vfx = (VfxStruct*)vfxValue.Address;
 			Vector3 position = newPosition;
 			position.Y = newPosition.Y + 1f;
 			vfx->Position = position;
 			byte* flags = &vfx->Flags;
-			*flags |= 2;
+			*flags = (byte)(*flags | 2u);
 		}
 	}
 
 	public unsafe void DespawnObject(Guid? id)
 	{
-		if (id.HasValue && _spawnedObjects.Remove(id.Value, out (nint, float) value))
+		if (id.HasValue && _spawnedObjects.Remove(id.Value, out var value))
 		{
-			base.Logger.LogDebug("Despawning {obj:X}", value.Item1);
-			_staticVfxRemove((VfxStruct*)value.Item1);
+			base.Logger.LogDebug("Despawning {obj:X}", value.Address);
+			_staticVfxRemove((VfxStruct*)value.Address);
 		}
 	}
 

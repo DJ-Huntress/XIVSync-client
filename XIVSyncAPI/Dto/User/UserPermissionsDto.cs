@@ -10,10 +10,9 @@ public record UserPermissionsDto : UserDto
 {
 	public UserPermissions Permissions { get; init; }
 
-	public UserPermissionsDto(UserData User, UserPermissions Permissions)
+	public UserPermissionsDto(UserData User, UserPermissions Permissions) : base(User)
 	{
 		this.Permissions = Permissions;
-		base._002Ector(User);
 	}
 
 	[CompilerGenerated]

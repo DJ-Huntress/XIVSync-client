@@ -85,13 +85,17 @@ public sealed record GposeLobbyUserData(UserData UserData)
 
 	public DateTime LastUpdatedCharaData { get; private set; } = DateTime.MaxValue;
 
+
 	public DateTime LastAppliedCharaDataDate { get; set; } = DateTime.MinValue;
+
 
 	public nint Address { get; set; }
 
 	public string AssociatedCharaName { get; set; } = string.Empty;
 
+
 	public string WorldDataDescriptor { get; private set; } = string.Empty;
+
 
 	public Vector2 MapCoordinates { get; private set; }
 
@@ -141,31 +145,31 @@ public sealed record GposeLobbyUserData(UserData UserData)
 				}
 			}
 		}
-		foreach (KeyValuePair<string, BoneData> bone2 in FullPoseData.Value.MainHand)
+		foreach (KeyValuePair<string, BoneData> bone in FullPoseData.Value.MainHand)
 		{
-			if (delta.MainHand.TryGetValue(bone2.Key, out var data2))
+			if (delta.MainHand.TryGetValue(bone.Key, out var data))
 			{
-				if (!data2.Exists)
+				if (!data.Exists)
 				{
-					output.MainHand.Remove(bone2.Key);
+					output.MainHand.Remove(bone.Key);
 				}
 				else
 				{
-					output.MainHand[bone2.Key] = data2;
+					output.MainHand[bone.Key] = data;
 				}
 			}
 		}
-		foreach (KeyValuePair<string, BoneData> bone3 in FullPoseData.Value.OffHand)
+		foreach (KeyValuePair<string, BoneData> bone in FullPoseData.Value.OffHand)
 		{
-			if (delta.OffHand.TryGetValue(bone3.Key, out var data3))
+			if (delta.OffHand.TryGetValue(bone.Key, out var data))
 			{
-				if (!data3.Exists)
+				if (!data.Exists)
 				{
-					output.OffHand.Remove(bone3.Key);
+					output.OffHand.Remove(bone.Key);
 				}
 				else
 				{
-					output.OffHand[bone3.Key] = data3;
+					output.OffHand[bone.Key] = data;
 				}
 			}
 		}
@@ -179,7 +183,7 @@ public sealed record GposeLobbyUserData(UserData UserData)
 			WorldDataDescriptor = "No World Data found";
 		}
 		WorldData worldData = WorldData.Value;
-		MapCoordinates = await dalamudUtilService.RunOnFrameworkThread(() => MapUtil.WorldToMap(new Vector2(worldData.PositionX, worldData.PositionY), dalamudUtilService.MapData.Value[worldData.LocationInfo.MapId].Map), "SetWorldDataDescriptor", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\Models\\GposeLobbyUserData.cs", 142).ConfigureAwait(continueOnCapturedContext: false);
+		MapCoordinates = await dalamudUtilService.RunOnFrameworkThread(() => MapUtil.WorldToMap(new Vector2(worldData.PositionX, worldData.PositionY), dalamudUtilService.MapData.Value[worldData.LocationInfo.MapId].Map), "SetWorldDataDescriptor", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\Models\\GposeLobbyUserData.cs", 142).ConfigureAwait(continueOnCapturedContext: false);
 		Map = dalamudUtilService.MapData.Value[worldData.LocationInfo.MapId].Map;
 		StringBuilder sb = new StringBuilder();
 		sb.AppendLine("Server: " + dalamudUtilService.WorldData.Value[(ushort)worldData.LocationInfo.ServerId]);
@@ -244,7 +248,7 @@ public sealed record GposeLobbyUserData(UserData UserData)
 		builder.Append(", LastAppliedCharaDataDate = ");
 		builder.Append(LastAppliedCharaDataDate.ToString());
 		builder.Append(", Address = ");
-		builder.Append(((object)Address/*cast due to .constrained prefix*/).ToString());
+		builder.Append(((object)Address).ToString());
 		builder.Append(", AssociatedCharaName = ");
 		builder.Append((object?)AssociatedCharaName);
 		builder.Append(", WorldDataDescriptor = ");

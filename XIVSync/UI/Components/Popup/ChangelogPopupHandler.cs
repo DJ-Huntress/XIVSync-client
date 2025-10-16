@@ -4,6 +4,7 @@ using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using XIVSync.MareConfiguration;
+using XIVSync.UI.Theming;
 
 namespace XIVSync.UI.Components.Popup;
 
@@ -64,6 +65,23 @@ public class ChangelogPopupHandler : IPopupHandler
 		{
 			new ThemePalette();
 		}
+		DrawVersionChangelog("1.36.2", new string[9] { "\ud83c\udfa8 UI & UX Enhancements:", "• Added build version display next to online user count (e.g., '1.36.1 | 42 Users Online')", "• Fixed online user count not updating in real-time - now refreshes every 15 seconds", "• Improved pairs list spacing with proper DPI scaling for different UI scales", "• Reduced drawable height at bottom to prevent status bar overlap", "", "\ud83d\udd27 Server Improvements:", "• Server now always broadcasts online user count updates to all connected clients", "• Enhanced reliability of real-time user presence information" });
+		ImGui.Spacing();
+		ImGui.Separator();
+		ImGui.Spacing();
+		DrawVersionChangelog("1.36.1", new string[7] { "\ud83d\udd04 Connection & Authentication Improvements:", "• Added intelligent auto-reconnect for authentication token failures", "• System now automatically retries connection up to 3 times with exponential backoff (3s, 6s, 9s)", "• Clears token cache and requests fresh authentication on each retry attempt", "• Auto-recovers from transient server issues, token glitches, and brief network problems", "• Only requires manual reconnection after 3 failed authentication attempts", "• Prevents users from getting unnecessarily disconnected during temporary auth issues" });
+		ImGui.Spacing();
+		ImGui.Separator();
+		ImGui.Spacing();
+		DrawVersionChangelog("1.36.0", new string[24]
+		{
+			"\ud83c\udfa8 Complete Visual Overhaul - Cyberpunk/Gaming Aesthetic:", "• Redesigned entire UI with animated neon cyberpunk effects", "• Added pulsing RGB borders that adapt to your theme's accent color", "• Implemented hex grid background with animated scanlines and corner glows", "• Removed separators throughout for sleek, modern appearance", "", "✨ Component Redesigns:", "• User pairs now display as animated cards with status-based colors (cyan/green/red/yellow)", "• Folder headers feature cyberpunk gradients with type-specific coloring", "• Top tab menu buttons have holographic effects with animated borders",
+			"• Status message bar redesigned with pulsing border and hover animations", "", "\ud83d\udd27 UI/UX Improvements:", "• All right-side buttons moved to cleaner right-click context menus", "• Added pause/resume syncshell controls to folder menus", "• Increased padding in status bar and folders for better spacing", "• Made hover toolbar 50% smaller and repositioned for less clutter", "• Reduced tooltip size to 85% for less intrusive display", "• Enhanced border animations with dramatic pulsing (60%-100% range, 3px thick)", "",
+			"\ud83d\udd10 Technical Updates:", "• Window names rebranded from 'Mare' to 'XIVSync' to prevent conflicts", "• All animated colors now theme-aware, using accent color from active theme", "• Fixed variable collision bugs in pause functionality"
+		});
+		ImGui.Spacing();
+		ImGui.Separator();
+		ImGui.Spacing();
 		DrawVersionChangelog("1.35.0", new string[18]
 		{
 			"UI Experience Improvements:", "• Moved Settings, Customize, Collapse, and Disconnect buttons out of hamburger menu for quick access", "• Added Close button next to Disconnect for easier window management", "• Removed hamburger menu and cleaned up toolbar layout", "• Made all backgrounds 25% more transparent for better game visibility", "", "Upload Performance Fixes:", "• Fixed large file upload cancellation issues that prevented 40MB+ files from completing", "• Smarter upload queue management - won't cancel uploads for minor character changes", "• Increased HTTP timeout to 10 minutes for large texture files",

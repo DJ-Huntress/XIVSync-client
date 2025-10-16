@@ -152,9 +152,9 @@ public class DataAnalysisUi : WindowMediatorSubscriberBase
 		}
 		using (ImRaii.TabBar("analysisRecordingTabBar"))
 		{
-			using (ImRaii.IEndObject tabItem = ImRaii.TabItem("Analysis"))
+			using (ImRaii.IEndObject endObject = ImRaii.TabItem("Analysis"))
 			{
-				if (tabItem)
+				if (endObject)
 				{
 					using (ImRaii.PushId("analysis"))
 					{
@@ -162,8 +162,8 @@ public class DataAnalysisUi : WindowMediatorSubscriberBase
 					}
 				}
 			}
-			using ImRaii.IEndObject tabItem2 = ImRaii.TabItem("Transient Files");
-			if (!ImRaii.IEndObject.op_True(tabItem2))
+			using ImRaii.IEndObject tabItem = ImRaii.TabItem("Transient Files");
+			if (!ImRaii.IEndObject.op_True(tabItem))
 			{
 				return;
 			}
@@ -277,11 +277,11 @@ public class DataAnalysisUi : WindowMediatorSubscriberBase
 						Task.Run(async delegate
 						{
 							string[] paths = selectedList.ToArray();
-							(string[], string[][]) resolved = await _ipcManager.Penumbra.ResolvePathsAsync(paths, Array.Empty<string>()).ConfigureAwait(continueOnCapturedContext: false);
+							(string[] forward, string[][] reverse) resolved = await _ipcManager.Penumbra.ResolvePathsAsync(paths, Array.Empty<string>()).ConfigureAwait(continueOnCapturedContext: false);
 							_filePathResolve.Clear();
-							for (int i = 0; i < resolved.Item1.Length; i++)
+							for (int i = 0; i < resolved.forward.Length; i++)
 							{
-								_filePathResolve[paths[i]] = resolved.Item1[i];
+								_filePathResolve[paths[i]] = resolved.forward[i];
 							}
 						});
 					}
@@ -334,14 +334,14 @@ public class DataAnalysisUi : WindowMediatorSubscriberBase
 					ImGui.TableSetupScrollFreeze(0, 1);
 					ImGui.TableHeadersRow();
 					int id = 0;
-					foreach (string entry2 in selectedList)
+					foreach (string entry in selectedList)
 					{
-						if (!string.IsNullOrWhiteSpace(_filterGamePath) && !entry2.Contains(_filterGamePath, StringComparison.OrdinalIgnoreCase))
+						if (!string.IsNullOrWhiteSpace(_filterGamePath) && !entry.Contains(_filterGamePath, StringComparison.OrdinalIgnoreCase))
 						{
 							continue;
 						}
 						string filePath;
-						bool hasFileResolve = _filePathResolve.TryGetValue(entry2, out filePath);
+						bool hasFileResolve = _filePathResolve.TryGetValue(entry, out filePath);
 						if (hasFileResolve && !string.IsNullOrEmpty(_filterFilePath) && !filePath.Contains(_filterFilePath, StringComparison.OrdinalIgnoreCase))
 						{
 							continue;
@@ -349,24 +349,24 @@ public class DataAnalysisUi : WindowMediatorSubscriberBase
 						using (ImRaii.PushId(id++))
 						{
 							ImGui.TableNextColumn();
-							bool isSelected = _storedPathsToRemove.Contains<string>(entry2, StringComparer.Ordinal);
+							bool isSelected = _storedPathsToRemove.Contains<string>(entry, StringComparer.Ordinal);
 							if (ImGui.Checkbox("##", ref isSelected))
 							{
 								if (isSelected)
 								{
-									_storedPathsToRemove.Add(entry2);
+									_storedPathsToRemove.Add(entry);
 								}
 								else
 								{
-									_storedPathsToRemove.Remove(entry2);
+									_storedPathsToRemove.Remove(entry);
 								}
 							}
 							ImGui.TableNextColumn();
-							ImGui.TextUnformatted(entry2);
-							UiSharedService.AttachToolTip(entry2 + "--SEP--Click to copy to clipboard");
+							ImGui.TextUnformatted(entry);
+							UiSharedService.AttachToolTip(entry + "--SEP--Click to copy to clipboard");
 							if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
 							{
-								ImGui.SetClipboardText(entry2);
+								ImGui.SetClipboardText(entry);
 							}
 							ImGui.TableNextColumn();
 							if (hasFileResolve)
@@ -544,10 +544,10 @@ public class DataAnalysisUi : WindowMediatorSubscriberBase
 		}
 		ImGui.TextUnformatted("Total size (actual):");
 		ImGui.SameLine();
-		ImGui.TextUnformatted(UiSharedService.ByteToString(_cachedAnalysis.Sum<KeyValuePair<ObjectKind, Dictionary<string, CharacterAnalyzer.FileDataEntry>>>((KeyValuePair<ObjectKind, Dictionary<string, CharacterAnalyzer.FileDataEntry>> c) => c.Value.Sum((KeyValuePair<string, CharacterAnalyzer.FileDataEntry> keyValuePair) => keyValuePair.Value.OriginalSize))));
+		ImGui.TextUnformatted(UiSharedService.ByteToString(_cachedAnalysis.Sum<KeyValuePair<ObjectKind, Dictionary<string, CharacterAnalyzer.FileDataEntry>>>((KeyValuePair<ObjectKind, Dictionary<string, CharacterAnalyzer.FileDataEntry>> c) => c.Value.Sum((KeyValuePair<string, CharacterAnalyzer.FileDataEntry> c) => c.Value.OriginalSize))));
 		ImGui.TextUnformatted("Total size (compressed for up/download only):");
 		ImGui.SameLine();
-		ImGui.TextUnformatted(UiSharedService.ByteToString(_cachedAnalysis.Sum<KeyValuePair<ObjectKind, Dictionary<string, CharacterAnalyzer.FileDataEntry>>>((KeyValuePair<ObjectKind, Dictionary<string, CharacterAnalyzer.FileDataEntry>> c) => c.Value.Sum((KeyValuePair<string, CharacterAnalyzer.FileDataEntry> keyValuePair) => keyValuePair.Value.CompressedSize))));
+		ImGui.TextUnformatted(UiSharedService.ByteToString(_cachedAnalysis.Sum<KeyValuePair<ObjectKind, Dictionary<string, CharacterAnalyzer.FileDataEntry>>>((KeyValuePair<ObjectKind, Dictionary<string, CharacterAnalyzer.FileDataEntry>> c) => c.Value.Sum((KeyValuePair<string, CharacterAnalyzer.FileDataEntry> c) => c.Value.CompressedSize))));
 		ImU8String text = new ImU8String(30, 1);
 		text.AppendLiteral("Total modded model triangles: ");
 		text.AppendFormatted(_cachedAnalysis.Sum<KeyValuePair<ObjectKind, Dictionary<string, CharacterAnalyzer.FileDataEntry>>>((KeyValuePair<ObjectKind, Dictionary<string, CharacterAnalyzer.FileDataEntry>> c) => c.Value.Sum((KeyValuePair<string, CharacterAnalyzer.FileDataEntry> f) => f.Value.Triangles)));
@@ -569,7 +569,7 @@ public class DataAnalysisUi : WindowMediatorSubscriberBase
 					{
 						continue;
 					}
-					List<IGrouping<string, CharacterAnalyzer.FileDataEntry>> groupedfiles2 = kvp.Value.Select((KeyValuePair<string, CharacterAnalyzer.FileDataEntry> v) => v.Value).GroupBy<CharacterAnalyzer.FileDataEntry, string>((CharacterAnalyzer.FileDataEntry f) => f.FileType, StringComparer.Ordinal).OrderBy<IGrouping<string, CharacterAnalyzer.FileDataEntry>, string>((IGrouping<string, CharacterAnalyzer.FileDataEntry> k) => k.Key, StringComparer.Ordinal)
+					List<IGrouping<string, CharacterAnalyzer.FileDataEntry>> groupedfiles = kvp.Value.Select((KeyValuePair<string, CharacterAnalyzer.FileDataEntry> v) => v.Value).GroupBy<CharacterAnalyzer.FileDataEntry, string>((CharacterAnalyzer.FileDataEntry f) => f.FileType, StringComparer.Ordinal).OrderBy<IGrouping<string, CharacterAnalyzer.FileDataEntry>, string>((IGrouping<string, CharacterAnalyzer.FileDataEntry> k) => k.Key, StringComparer.Ordinal)
 						.ToList();
 					ImGui.TextUnformatted("Files for " + kvp.Key);
 					ImGui.SameLine();
@@ -581,7 +581,7 @@ public class DataAnalysisUi : WindowMediatorSubscriberBase
 					}
 					if (ImGui.IsItemHovered())
 					{
-						ImGui.SetTooltip(string.Join(Environment.NewLine, groupedfiles2.Select((IGrouping<string, CharacterAnalyzer.FileDataEntry> f) => f.Key + ": " + f.Count() + " files, size: " + UiSharedService.ByteToString(f.Sum((CharacterAnalyzer.FileDataEntry v) => v.OriginalSize)) + ", compressed: " + UiSharedService.ByteToString(f.Sum((CharacterAnalyzer.FileDataEntry v) => v.CompressedSize)))));
+						ImGui.SetTooltip(string.Join(Environment.NewLine, groupedfiles.Select((IGrouping<string, CharacterAnalyzer.FileDataEntry> f) => f.Key + ": " + f.Count() + " files, size: " + UiSharedService.ByteToString(f.Sum((CharacterAnalyzer.FileDataEntry v) => v.OriginalSize)) + ", compressed: " + UiSharedService.ByteToString(f.Sum((CharacterAnalyzer.FileDataEntry v) => v.CompressedSize)))));
 					}
 					text = new ImU8String(15, 1);
 					text.AppendFormatted(kvp.Key);
@@ -596,7 +596,7 @@ public class DataAnalysisUi : WindowMediatorSubscriberBase
 					ImGui.SameLine();
 					ImGui.TextUnformatted(UiSharedService.ByteToString(kvp.Value.Sum((KeyValuePair<string, CharacterAnalyzer.FileDataEntry> c) => c.Value.CompressedSize)));
 					ImGui.Separator();
-					IGrouping<string, CharacterAnalyzer.FileDataEntry> vramUsage = groupedfiles2.SingleOrDefault((IGrouping<string, CharacterAnalyzer.FileDataEntry> v) => string.Equals(v.Key, "tex", StringComparison.Ordinal));
+					IGrouping<string, CharacterAnalyzer.FileDataEntry> vramUsage = groupedfiles.SingleOrDefault((IGrouping<string, CharacterAnalyzer.FileDataEntry> v) => string.Equals(v.Key, "tex", StringComparison.Ordinal));
 					if (vramUsage != null)
 					{
 						long actualVramUsage = vramUsage.Sum((CharacterAnalyzer.FileDataEntry f) => f.OriginalSize);
@@ -656,7 +656,7 @@ public class DataAnalysisUi : WindowMediatorSubscriberBase
 					}
 					using (ImRaii.TabBar("fileTabs"))
 					{
-						foreach (IGrouping<string, CharacterAnalyzer.FileDataEntry> fileGroup in groupedfiles2)
+						foreach (IGrouping<string, CharacterAnalyzer.FileDataEntry> fileGroup in groupedfiles)
 						{
 							string fileGroupText = fileGroup.Key + " [" + fileGroup.Count() + "]";
 							bool requiresCompute = fileGroup.Any((CharacterAnalyzer.FileDataEntry k) => !k.IsComputed);

@@ -48,7 +48,7 @@ public sealed class CharacterAnalyzer : MediatorSubscriberBase, IDisposable
 
 		public Lazy<string> Format;
 
-		public FileDataEntry(string Hash, string FileType, List<string> GamePaths, List<string> FilePaths, long OriginalSize, long CompressedSize, long Triangles)
+		public FileDataEntry(string Hash, string FileType, List<string> GamePaths, List<string> FilePaths, long OriginalSize, long CompressedSize, long Triangles) : base()
 		{
 			this.Hash = Hash;
 			this.FileType = FileType;
@@ -66,7 +66,7 @@ public sealed class CharacterAnalyzer : MediatorSubscriberBase, IDisposable
 						using FileStream input = new FileStream(FilePaths[0], FileMode.Open, FileAccess.Read, FileShare.Read);
 						using BinaryReader binaryReader = new BinaryReader(input);
 						binaryReader.BaseStream.Position = 4L;
-						return ((TexFile.TextureFormat)binaryReader.ReadInt32()/*cast due to .constrained prefix*/).ToString();
+						return ((TexFile.TextureFormat)binaryReader.ReadInt32()).ToString();
 					}
 					catch
 					{
@@ -75,7 +75,7 @@ public sealed class CharacterAnalyzer : MediatorSubscriberBase, IDisposable
 				}
 				return string.Empty;
 			});
-			base._002Ector();
+	
 		}
 
 		public async Task ComputeSizes(FileCacheManager fileCacheManager, CancellationToken token)
@@ -122,6 +122,7 @@ public sealed class CharacterAnalyzer : MediatorSubscriberBase, IDisposable
 
 	internal Dictionary<ObjectKind, Dictionary<string, FileDataEntry>> LastAnalysis { get; } = new Dictionary<ObjectKind, Dictionary<string, FileDataEntry>>();
 
+
 	public CharacterAnalyzer(ILogger<CharacterAnalyzer> logger, MareMediator mediator, FileCacheManager fileCacheManager, XivDataAnalyzer modelAnalyzer)
 		: base(logger, mediator)
 	{
@@ -164,9 +165,9 @@ public sealed class CharacterAnalyzer : MediatorSubscriberBase, IDisposable
 				}
 				_fileCacheManager.WriteOutFullCsv();
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				base.Logger.LogWarning(exception, "Failed to analyze files");
+				base.Logger.LogWarning(ex, "Failed to analyze files");
 			}
 			finally
 			{
@@ -214,9 +215,9 @@ public sealed class CharacterAnalyzer : MediatorSubscriberBase, IDisposable
 					string extension = fi.Extension;
 					ext = extension.Substring(1, extension.Length - 1);
 				}
-				catch (Exception exception)
+				catch (Exception ex)
 				{
-					base.Logger.LogWarning(exception, "Could not identify extension for {path}", filePath);
+					base.Logger.LogWarning(ex, "Could not identify extension for {path}", filePath);
 				}
 				long tris = await _xivDataAnalyzer.GetTrianglesByHash(fileEntry.Hash).ConfigureAwait(continueOnCapturedContext: false);
 				foreach (FileCacheEntity entry in fileCacheEntries)
@@ -259,15 +260,15 @@ public sealed class CharacterAnalyzer : MediatorSubscriberBase, IDisposable
 				base.Logger.LogInformation("  Size: {size}, Compressed: {compressed}", UiSharedService.ByteToString(entry.Value.OriginalSize), UiSharedService.ByteToString(entry.Value.CompressedSize));
 			}
 		}
-		foreach (KeyValuePair<ObjectKind, Dictionary<string, FileDataEntry>> kvp2 in LastAnalysis)
+		foreach (KeyValuePair<ObjectKind, Dictionary<string, FileDataEntry>> kvp in LastAnalysis)
 		{
-			base.Logger.LogInformation("=== Detailed summary by file type for {obj} ===", kvp2.Key);
-			foreach (IGrouping<string, FileDataEntry> entry2 in kvp2.Value.Select((KeyValuePair<string, FileDataEntry> v) => v.Value).GroupBy<FileDataEntry, string>((FileDataEntry v) => v.FileType, StringComparer.Ordinal))
+			base.Logger.LogInformation("=== Detailed summary by file type for {obj} ===", kvp.Key);
+			foreach (IGrouping<string, FileDataEntry> entry in kvp.Value.Select((KeyValuePair<string, FileDataEntry> v) => v.Value).GroupBy<FileDataEntry, string>((FileDataEntry v) => v.FileType, StringComparer.Ordinal))
 			{
-				base.Logger.LogInformation("{ext} files: {count}, size extracted: {size}, size compressed: {sizeComp}", entry2.Key, entry2.Count(), UiSharedService.ByteToString(entry2.Sum((FileDataEntry v) => v.OriginalSize)), UiSharedService.ByteToString(entry2.Sum((FileDataEntry v) => v.CompressedSize)));
+				base.Logger.LogInformation("{ext} files: {count}, size extracted: {size}, size compressed: {sizeComp}", entry.Key, entry.Count(), UiSharedService.ByteToString(entry.Sum((FileDataEntry v) => v.OriginalSize)), UiSharedService.ByteToString(entry.Sum((FileDataEntry v) => v.CompressedSize)));
 			}
-			base.Logger.LogInformation("=== Total summary for {obj} ===", kvp2.Key);
-			base.Logger.LogInformation("Total files: {count}, size extracted: {size}, size compressed: {sizeComp}", kvp2.Value.Count, UiSharedService.ByteToString(kvp2.Value.Sum((KeyValuePair<string, FileDataEntry> v) => v.Value.OriginalSize)), UiSharedService.ByteToString(kvp2.Value.Sum((KeyValuePair<string, FileDataEntry> v) => v.Value.CompressedSize)));
+			base.Logger.LogInformation("=== Total summary for {obj} ===", kvp.Key);
+			base.Logger.LogInformation("Total files: {count}, size extracted: {size}, size compressed: {sizeComp}", kvp.Value.Count, UiSharedService.ByteToString(kvp.Value.Sum((KeyValuePair<string, FileDataEntry> v) => v.Value.OriginalSize)), UiSharedService.ByteToString(kvp.Value.Sum((KeyValuePair<string, FileDataEntry> v) => v.Value.CompressedSize)));
 		}
 		base.Logger.LogInformation("=== Total summary for all currently present objects ===");
 		base.Logger.LogInformation("Total files: {count}, size extracted: {size}, size compressed: {sizeComp}", LastAnalysis.Values.Sum((Dictionary<string, FileDataEntry> v) => v.Values.Count), UiSharedService.ByteToString(LastAnalysis.Values.Sum((Dictionary<string, FileDataEntry> c) => c.Values.Sum((FileDataEntry v) => v.OriginalSize))), UiSharedService.ByteToString(LastAnalysis.Values.Sum((Dictionary<string, FileDataEntry> c) => c.Values.Sum((FileDataEntry v) => v.CompressedSize))));

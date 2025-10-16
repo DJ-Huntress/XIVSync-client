@@ -35,6 +35,7 @@ public class FileDownloadManager : DisposableMediatorSubscriberBase
 
 	public List<DownloadFileTransfer> CurrentDownloads { get; private set; } = new List<DownloadFileTransfer>();
 
+
 	public List<FileTransfer> ForbiddenTransfers => _orchestrator.ForbiddenTransfers;
 
 	public bool IsDownloading => !CurrentDownloads.Any();
@@ -116,7 +117,7 @@ public class FileDownloadManager : DisposableMediatorSubscriberBase
 		{
 			throw new EndOfStreamException();
 		}
-		return (byte)(byteOrEof ^ 0x2A);
+		return (byte)((uint)byteOrEof ^ 0x2Au);
 	}
 
 	private static (string fileHash, long fileLengthBytes) ReadBlockFileHeader(FileStream fileBlockStream)
@@ -191,45 +192,34 @@ public class FileDownloadManager : DisposableMediatorSubscriberBase
 		ThrottledStream stream = null;
 		try
 		{
-			int num;
-			_ = num - 2;
-			_ = 3;
 			try
 			{
 				FileStream fileStream = File.Create(tempPath);
-				ConfiguredAsyncDisposable I_2 = fileStream.ConfigureAwait(continueOnCapturedContext: false);
-				try
-				{
-					int bufferSize = ((response.Content.Headers.ContentLength > 1048576) ? 65536 : 8196);
-					byte[] buffer = new byte[bufferSize];
-					long limit = _orchestrator.DownloadLimitPerSlot();
-					base.Logger.LogTrace("Starting Download of {id} with a speed limit of {limit} to {tempPath}", requestId, limit, tempPath);
-					stream = new ThrottledStream(await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(continueOnCapturedContext: false), limit);
-					_activeDownloadStreams.Add(stream);
-					while (true)
-					{
-						int num2;
-						int bytesRead = (num2 = await stream.ReadAsync(buffer, ct).ConfigureAwait(continueOnCapturedContext: false));
-						if (num2 <= 0)
-						{
-							break;
-						}
-						ct.ThrowIfCancellationRequested();
-						MungeBuffer(buffer.AsSpan(0, bytesRead));
-						await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), ct).ConfigureAwait(continueOnCapturedContext: false);
-						progress.Report(bytesRead);
-					}
-					base.Logger.LogDebug("{requestUrl} downloaded to {tempPath}", requestUrl, tempPath);
-				}
-				finally
-				{
-					IAsyncDisposable asyncDisposable = I_2 as IAsyncDisposable;
-					if (asyncDisposable != null)
-					{
-						await asyncDisposable.DisposeAsync();
-					}
-				}
-			}
+				ConfiguredAsyncDisposable configuredAsyncDisposable = fileStream.ConfigureAwait(continueOnCapturedContext: false);
+                await using (fileStream.ConfigureAwait(false))
+                {
+                    var bufferSize = response.Content.Headers.ContentLength > 1024 * 1024 ? 65536 : 8196;
+                    var buffer = new byte[bufferSize];
+
+                    var bytesRead = 0;
+                    var limit = _orchestrator.DownloadLimitPerSlot();
+                    Logger.LogTrace("Starting Download of {id} with a speed limit of {limit} to {tempPath}", requestId, limit, tempPath);
+                    stream = new ThrottledStream(await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false), limit);
+                    _activeDownloadStreams.Add(stream);
+                    while ((bytesRead = await stream.ReadAsync(buffer, ct).ConfigureAwait(false)) > 0)
+                    {
+                        ct.ThrowIfCancellationRequested();
+
+                        MungeBuffer(buffer.AsSpan(0, bytesRead));
+
+                        await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), ct).ConfigureAwait(false);
+
+                        progress.Report(bytesRead);
+                    }
+
+                    Logger.LogDebug("{requestUrl} downloaded to {tempPath}", requestUrl, tempPath);
+                }
+            }
 			catch (OperationCanceledException)
 			{
 				throw;
@@ -325,9 +315,9 @@ public class FileDownloadManager : DisposableMediatorSubscriberBase
 							value.TransferredBytes += bytesDownloaded;
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception exception)
 					{
-						base.Logger.LogWarning(exception4, "Could not set download progress");
+						base.Logger.LogWarning(exception, "Could not set download progress");
 					}
 				});
 				await DownloadAndMungeFileHttpClient(fileGroup.Key, requestId, fileGroup.ToList(), blockFile, progress, token).ConfigureAwait(continueOnCapturedContext: false);
@@ -336,11 +326,11 @@ public class FileDownloadManager : DisposableMediatorSubscriberBase
 			{
 				base.Logger.LogDebug("{dlName}: Detected cancellation of download, partially extracting files for {id}", fi.Name, gameObjectHandler);
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
 				_orchestrator.ReleaseDownloadSlot();
 				File.Delete(blockFile);
-				base.Logger.LogError(exception, "{dlName}: Error during download of {id}", fi.Name, requestId);
+				base.Logger.LogError(ex, "{dlName}: Error during download of {id}", fi.Name, requestId);
 				ClearDownload();
 				return;
 			}
@@ -380,9 +370,9 @@ public class FileDownloadManager : DisposableMediatorSubscriberBase
 						{
 							base.Logger.LogWarning("{dlName}: Failure to extract file {fileHash}, stream ended prematurely", fi.Name, fileHash);
 						}
-						catch (Exception exception2)
+						catch (Exception e)
 						{
-							base.Logger.LogWarning(exception2, "{dlName}: Error during decompression", fi.Name);
+							base.Logger.LogWarning(e, "{dlName}: Error during decompression", fi.Name);
 						}
 					}
 				}
@@ -390,9 +380,9 @@ public class FileDownloadManager : DisposableMediatorSubscriberBase
 				{
 					base.Logger.LogDebug("{dlName}: Failure to extract file header data, stream ended", fi.Name);
 				}
-				catch (Exception exception3)
+				catch (Exception ex)
 				{
-					base.Logger.LogError(exception3, "{dlName}: Error during block file read", fi.Name);
+					base.Logger.LogError(ex, "{dlName}: Error during block file read", fi.Name);
 				}
 			}
 			finally
@@ -436,9 +426,9 @@ public class FileDownloadManager : DisposableMediatorSubscriberBase
 				_fileDbManager.RemoveHashedFile(entry.Hash, entry.PrefixedFilePath);
 			}
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			base.Logger.LogWarning(exception, "Error creating cache entry");
+			base.Logger.LogWarning(ex, "Error creating cache entry");
 		}
 		static Func<DateTime> RandomDayInThePast()
 		{

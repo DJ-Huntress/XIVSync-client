@@ -56,6 +56,7 @@ public sealed class CharaDataNearbyManager : DisposableMediatorSubscriberBase
 
 	public string UserNoteFilter { get; set; } = string.Empty;
 
+
 	public CharaDataNearbyManager(ILogger<CharaDataNearbyManager> logger, MareMediator mediator, DalamudUtilService dalamudUtilService, VfxSpawnManager vfxSpawnManager, ServerConfigurationManager serverConfigurationManager, CharaDataConfigService charaDataConfigService)
 		: base(logger, mediator)
 	{
@@ -123,10 +124,10 @@ public sealed class CharaDataNearbyManager : DisposableMediatorSubscriberBase
 		else if (hoveredPose != _hoveredVfx.Value.Pose)
 		{
 			_vfxSpawnManager.DespawnObject(_hoveredVfx.Value.VfxId);
-			Guid? vfxGuid2 = _vfxSpawnManager.SpawnObject(hoveredPose.Position, hoveredPose.Rotation, Vector3.One * 4f, 1f, 0.2f, 0.2f, 1f);
-			if (vfxGuid2.HasValue)
+			Guid? vfxGuid = _vfxSpawnManager.SpawnObject(hoveredPose.Position, hoveredPose.Rotation, Vector3.One * 4f, 1f, 0.2f, 0.2f, 1f);
+			if (vfxGuid.HasValue)
 			{
-				_hoveredVfx = (vfxGuid2.Value, hoveredPose);
+				_hoveredVfx = (vfxGuid.Value, hoveredPose);
 			}
 		}
 	}
@@ -185,8 +186,8 @@ public sealed class CharaDataNearbyManager : DisposableMediatorSubscriberBase
 	{
 		List<PoseEntryExtended> previousPoses = _nearbyData.Keys.ToList();
 		_nearbyData.Clear();
-		LocationInfo ownLocation = await _dalamudUtilService.RunOnFrameworkThread(() => _dalamudUtilService.GetMapData(), "FilterEntriesAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataNearbyManager.cs", 189).ConfigureAwait(continueOnCapturedContext: false);
-		IPlayerCharacter obj = await _dalamudUtilService.RunOnFrameworkThread(() => _dalamudUtilService.GetPlayerCharacter(), "FilterEntriesAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataNearbyManager.cs", 190).ConfigureAwait(continueOnCapturedContext: false);
+		LocationInfo ownLocation = await _dalamudUtilService.RunOnFrameworkThread(() => _dalamudUtilService.GetMapData(), "FilterEntriesAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataNearbyManager.cs", 189).ConfigureAwait(continueOnCapturedContext: false);
+		IPlayerCharacter obj = await _dalamudUtilService.RunOnFrameworkThread(() => _dalamudUtilService.GetPlayerCharacter(), "FilterEntriesAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataNearbyManager.cs", 190).ConfigureAwait(continueOnCapturedContext: false);
 		RowRef<Lumina.Excel.Sheets.World> currentServer = obj.CurrentWorld;
 		Vector3 playerPos = obj.Position;
 		float cameraYaw = GetCameraYaw(cameraPos, cameraLookAt);
@@ -217,7 +218,7 @@ public sealed class CharaDataNearbyManager : DisposableMediatorSubscriberBase
 			await _dalamudUtilService.RunOnFrameworkThread(delegate
 			{
 				ManageWispsNearby(previousPoses);
-			}, "FilterEntriesAsync", "\\\\wsl.localhost\\Ubuntu\\home\\ddev\\xivsync\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataNearbyManager.cs", 240).ConfigureAwait(continueOnCapturedContext: false);
+			}, "FilterEntriesAsync", "C:\\Users\\Owner\\sync_client2\\XIVSync\\Services\\CharaData\\CharaDataNearbyManager.cs", 240).ConfigureAwait(continueOnCapturedContext: false);
 		}
 	}
 
@@ -266,9 +267,9 @@ public sealed class CharaDataNearbyManager : DisposableMediatorSubscriberBase
 				}
 			}
 		}
-		foreach (PoseEntryExtended data2 in previousPoses.Except(_nearbyData.Keys))
+		foreach (PoseEntryExtended data in previousPoses.Except(_nearbyData.Keys))
 		{
-			if (_poseVfx.Remove(data2, out var guid))
+			if (_poseVfx.Remove(data, out var guid))
 			{
 				_vfxSpawnManager.DespawnObject(guid);
 			}

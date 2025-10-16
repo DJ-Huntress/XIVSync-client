@@ -44,7 +44,7 @@ public sealed class Plugin : IDalamudPlugin, IDisposable
 {
 	private readonly IHost _host;
 
-	public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commandManager, IDataManager gameData, IFramework framework, IObjectTable objectTable, IClientState clientState, ICondition condition, IChatGui chatGui, IGameGui gameGui, IDtrBar dtrBar, IPluginLog pluginLog, ITargetManager targetManager, INotificationManager notificationManager, ITextureProvider textureProvider, IContextMenu contextMenu, IGameInteropProvider gameInteropProvider, IGameConfig gameConfig, ISigScanner sigScanner)
+	public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commandManager, IDataManager gameData, IFramework framework, IObjectTable objectTable, IClientState clientState, ICondition condition, IChatGui chatGui, IGameGui gameGui, IDtrBar dtrBar, IPluginLog pluginLog, ITargetManager targetManager, INotificationManager notificationManager, ITextureProvider textureProvider, IContextMenu contextMenu, IGameInteropProvider gameInteropProvider, IGameConfig gameConfig, ISigScanner sigScanner) : base()
 	{
 		if (!Directory.Exists(pluginInterface.ConfigDirectory.FullName))
 		{
@@ -153,6 +153,7 @@ public sealed class Plugin : IDalamudPlugin, IDisposable
 				return httpClient;
 			});
 			collection.AddSingleton((IServiceProvider s) => new MareConfigService(pluginInterface.ConfigDirectory.FullName));
+			collection.AddSingleton((IServiceProvider s) => new ThemeManager(s.GetRequiredService<MareConfigService>()));
 			collection.AddSingleton((IServiceProvider s) => new ServerConfigService(pluginInterface.ConfigDirectory.FullName));
 			collection.AddSingleton((IServiceProvider s) => new NotesConfigService(pluginInterface.ConfigDirectory.FullName));
 			collection.AddSingleton((IServiceProvider s) => new ServerTagConfigService(pluginInterface.ConfigDirectory.FullName));

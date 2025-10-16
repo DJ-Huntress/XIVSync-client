@@ -62,6 +62,7 @@ public class ModernTheme
 
 	public float BackgroundOpacity { get; set; } = 0.4f;
 
+
 	public Vector4 Surface0 { get; set; }
 
 	public Vector4 Surface1 { get; set; }
@@ -76,13 +77,18 @@ public class ModernTheme
 
 	public Vector4 TextPrimary { get; set; } = new Vector4(0.914f, 0.929f, 0.945f, 1f);
 
+
 	public Vector4 TextMuted { get; set; } = new Vector4(0.604f, 0.639f, 0.678f, 1f);
+
 
 	public Vector4 TextMuted2 { get; set; } = new Vector4(0.42f, 0.459f, 0.502f, 1f);
 
+
 	public Vector4 Accent { get; set; } = new Vector4(0.29f, 0.424f, 0.969f, 1f);
 
+
 	public Vector4 Accent2 { get; set; } = new Vector4(0.608f, 0.694f, 1f, 1f);
+
 
 	public Vector4 StatusOk => new Vector4(0.212f, 0.773f, 0.416f, 1f);
 
@@ -110,7 +116,9 @@ public class ModernTheme
 
 	public string Name { get; set; } = "Default";
 
+
 	public string DisplayName { get; set; } = "Default Blue";
+
 
 	public void UpdateSurfaceOpacity()
 	{

@@ -42,8 +42,7 @@ public sealed class CacheCreationService : DisposableMediatorSubscriberBase
 
 	private bool _isZoning;
 
-	public CacheCreationService(ILogger<CacheCreationService> logger, MareMediator mediator, GameObjectHandlerFactory gameObjectHandlerFactory, PlayerDataFactory characterDataFactory, DalamudUtilService dalamudUtil, MareConfigService mareConfigService)
-		: base(logger, mediator)
+	public CacheCreationService(ILogger<CacheCreationService> logger, MareMediator mediator, GameObjectHandlerFactory gameObjectHandlerFactory, PlayerDataFactory characterDataFactory, DalamudUtilService dalamudUtil, MareConfigService mareConfigService) : base(logger, mediator)
 	{
 		CacheCreationService cacheCreationService = this;
 		_characterDataFactory = characterDataFactory;
@@ -95,8 +94,9 @@ public sealed class CacheCreationService : DisposableMediatorSubscriberBase
 			{
 				return;
 			}
-			foreach (ObjectKind current in from k in cacheCreationService._playerRelatedObjects
-				where !msg.Address.HasValue || k.Value.Address == msg.Address
+			foreach (ObjectKind current in from item in cacheCreationService._playerRelatedObjects
+				where !msg.Address.HasValue || item.Value.Address == msg.Address
+				select item into k
 				select k.Key)
 			{
 				cacheCreationService.Logger.LogDebug("Received CustomizePlus change, updating {obj}", current);
@@ -115,11 +115,11 @@ public sealed class CacheCreationService : DisposableMediatorSubscriberBase
 		{
 			if (!cacheCreationService._isZoning)
 			{
-				KeyValuePair<ObjectKind, GameObjectHandler> keyValuePair = cacheCreationService._playerRelatedObjects.FirstOrDefault<KeyValuePair<ObjectKind, GameObjectHandler>>((KeyValuePair<ObjectKind, GameObjectHandler> f) => f.Value.Address == msg.Address);
-				if (!default(KeyValuePair<ObjectKind, GameObjectHandler>).Equals(keyValuePair))
+				KeyValuePair<ObjectKind, GameObjectHandler> keyValuePair2 = cacheCreationService._playerRelatedObjects.FirstOrDefault<KeyValuePair<ObjectKind, GameObjectHandler>>((KeyValuePair<ObjectKind, GameObjectHandler> f) => f.Value.Address == msg.Address);
+				if (!default(KeyValuePair<ObjectKind, GameObjectHandler>).Equals(keyValuePair2))
 				{
-					cacheCreationService.Logger.LogDebug("Received GlamourerChangedMessage for {kind}", keyValuePair);
-					cacheCreationService.AddCacheToCreate(keyValuePair.Key);
+					cacheCreationService.Logger.LogDebug("Received GlamourerChangedMessage for {kind}", keyValuePair2);
+					cacheCreationService.AddCacheToCreate(keyValuePair2.Key);
 				}
 			}
 		});
@@ -258,9 +258,9 @@ public sealed class CacheCreationService : DisposableMediatorSubscriberBase
 			{
 				base.Logger.LogDebug("Cache Creation cancelled");
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
-				base.Logger.LogCritical(exception, "Error during Cache Creation Processing");
+				base.Logger.LogCritical(ex, "Error during Cache Creation Processing");
 			}
 			finally
 			{

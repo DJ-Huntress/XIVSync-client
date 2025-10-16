@@ -246,9 +246,9 @@ public class ServerConfigurationManager
 		{
 			return handler.ReadJwtToken(server.OAuthToken).Claims.First((Claim f) => string.Equals(f.Type, "discord_user", StringComparison.Ordinal)).Value;
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Could not read jwt, resetting it");
+			_logger.LogWarning(ex, "Could not read jwt, resetting it");
 			server.OAuthToken = null;
 			Save();
 			return string.Empty;
@@ -566,9 +566,9 @@ public class ServerConfigurationManager
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 			return (await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(await (await _httpClient.GetAsync(oauthCheckUri).ConfigureAwait(continueOnCapturedContext: false)).Content.ReadAsStreamAsync().ConfigureAwait(continueOnCapturedContext: false)).ConfigureAwait(continueOnCapturedContext: false)) ?? new Dictionary<string, string>();
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Failure getting UIDs");
+			_logger.LogWarning(ex, "Failure getting UIDs");
 			return new Dictionary<string, string>();
 		}
 	}
@@ -580,9 +580,9 @@ public class ServerConfigurationManager
 			Uri oauthCheckUri = MareAuth.GetDiscordOAuthEndpointFullPath(new Uri(serverUri.Replace("wss://", "https://").Replace("ws://", "http://")));
 			return await _httpClient.GetFromJsonAsync<Uri>(oauthCheckUri).ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Failure checking for Discord Auth");
+			_logger.LogWarning(ex, "Failure checking for Discord Auth");
 			return null;
 		}
 	}
@@ -601,9 +601,9 @@ public class ServerConfigurationManager
 			Uri oauthCheckUri = MareAuth.GetDiscordOAuthTokenFullPath(new Uri(serverUri.Replace("wss://", "https://").Replace("ws://", "http://")), sessionId);
 			discordToken = await (await _httpClient.GetAsync(oauthCheckUri, linkedCts.Token).ConfigureAwait(continueOnCapturedContext: false)).Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
 		}
-		catch (Exception exception)
+		catch (Exception ex)
 		{
-			_logger.LogWarning(exception, "Failure getting Discord Token");
+			_logger.LogWarning(ex, "Failure getting Discord Token");
 			return null;
 		}
 		if (discordToken == null)
